@@ -1,7 +1,7 @@
 package com.example.benefits.controller;
 
-import com.example.benefits.entity.User;
-import com.example.benefits.service.UserService;
+import com.example.benefits.entity.Admin;
+import com.example.benefits.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,12 +11,15 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminController {
     @Autowired
-    private UserService userService;
+    private AdminService adminService;
 
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @PostMapping("/login")
+    public Admin createAdmin(@RequestBody Admin admin) {
+        return adminService.saveAdmin(admin);
     }
 
-    // Add endpoints for creating questions and benefits
+    @GetMapping("/users")
+    public List<Admin> getAllAdmins() {
+        return adminService.getAllAdmins();
+    }
 }

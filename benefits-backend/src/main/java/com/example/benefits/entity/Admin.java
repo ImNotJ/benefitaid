@@ -6,13 +6,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Question {
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String questionName;
-    private String questionType;
-    private String questionText;
+    private String username;
+    private String password;
 
     // Getters and Setters
 }
