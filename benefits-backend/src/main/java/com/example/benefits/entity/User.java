@@ -1,6 +1,8 @@
 package com.example.benefits.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.Map;
 
 @Entity
@@ -8,6 +10,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Email
+    @NotBlank
     private String email;
 
     @ElementCollection

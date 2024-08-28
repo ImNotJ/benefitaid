@@ -5,6 +5,7 @@ import com.example.benefits.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -14,7 +15,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         return userService.saveUser(user);
     }
 
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    public User updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         user.setId(id);
         return userService.saveUser(user);
     }
