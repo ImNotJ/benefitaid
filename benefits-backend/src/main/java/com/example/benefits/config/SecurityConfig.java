@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.benefits.filter.RateLimitingFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
