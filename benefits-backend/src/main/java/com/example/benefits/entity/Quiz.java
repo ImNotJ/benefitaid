@@ -26,4 +26,36 @@ public class Quiz {
     private Benefit benefit;
 
     // Getters and Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getQuizName() {
+        return quizName;
+    }
+
+    public void setQuizName(String quizName) {
+        this.quizName = quizName;
+    }
+
+    public Set<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(Set<Question> questions) {
+        this.questions = questions;
+    }
+
+    public Benefit getBenefit() {
+        return benefit;
+    }
+
+    public void setBenefit(Benefit benefit) {
+        this.benefit = benefit;
+    }
 }
