@@ -16,7 +16,15 @@ public class BenefitService {
         return benefitRepository.save(benefit);
     }
 
+    public Benefit getBenefitById(Long id) {
+        return benefitRepository.findById(id).orElse(null);
+    }
+
     public List<Benefit> getAllBenefits() {
         return benefitRepository.findAll();
+    }
+
+    public void deleteBenefitById(Long id) {
+        benefitRepository.deleteById(id);
     }
 }

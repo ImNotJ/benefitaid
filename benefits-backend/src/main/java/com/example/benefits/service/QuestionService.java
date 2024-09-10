@@ -16,7 +16,15 @@ public class QuestionService {
         return questionRepository.save(question);
     }
 
+    public Question getQuestionById(Long id) {
+        return questionRepository.findById(id).orElse(null);
+    }
+
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
+    }
+
+    public void deleteQuestionById(Long id) {
+        questionRepository.deleteById(id);
     }
 }

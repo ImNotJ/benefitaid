@@ -21,7 +21,15 @@ public class AdminService {
         return adminRepository.save(admin);
     }
 
+    public Admin getAdminById(Long id) {
+        return adminRepository.findById(id).orElse(null);
+    }
+
     public List<Admin> getAllAdmins() {
         return adminRepository.findAll();
+    }
+
+    public void deleteAdminById(Long id) {
+        adminRepository.deleteById(id);
     }
 }

@@ -9,7 +9,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-data")
+@RequestMapping("/api/users")
 public class UserController {
     @Autowired
     private UserService userService;
