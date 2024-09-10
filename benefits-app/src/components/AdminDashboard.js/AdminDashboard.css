@@ -1,0 +1,12 @@
+.admin-dashboard {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .admin-dashboard .links {
+    margin-top: 20px;
+  }
+  
+  .admin-dashboard .btn {
+    margin: 10px;
+  }

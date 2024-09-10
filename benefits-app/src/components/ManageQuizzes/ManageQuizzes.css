@@ -1,0 +1,38 @@
+.manage-quizzes {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .manage-quizzes h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .manage-quizzes .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .manage-quizzes .form-control {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+  }
+  
+  .manage-quizzes .btn {
+    margin-top: 10px;
+  }
+  
+  .manage-quizzes .quiz-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .manage-quizzes .quiz-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+  }
