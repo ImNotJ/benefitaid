@@ -1,14 +1,16 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import App from './App';
+import HomePage from './HomePage';
 
-test('renders App component', () => {
+test('renders HomePage component', () => {
   const { getByText } = render(
     <Router>
-      <App />
+      <HomePage />
     </Router>
   );
 
   expect(getByText('Welcome to the Benefits Eligibility Service')).toBeInTheDocument();
+  expect(getByText('Take a Quiz')).toBeInTheDocument();
+  expect(getByText('Admin Login')).toBeInTheDocument();
 });
