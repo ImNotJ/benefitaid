@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage/HomePage';
 import AdminLogin from './components/AdminLogin/AdminLogin';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
@@ -10,17 +10,15 @@ import UserForm from './components/UserForm/UserForm';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/manage-questions" element={<ManageQuestions />} />
-        <Route path="/manage-benefits" element={<ManageBenefits />} />
-        <Route path="/manage-quizzes" element={<ManageQuizzes />} />
-        <Route path="/user-form" element={<UserForm />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/manage-questions" element={<ManageQuestions />} />
+      <Route path="/manage-benefits" element={<ManageBenefits />} />
+      <Route path="/manage-quizzes" element={<ManageQuizzes />} />
+      <Route path="/user-form" element={<UserForm />} />
+    </Routes>
   );
 }
 
