@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,14 +36,17 @@ public class BenefitControllerTest {
     public void testCreateBenefit() throws Exception {
         Benefit benefit = new Benefit();
         benefit.setBenefitName("Test Benefit");
+        benefit.setBenefitUrl("http://test-url.com"); // Add this field
 
         when(benefitService.saveBenefit(any(Benefit.class))).thenReturn(benefit);
 
         mockMvc.perform(post("/api/benefits")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"benefitName\":\"Test Benefit\"}"))
+                .content("{\"benefitName\":\"Test Benefit\", \"benefitUrl\":\"http://test-url.com\"}")) // Add this
+                                                                                                        // field
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.benefitName").value("Test Benefit"));
+                .andExpect(jsonPath("$.benefitName").value("Test Benefit"))
+                .andExpect(jsonPath("$.benefitUrl").value("http://test-url.com")); // Add this check
 
         verify(benefitService, times(1)).saveBenefit(any(Benefit.class));
     }

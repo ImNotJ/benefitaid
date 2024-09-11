@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,14 +36,21 @@ public class QuestionControllerTest {
     public void testCreateQuestion() throws Exception {
         Question question = new Question();
         question.setQuestionName("Test Question");
+        question.setQuestionType("Multiple Choice"); // Add this field
+        question.setQuestionText("What is your favorite color?"); // Add this field
 
         when(questionService.saveQuestion(any(Question.class))).thenReturn(question);
 
         mockMvc.perform(post("/api/questions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"questionName\":\"Test Question\"}"))
+                .content(
+                        "{\"questionName\":\"Test Question\", \"questionType\":\"Multiple Choice\", \"questionText\":\"What is your favorite color?\"}")) // Add
+                                                                                                                                                          // these
+                                                                                                                                                          // fields
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.questionName").value("Test Question"));
+                .andExpect(jsonPath("$.questionName").value("Test Question"))
+                .andExpect(jsonPath("$.questionType").value("Multiple Choice")) // Add this check
+                .andExpect(jsonPath("$.questionText").value("What is your favorite color?")); // Add this check
 
         verify(questionService, times(1)).saveQuestion(any(Question.class));
     }
