@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
 import axios from 'axios';
 
@@ -7,7 +7,7 @@ function AdminLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -15,7 +15,7 @@ function AdminLogin() {
       const response = await axios.post('/api/admins/login', { username, password });
       // Assuming the response contains a token
       localStorage.setItem('token', response.data.token);
-      history.push('/admin-dashboard');
+      navigate('/admin-dashboard');
     } catch (err) {
       setError('Invalid username or password');
     }
