@@ -2,6 +2,7 @@ package com.example.benefits.controller;
 
 import com.example.benefits.entity.Admin;
 import com.example.benefits.service.AdminService;
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ import java.util.logging.Logger;
 public class AdminController {
 
     private static final Logger logger = Logger.getLogger(AdminController.class.getName());
-    private static final String SECRET_KEY = "your_secret_key"; // Replace with a secure key
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
 
     @Autowired
     private AdminService adminService;

@@ -1,4 +1,3 @@
-// src/axiosConfig.js
 import axios from 'axios';
 
 const instance = axios.create({
@@ -8,9 +7,13 @@ const instance = axios.create({
 // Add a request interceptor to include the token in the headers
 instance.interceptors.request.use(
   (config) => {
-    const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    const cookies = document.cookie.split('; ');
+    const tokenCookie = cookies.find(row => row.startsWith('token='));
+    if (tokenCookie) {
+      const token = tokenCookie.split('=')[1];
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
     return config;
   },

@@ -13,11 +13,14 @@ function AdminLogin() {
     e.preventDefault();
     try {
       const response = await axios.post('/api/admins/login', { username, password });
+      console.log('Login response:', response); // Debug log
       // Assuming the response contains a token and role
       document.cookie = `token=${response.data.token}; HttpOnly; Secure; SameSite=Strict`;
+      console.log('Cookies after login:', document.cookie); // Debug log
       localStorage.setItem('role', response.data.role);
       navigate('/admin-dashboard');
     } catch (err) {
+      console.error('Login error:', err); // Debug log
       setError('Invalid username or password');
     }
   };
