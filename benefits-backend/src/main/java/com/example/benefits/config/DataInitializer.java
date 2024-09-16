@@ -19,10 +19,17 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
-        if (adminRepository.findByUsername("rootadmin") == null) {
+        String rootAdminUsername = System.getenv("ROOT_ADMIN_USERNAME");
+        String rootAdminPassword = System.getenv("ROOT_ADMIN_PASSWORD");
+
+        if (rootAdminUsername == null || rootAdminPassword == null) {
+            throw new IllegalStateException("Root admin credentials are not set in environment variables");
+        }
+
+        if (adminRepository.findByUsername(rootAdminUsername) == null) {
             Admin rootAdmin = new Admin();
-            rootAdmin.setUsername("rootadmin");
-            rootAdmin.setPassword(passwordEncoder.encode("rootpassword"));
+            rootAdmin.setUsername(rootAdminUsername);
+            rootAdmin.setPassword(passwordEncoder.encode(rootAdminPassword));
             rootAdmin.setRole("ROLE_ROOT_ADMIN");
             adminRepository.save(rootAdmin);
         }

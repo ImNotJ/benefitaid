@@ -17,7 +17,10 @@ public class AdminService {
     private BCryptPasswordEncoder passwordEncoder;
 
     public Admin saveAdmin(Admin admin) {
-        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        if (!admin.getPassword().startsWith("$2a$")) { // Check if the password is already hashed
+            admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        }
+        validateRole(admin.getRole());
         return adminRepository.save(admin);
     }
 
@@ -35,5 +38,11 @@ public class AdminService {
 
     public Admin findByUsername(String username) {
         return adminRepository.findByUsername(username);
+    }
+
+    private void validateRole(String role) {
+        if (!role.equals("ROLE_ROOT_ADMIN") && !role.equals("ROLE_ADMIN")) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
     }
 }

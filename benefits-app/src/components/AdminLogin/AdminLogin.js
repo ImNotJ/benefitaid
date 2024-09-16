@@ -14,7 +14,7 @@ function AdminLogin() {
     try {
       const response = await axios.post('/api/admins/login', { username, password });
       // Assuming the response contains a token and role
-      localStorage.setItem('token', response.data.token);
+      document.cookie = `token=${response.data.token}; HttpOnly; Secure; SameSite=Strict`;
       localStorage.setItem('role', response.data.role);
       navigate('/admin-dashboard');
     } catch (err) {

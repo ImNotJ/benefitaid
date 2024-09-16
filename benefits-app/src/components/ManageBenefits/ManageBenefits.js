@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../utils/axiosConfig';
 import './ManageBenefits.css';
 
 function ManageBenefits() {
@@ -15,25 +15,37 @@ function ManageBenefits() {
   }, []);
 
   const fetchBenefits = async () => {
-    const response = await axios.get('/api/benefits');
-    setBenefits(response.data);
+    try {
+      const response = await axios.get('/api/benefits');
+      setBenefits(response.data);
+    } catch (error) {
+      console.error('Error fetching benefits:', error);
+    }
   };
 
   const handleAddBenefit = async (e) => {
     e.preventDefault();
     const newBenefit = { benefitName, federal, state: federal ? null : state, benefitUrl, benefitRequirements: JSON.parse(benefitRequirements) };
-    await axios.post('/api/benefits', newBenefit);
-    fetchBenefits();
-    setBenefitName('');
-    setFederal(false);
-    setState('');
-    setBenefitUrl('');
-    setBenefitRequirements('');
+    try {
+      await axios.post('/api/benefits', newBenefit);
+      fetchBenefits();
+      setBenefitName('');
+      setFederal(false);
+      setState('');
+      setBenefitUrl('');
+      setBenefitRequirements('');
+    } catch (error) {
+      console.error('Error adding benefit:', error);
+    }
   };
 
   const handleDeleteBenefit = async (id) => {
-    await axios.delete(`/api/benefits/${id}`);
-    fetchBenefits();
+    try {
+      await axios.delete(`/api/benefits/${id}`);
+      fetchBenefits();
+    } catch (error) {
+      console.error('Error deleting benefit:', error);
+    }
   };
 
   return (
