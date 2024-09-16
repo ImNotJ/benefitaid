@@ -45,10 +45,11 @@
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
 
-        <!-- MySQL Driver (or PostgreSQL Driver) -->
+        <!-- MySQL Driver -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.30</version> <!-- Latest stable version -->
             <scope>runtime</scope>
         </dependency>
 
@@ -89,20 +90,14 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.0.Final</version> <!-- Updated version -->
+            <version>6.2.5.Final</version> <!-- Latest stable version -->
         </dependency>
 
         <!-- Optional: JSR 305 annotations for @NonNull, etc. -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
+            <version>3.0.2</version> <!-- Latest stable version -->
         </dependency>
     </dependencies>
 

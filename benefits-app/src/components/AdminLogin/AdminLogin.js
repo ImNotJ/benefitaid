@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
+import axios from '../../utils/axiosConfig'; // Import the configured Axios instance
 
 function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -10,11 +11,13 @@ function AdminLogin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Temporary login logic
-    if (username === 'admin' && password === 'password') {
-      localStorage.setItem('token', 'fake-token'); // Mock token
+    try {
+      const response = await axios.post('/api/admins/login', { username, password });
+      // Assuming the response contains a token and role
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('role', response.data.role);
       navigate('/admin-dashboard');
-    } else {
+    } catch (err) {
       setError('Invalid username or password');
     }
   };

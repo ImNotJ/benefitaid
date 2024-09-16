@@ -18,6 +18,9 @@ public class Admin {
     @NotBlank
     private String password; // Store hashed password
 
+    @NotBlank
+    private String role; // ROLE_ROOT_ADMIN or ROLE_ADMIN
+
     // Getters and Setters
 
     public Long getId() {
@@ -42,5 +45,13 @@ public class Admin {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
