@@ -7,13 +7,9 @@ const instance = axios.create({
 // Add a request interceptor to include the token in the headers
 instance.interceptors.request.use(
   (config) => {
-    const cookies = document.cookie.split('; ');
-    const tokenCookie = cookies.find(row => row.startsWith('token='));
-    if (tokenCookie) {
-      const token = tokenCookie.split('=')[1];
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },

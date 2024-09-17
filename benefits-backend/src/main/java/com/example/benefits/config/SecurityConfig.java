@@ -26,11 +26,12 @@ public class SecurityConfig {
                 authorizeRequests
                     .antMatchers("/api/admins/login").permitAll() // Allow unauthenticated access to login
                     .antMatchers("/api/admins/**").hasRole("ADMIN")
+                    .antMatchers("/api/questions/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Allow access to questions for ADMIN and ROOT_ADMIN roles
                     .antMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringAntMatchers("/api/admins/login") // Disable CSRF protection for login endpoint
+                .ignoringAntMatchers("/api/admins/login", "/api/questions/**") // Disable CSRF protection for login and questions endpoints
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

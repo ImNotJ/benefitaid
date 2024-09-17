@@ -1,5 +1,6 @@
 package com.example.benefits.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,12 +18,15 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
+        System.out.println("Request URI: " + path); // Debug log
+
         if ("/api/admins/login".equals(path)) {
             chain.doFilter(request, response);
             return;
@@ -34,25 +38,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             token = header.substring(7);
         }
 
+        System.out.println("Token: " + token); // Debug log
+
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(token)
-                    .getBody();
+            try {
+                Claims claims = Jwts.parser()
+                        .setSigningKey(SECRET_KEY)
+                        .parseClaimsJws(token)
+                        .getBody();
 
-            String username = claims.getSubject();
-            String role = claims.get("role", String.class);
+                String username = claims.getSubject();
+                String role = claims.get("role", String.class);
+                System.out.println("Parsed role from JWT: " + role); // Debug log
 
-            UserDetails userDetails = User.withUsername(username)
-                    .password("") // No password needed for JWT authentication
-                    .authorities(role)
-                    .build();
+                UserDetails userDetails = User.withUsername(username)
+                        .password("") // No password needed for JWT authentication
+                        .authorities(role)
+                        .build();
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                System.out.println("JWT parsing error: " + e.getMessage()); // Debug log
+            }
         }
 
         chain.doFilter(request, response);

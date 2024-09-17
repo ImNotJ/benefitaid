@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../utils/axiosConfig';
 import './ManageQuestions.css';
 
 function ManageQuestions() {
@@ -13,23 +13,38 @@ function ManageQuestions() {
   }, []);
 
   const fetchQuestions = async () => {
-    const response = await axios.get('/api/questions');
-    setQuestions(response.data);
+    try {
+      const response = await axios.get('/api/questions');
+      console.log('Fetch questions response:', response); // Debug log
+      setQuestions(response.data);
+    } catch (error) {
+      console.error('Fetch questions error:', error); // Debug log
+    }
   };
 
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     const newQuestion = { questionName, questionType, questionText };
-    await axios.post('/api/questions', newQuestion);
-    fetchQuestions();
-    setQuestionName('');
-    setQuestionType('');
-    setQuestionText('');
+    try {
+      const response = await axios.post('/api/questions', newQuestion);
+      console.log('Add question response:', response); // Debug log
+      fetchQuestions();
+      setQuestionName('');
+      setQuestionType('');
+      setQuestionText('');
+    } catch (error) {
+      console.error('Add question error:', error); // Debug log
+    }
   };
 
   const handleDeleteQuestion = async (id) => {
-    await axios.delete(`/api/questions/${id}`);
-    fetchQuestions();
+    try {
+      const response = await axios.delete(`/api/questions/${id}`);
+      console.log('Delete question response:', response); // Debug log
+      fetchQuestions();
+    } catch (error) {
+      console.error('Delete question error:', error); // Debug log
+    }
   };
 
   return (
