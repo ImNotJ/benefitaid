@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageQuestions.css';
 
@@ -7,6 +8,8 @@ function ManageQuestions() {
   const [questionName, setQuestionName] = useState('');
   const [questionType, setQuestionType] = useState('');
   const [questionText, setQuestionText] = useState('');
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchQuestions();
@@ -22,19 +25,33 @@ function ManageQuestions() {
     }
   };
 
-  const handleAddQuestion = async (e) => {
+  const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
     const newQuestion = { questionName, questionType, questionText };
     try {
-      const response = await axios.post('/api/questions', newQuestion);
-      console.log('Add question response:', response); // Debug log
+      let response;
+      if (editingQuestionId) {
+        response = await axios.put(`/api/questions/${editingQuestionId}`, newQuestion);
+        console.log('Update question response:', response); // Debug log
+      } else {
+        response = await axios.post('/api/questions', newQuestion);
+        console.log('Add question response:', response); // Debug log
+      }
       fetchQuestions();
       setQuestionName('');
       setQuestionType('');
       setQuestionText('');
+      setEditingQuestionId(null);
     } catch (error) {
-      console.error('Add question error:', error); // Debug log
+      console.error('Add or update question error:', error); // Debug log
     }
+  };
+
+  const handleEditQuestion = (question) => {
+    setQuestionName(question.questionName);
+    setQuestionType(question.questionType);
+    setQuestionText(question.questionText);
+    setEditingQuestionId(question.id);
   };
 
   const handleDeleteQuestion = async (id) => {
@@ -47,10 +64,35 @@ function ManageQuestions() {
     }
   };
 
+  const handleBackToDashboard = () => {
+    navigate('/admin-dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/admin-login');
+  };
+
+  const handleClearFields = () => {
+    setQuestionName('');
+    setQuestionType('');
+    setQuestionText('');
+    setEditingQuestionId(null);
+  };
+
   return (
     <div className="manage-questions">
+      <div className="top-buttons">
+        <button onClick={handleBackToDashboard} className="btn btn-secondary">
+          Back to Dashboard
+        </button>
+        <button onClick={handleLogout} className="btn btn-secondary">
+          Logout
+        </button>
+      </div>
       <h2>Manage Questions</h2>
-      <form onSubmit={handleAddQuestion}>
+      <form onSubmit={handleAddOrUpdateQuestion}>
         <div className="form-group">
           <label htmlFor="questionName">Question Name</label>
           <input
@@ -84,13 +126,23 @@ function ManageQuestions() {
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary">Add Question</button>
+        <div className="form-buttons">
+          <button type="submit" className="btn btn-primary">
+            {editingQuestionId ? 'Update Question' : 'Add Question'}
+          </button>
+          <button type="button" onClick={handleClearFields} className="btn btn-secondary">
+            Clear
+          </button>
+        </div>
       </form>
       <ul className="question-list">
         {questions.map((question) => (
           <li key={question.id}>
-            <span>{question.questionName} - {question.questionType} - {question.questionText}</span>
-            <button onClick={() => handleDeleteQuestion(question.id)} className="btn btn-danger">Delete</button>
+            <span>{question.questionName}</span>
+            <div className="question-buttons">
+              <button onClick={() => handleEditQuestion(question)} className="btn btn-secondary">Edit</button>
+              <button onClick={() => handleDeleteQuestion(question.id)} className="btn btn-danger">Delete</button>
+            </div>
           </li>
         ))}
       </ul>

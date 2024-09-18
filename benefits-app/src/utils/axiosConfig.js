@@ -18,4 +18,20 @@ instance.interceptors.request.use(
   }
 );
 
+// Add a response interceptor to handle token expiration
+instance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Token expired or unauthorized, log out the user
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/admin-login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default instance;
