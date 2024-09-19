@@ -1,8 +1,10 @@
 package com.example.benefits.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Map;
+import java.util.Set;
 
 @Entity
 public class Benefit {
@@ -20,11 +22,9 @@ public class Benefit {
     @NotBlank
     private String benefitUrl;
 
-    @ElementCollection
-    @CollectionTable(name = "benefit_requirements", joinColumns = @JoinColumn(name = "benefit_id"))
-    @MapKeyColumn(name = "question_id")
-    @Column(name = "requirement")
-    private Map<Long, String> benefitRequirements;
+    @OneToMany(mappedBy = "benefit", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Set<Requirement> requirements;
 
     // Getters and Setters
 
@@ -73,11 +73,11 @@ public class Benefit {
         this.benefitUrl = benefitUrl;
     }
 
-    public Map<Long, String> getBenefitRequirements() {
-        return benefitRequirements;
+    public Set<Requirement> getRequirements() {
+        return requirements;
     }
 
-    public void setBenefitRequirements(Map<Long, String> benefitRequirements) {
-        this.benefitRequirements = benefitRequirements;
+    public void setRequirements(Set<Requirement> requirements) {
+        this.requirements = requirements;
     }
 }

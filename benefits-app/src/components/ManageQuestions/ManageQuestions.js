@@ -9,6 +9,8 @@ function ManageQuestions() {
   const [questionType, setQuestionType] = useState('');
   const [questionText, setQuestionText] = useState('');
   const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,23 +29,36 @@ function ManageQuestions() {
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
+
+    // Custom validation
+    if (!questionName || !questionType || !questionText) {
+      setErrorMessage('All fields are required.');
+      setSuccessMessage('');
+      return;
+    }
+
     const newQuestion = { questionName, questionType, questionText };
     try {
       let response;
       if (editingQuestionId) {
         response = await axios.put(`/api/questions/${editingQuestionId}`, newQuestion);
         console.log('Update question response:', response); // Debug log
+        setSuccessMessage('Question updated successfully!');
       } else {
         response = await axios.post('/api/questions', newQuestion);
         console.log('Add question response:', response); // Debug log
+        setSuccessMessage('Question added successfully!');
       }
       fetchQuestions();
       setQuestionName('');
       setQuestionType('');
       setQuestionText('');
       setEditingQuestionId(null);
+      setErrorMessage('');
     } catch (error) {
       console.error('Add or update question error:', error); // Debug log
+      setErrorMessage('Failed to add or update question.');
+      setSuccessMessage('');
     }
   };
 
@@ -52,6 +67,8 @@ function ManageQuestions() {
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
     setEditingQuestionId(question.id);
+    setSuccessMessage('');
+    setErrorMessage('');
   };
 
   const handleDeleteQuestion = async (id) => {
@@ -59,8 +76,12 @@ function ManageQuestions() {
       const response = await axios.delete(`/api/questions/${id}`);
       console.log('Delete question response:', response); // Debug log
       fetchQuestions();
+      setSuccessMessage('Question deleted successfully!');
+      setErrorMessage('');
     } catch (error) {
       console.error('Delete question error:', error); // Debug log
+      setErrorMessage('Failed to delete question.');
+      setSuccessMessage('');
     }
   };
 
@@ -79,6 +100,8 @@ function ManageQuestions() {
     setQuestionType('');
     setQuestionText('');
     setEditingQuestionId(null);
+    setSuccessMessage('');
+    setErrorMessage('');
   };
 
   return (
@@ -92,6 +115,8 @@ function ManageQuestions() {
         </button>
       </div>
       <h2>Manage Questions</h2>
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <form onSubmit={handleAddOrUpdateQuestion}>
         <div className="form-group">
           <label htmlFor="questionName">Question Name</label>
@@ -101,7 +126,6 @@ function ManageQuestions() {
             className="form-control"
             value={questionName}
             onChange={(e) => setQuestionName(e.target.value)}
-            required
           />
         </div>
         <div className="form-group">
@@ -112,7 +136,6 @@ function ManageQuestions() {
             className="form-control"
             value={questionType}
             onChange={(e) => setQuestionType(e.target.value)}
-            required
           />
         </div>
         <div className="form-group">
@@ -123,7 +146,6 @@ function ManageQuestions() {
             className="form-control"
             value={questionText}
             onChange={(e) => setQuestionText(e.target.value)}
-            required
           />
         </div>
         <div className="form-buttons">
@@ -138,7 +160,7 @@ function ManageQuestions() {
       <ul className="question-list">
         {questions.map((question) => (
           <li key={question.id}>
-            <span>{question.questionName}</span>
+            <span>{question.id}: {question.questionName}</span>
             <div className="question-buttons">
               <button onClick={() => handleEditQuestion(question)} className="btn btn-secondary">Edit</button>
               <button onClick={() => handleDeleteQuestion(question.id)} className="btn btn-danger">Delete</button>
