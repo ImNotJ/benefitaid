@@ -2,6 +2,7 @@ package com.example.benefits.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,14 +27,24 @@ public class SecurityConfig {
                 authorizeRequests
                     .antMatchers("/api/admins/login").permitAll() // Allow unauthenticated access to login
                     .antMatchers("/api/admins/**").hasRole("ADMIN")
-                    .antMatchers("/api/questions/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Allow access to questions for ADMIN and ROOT_ADMIN roles
+                    .antMatchers(HttpMethod.GET, "/api/questions/**").permitAll() // Allow any user to access GET endpoints for questions
+                    .antMatchers(HttpMethod.POST, "/api/questions/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Restrict POST to admins
+                    .antMatchers(HttpMethod.PUT, "/api/questions/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Restrict PUT to admins
+                    .antMatchers(HttpMethod.DELETE, "/api/questions/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Restrict DELETE to admins
+                    .antMatchers(HttpMethod.GET, "/api/quizzes/**").permitAll() // Allow any user to access GET endpoints for quizzes
+                    .antMatchers(HttpMethod.POST, "/api/quizzes/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Restrict POST to admins
+                    .antMatchers(HttpMethod.PUT, "/api/quizzes/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Restrict PUT to admins
+                    .antMatchers(HttpMethod.DELETE, "/api/quizzes/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Restrict DELETE to admins
+                    .antMatchers(HttpMethod.POST, "/api/users").permitAll() // Allow any user to submit responses
+                    .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN") // Restrict GET to admins
+                    .antMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN") // Restrict PUT to admins
+                    .antMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN") // Restrict DELETE to admins
                     .antMatchers("/api/benefits/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Allow access to benefits for ADMIN and ROOT_ADMIN roles
-                    .antMatchers("/api/quizzes/**").hasAnyRole("ADMIN", "ROOT_ADMIN") // Allow access to quizzes for ADMIN and ROOT_ADMIN roles
                     .antMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringAntMatchers("/api/admins/login", "/api/questions/**", "/api/benefits/**", "/api/quizzes/**") // Disable CSRF protection for login, questions, and benefits endpoints
+                .ignoringAntMatchers("/api/admins/login", "/api/questions/**", "/api/benefits/**", "/api/quizzes/**", "/api/users") // Disable CSRF protection for login, questions, benefits, quizzes, and user endpoints
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

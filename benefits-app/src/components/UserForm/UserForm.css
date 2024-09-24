@@ -1,43 +1,92 @@
 .user-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .user-form h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .user-form .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .user-form .form-control {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-  }
-  
-  .user-form .btn {
-    margin-top: 10px;
-  }
-  
-  .eligibility-results {
-    margin-top: 20px;
-  }
-  
-  .eligibility-results h3 {
-    text-align: center;
-  }
-  
-  .eligibility-results ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .eligibility-results ul li {
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-  }
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-form .top-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.user-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  color: #333;
+}
+
+.user-form .form-group {
+  margin-bottom: 15px;
+}
+
+.user-form .form-control {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.user-form .btn {
+  margin-top: 10px;
+}
+
+.user-form .quiz-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-form .quiz-list li {
+  margin-bottom: 10px;
+}
+
+.user-form .btn-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.user-form .eligibility-results {
+  margin-top: 20px;
+}
+
+.user-form .eligibility-results h3 {
+  text-align: center;
+}
+
+.user-form .eligibility-results ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-form .eligibility-results ul li {
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.alert {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
