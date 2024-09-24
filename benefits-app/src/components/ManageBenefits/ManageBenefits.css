@@ -1,8 +1,10 @@
-/* ManageBenefits.css */
 .manage-benefits {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .manage-benefits .top-buttons {
@@ -14,23 +16,40 @@
 .manage-benefits h2 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 1.8em;
+  color: #333;
+}
+
+.manage-benefits h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.4em; /* Smaller font size for subheadings */
+  color: #333;
 }
 
 .manage-benefits .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.manage-benefits .form-group label {
+  font-size: 1.1em;
+  color: #333;
+  font-weight: 600;
 }
 
 .manage-benefits .form-control {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .manage-benefits .form-buttons {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .manage-benefits .btn {
@@ -38,22 +57,30 @@
 }
 
 .manage-benefits .benefit-list,
-.manage-benefits .requirement-list {
+.manage-benefits .requirement-list,
+.manage-benefits .condition-list {
   list-style-type: none;
   padding: 0;
 }
 
 .manage-benefits .benefit-list li,
-.manage-benefits .requirement-list li {
+.manage-benefits .requirement-list li,
+.manage-benefits .condition-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
   border: 1px solid #ccc;
+  border-radius: 5px;
   margin-top: 10px;
 }
 
-.alert {
+.manage-benefits .requirement-section,
+.manage-benefits .condition-section {
+  margin-top: 30px;
+}
+
+.manage-benefits .alert {
   padding: 10px;
   margin-bottom: 20px;
   border-radius: 5px;
@@ -71,4 +98,3 @@
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
-

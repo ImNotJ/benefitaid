@@ -3,6 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageBenefits.css';
 
+const states = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+  "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+  "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+  "Wisconsin", "Wyoming"
+];
+
 function ManageBenefits() {
   const [benefits, setBenefits] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -45,7 +54,7 @@ function ManageBenefits() {
       console.error('Error fetching questions:', error);
     }
   };
-  
+
   const handleAddBenefit = async (e) => {
     e.preventDefault();
 
@@ -206,6 +215,26 @@ function ManageBenefits() {
     setErrorMessage('');
   };
 
+  const handleClearRequirementFields = () => {
+    setRequirementName('');
+    setCurrentConditions([]);
+    setEditingRequirementIndex(null);
+    setErrorMessage('');
+  };
+
+  const handleClearConditionFields = () => {
+    setCurrentQuestionId('');
+    setCurrentOperator('');
+    setCurrentValue('');
+    setEditingConditionIndex(null);
+    setErrorMessage('');
+  };
+
+  const getQuestionName = (questionId) => {
+    const question = questions.find(q => q.id === questionId);
+    return question ? question.questionName : '';
+  };
+
   return (
     <div className="manage-benefits">
       <div className="top-buttons">
@@ -243,13 +272,19 @@ function ManageBenefits() {
         {!federal && (
           <div className="form-group">
             <label htmlFor="state">State</label>
-            <input
-              type="text"
+            <select
               id="state"
               className="form-control"
               value={state}
               onChange={(e) => setState(e.target.value)}
-            />
+            >
+              <option value="">Select a state</option>
+              {states.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
           </div>
         )}
         <div className="form-group">
@@ -262,6 +297,14 @@ function ManageBenefits() {
             onChange={(e) => setBenefitUrl(e.target.value)}
           />
         </div>
+        <div className="form-buttons">
+          <button type="submit" className="btn btn-primary">{editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}</button>
+          <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
+        </div>
+      </form>
+
+      <div className="requirement-section">
+        <h3>Requirements</h3>
         <div className="form-group">
           <label htmlFor="requirementName">Requirement Name</label>
           <input
@@ -272,6 +315,34 @@ function ManageBenefits() {
             onChange={(e) => setRequirementName(e.target.value)}
           />
         </div>
+        <div className="form-buttons">
+          <button type="button" onClick={handleAddRequirement} className="btn btn-secondary">
+            {editingRequirementIndex !== null ? 'Update Requirement' : 'Add Requirement'}
+          </button>
+          <button type="button" onClick={handleClearRequirementFields} className="btn btn-secondary">Clear</button>
+        </div>
+        <ul className="requirement-list">
+          {requirements.map((requirement, index) => (
+            <li key={index}>
+              <span>{requirement.name}</span>
+              <ul>
+                {requirement.conditions.map((condition, i) => (
+                  <li key={i}>
+                    {getQuestionName(condition.questionId)} {condition.operator} {condition.value}
+                  </li>
+                ))}
+              </ul>
+              <div className="form-buttons">
+                <button onClick={() => handleEditRequirement(index)} className="btn btn-secondary">Edit</button>
+                <button onClick={() => handleDeleteRequirement(index)} className="btn btn-danger">Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="condition-section">
+        <h3>Conditions</h3>
         <div className="form-group">
           <label htmlFor="currentQuestionId">Question</label>
           <select
@@ -318,48 +389,30 @@ function ManageBenefits() {
           <button type="button" onClick={handleAddCondition} className="btn btn-secondary">
             {editingConditionIndex !== null ? 'Update Condition' : 'Add Condition'}
           </button>
+          <button type="button" onClick={handleClearConditionFields} className="btn btn-secondary">Clear</button>
         </div>
         <ul className="condition-list">
           {currentConditions.map((condition, index) => (
             <li key={index}>
-              {questions.find(q => q.id === condition.questionId)?.questionName} {condition.operator} {condition.value}
-              <button onClick={() => handleEditCondition(index)} className="btn btn-secondary">Edit</button>
-              <button onClick={() => handleDeleteCondition(index)} className="btn btn-danger">Delete</button>
+              {getQuestionName(condition.questionId)} {condition.operator} {condition.value}
+              <div className="form-buttons">
+                <button onClick={() => handleEditCondition(index)} className="btn btn-secondary">Edit</button>
+                <button onClick={() => handleDeleteCondition(index)} className="btn btn-danger">Delete</button>
+              </div>
             </li>
           ))}
         </ul>
-        <div className="form-buttons">
-          <button type="button" onClick={handleAddRequirement} className="btn btn-secondary">
-            {editingRequirementIndex !== null ? 'Update Requirement' : 'Add Requirement'}
-          </button>
-        </div>
-        <ul className="requirement-list">
-          {requirements.map((requirement, index) => (
-            <li key={index}>
-              <span>{requirement.name}</span>
-              <ul>
-                {requirement.conditions.map((condition, i) => (
-                  <li key={i}>
-                    {questions.find(q => q.id === condition.questionId)?.questionName} {condition.operator} {condition.value}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={() => handleEditRequirement(index)} className="btn btn-secondary">Edit</button>
-              <button onClick={() => handleDeleteRequirement(index)} className="btn btn-danger">Delete</button>
-            </li>
-          ))}
-        </ul>
-        <div className="form-buttons">
-          <button type="submit" className="btn btn-primary">{editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}</button>
-          <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
-        </div>
-      </form>
+      </div>
+
+      <h3>Existing Benefits</h3>
       <ul className="benefit-list">
         {benefits.map((benefit, index) => (
           <li key={benefit.id}>
-            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : `State: ${benefit.state}`} <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">Link</a></span>
-            <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">Edit</button>
-            <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">Delete</button>
+            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : `${benefit.state}`}</span>
+            <div className="form-buttons">
+              <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">Edit</button>
+              <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">Delete</button>
+            </div>
           </li>
         ))}
       </ul>
