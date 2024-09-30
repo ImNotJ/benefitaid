@@ -15,6 +15,12 @@ public class User {
     @NotBlank
     private String email;
 
+    @NotBlank
+    private String password; // Store hashed password
+
+    @NotBlank
+    private String role = "ROLE_USER"; // Add default value for role
+
     @ElementCollection
     @CollectionTable(name = "user_responses", joinColumns = @JoinColumn(name = "user_id"))
     @MapKeyColumn(name = "question_id")
@@ -37,6 +43,22 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public Map<Long, String> getResponses() {

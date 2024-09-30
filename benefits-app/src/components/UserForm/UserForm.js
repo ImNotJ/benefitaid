@@ -48,13 +48,25 @@ function UserForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const email = localStorage.getItem('email'); // Assuming email is stored in localStorage
+    const password = localStorage.getItem('password'); // Assuming password is stored in localStorage
+  
+    const payload = {
+      email,
+      password,
+      responses
+    };
+  
+    console.log('Submitting payload:', payload); // Log the payload
+  
     try {
-      const response = await axios.post('/api/eligibility/check', { responses });
+      const response = await axios.post('/api/eligibility/check', payload);
       setEligibilityResults(response.data);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
     } catch (error) {
       console.error('Error checking eligibility:', error);
+      console.error('Error response data:', error.response.data); // Log the error response data
       setErrorMessage('Failed to check eligibility.');
       setSuccessMessage('');
     }
@@ -67,6 +79,12 @@ function UserForm() {
     setEligibilityResults(null);
     setSuccessMessage('');
     setErrorMessage('');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    window.location.href = '/user-login'; // Redirect to user login page
   };
 
   const renderInputField = (question) => {
@@ -151,16 +169,16 @@ function UserForm() {
 
   return (
     <div className="user-form">
+      <div className="top-buttons">
+        <button onClick={handleBackToQuizzes} className="btn btn-secondary">
+          Back to Quizzes
+        </button>
+        <button onClick={handleLogout} className="btn btn-danger">
+          Logout
+        </button>
+      </div>
       {selectedQuiz ? (
         <>
-          <div className="top-buttons">
-            <button onClick={handleBackToQuizzes} className="btn btn-secondary">
-              Back to Quizzes
-            </button>
-            <button onClick={() => window.location.href = '/'} className="btn btn-secondary">
-              Back to Homepage
-            </button>
-          </div>
           <h2>{selectedQuiz.quizName}</h2>
           {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
@@ -188,11 +206,6 @@ function UserForm() {
         </>
       ) : (
         <>
-          <div className="top-buttons">
-            <button onClick={() => window.location.href = '/'} className="btn btn-secondary">
-              Back to Homepage
-            </button>
-          </div>
           <h2>Available Quizzes</h2>
           <ul className="quiz-list">
             {quizzes.map((quiz) => (

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './AdminLogin.css';
+import './UserLogin.css';
 import axios from '../../utils/axiosConfig';
 
-function AdminLogin() {
-  const [identifier, setIdentifier] = useState('');
+function UserLogin() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -14,13 +14,12 @@ function AdminLogin() {
     e.preventDefault();
     try {
       clearCurrentSession(); // Clear current session before login
-      // Try admin login first
-      let response = await axios.post('/api/admins/login', { username: identifier, password });
-      console.log('Admin login response:', response);
-      handleSuccessfulLogin(response.data, '/admin-dashboard');
-    } catch (adminErr) {
-      console.log('Admin login failed:', adminErr);
-      setError('Invalid username or password');
+      let response = await axios.post('/api/users/login', { email, password });
+      console.log('User login response:', response);
+      handleSuccessfulLogin(response.data, '/user-dashboard');
+    } catch (userErr) {
+      console.log('User login failed:', userErr);
+      setError('Invalid email or password');
       setSuccess('');
     }
   };
@@ -29,6 +28,8 @@ function AdminLogin() {
     console.log('Successful login data:', data);
     localStorage.setItem('token', data.token);
     localStorage.setItem('role', data.role);
+    localStorage.setItem('email', email); // Store email in localStorage
+    localStorage.setItem('password', password); // Store password in localStorage
     setSuccess('Login successful! Redirecting...');
     setError('');
     setTimeout(() => {
@@ -40,6 +41,8 @@ function AdminLogin() {
   const clearCurrentSession = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('email'); // Clear email from localStorage
+    localStorage.removeItem('password'); // Clear password from localStorage
   };
 
   const handleBackToHomepage = () => {
@@ -47,24 +50,24 @@ function AdminLogin() {
   };
 
   return (
-    <div className="admin-login">
+    <div className="user-login">
       <div className="top-buttons">
         <button onClick={handleBackToHomepage} className="btn btn-secondary">
           Back to Homepage
         </button>
       </div>
-      <h2>Admin Login</h2>
+      <h2>Login</h2>
       {success && <div className="alert alert-success">{success}</div>}
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label htmlFor="identifier">Username</label>
+          <label htmlFor="email">Email</label>
           <input
-            type="text"
-            id="identifier"
+            type="email"
+            id="email"
             className="form-control"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -85,4 +88,4 @@ function AdminLogin() {
   );
 }
 
-export default AdminLogin;
+export default UserLogin;

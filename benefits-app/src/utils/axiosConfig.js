@@ -28,7 +28,7 @@ instance.interceptors.response.use(
       // Token expired or unauthorized, log out the user
       localStorage.removeItem('token');
       localStorage.removeItem('role');
-      window.location.href = '/admin-login';
+      window.location.href = '/user-login'; // Redirect to user login page
     }
     return Promise.reject(error);
   }
