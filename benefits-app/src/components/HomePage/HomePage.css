@@ -50,6 +50,7 @@
 .home-page .button-group {
   display: flex;
   justify-content: center;
+  margin-top: 20px;
 }
 
 .home-page .eligibility-results {
@@ -69,6 +70,23 @@
   padding: 10px;
   border: 1px solid #ccc;
   margin-top: 10px;
+}
+
+.home-page .benefits-dropdown ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.home-page .benefits-dropdown ul li {
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.home-page .divider {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid #ccc;
 }
 
 .alert {

@@ -36,6 +36,12 @@
   margin-top: 10px;
 }
 
+.user-form .button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .user-form .quiz-list {
   list-style-type: none;
   padding: 0;
@@ -70,6 +76,23 @@
   padding: 10px;
   border: 1px solid #ccc;
   margin-top: 10px;
+}
+
+.user-form .benefits-dropdown ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-form .benefits-dropdown ul li {
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.user-form .divider {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid #ccc;
 }
 
 .alert {

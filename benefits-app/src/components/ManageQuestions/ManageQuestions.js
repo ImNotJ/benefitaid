@@ -130,13 +130,19 @@ function ManageQuestions() {
         </div>
         <div className="form-group">
           <label htmlFor="questionType">Question Type</label>
-          <input
-            type="text"
+          <select
             id="questionType"
             className="form-control"
             value={questionType}
             onChange={(e) => setQuestionType(e.target.value)}
-          />
+          >
+            <option value="">Select</option>
+            <option value="Numerical">Numerical</option>
+            <option value="Text">Text</option>
+            <option value="YesNo">Yes/No</option>
+            <option value="Date">Date (MM/DD/YYYY)</option>
+            <option value="Email">Email (text@domain)</option>
+          </select>
         </div>
         <div className="form-group">
           <label htmlFor="questionText">Question Text</label>

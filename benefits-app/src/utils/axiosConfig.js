@@ -26,9 +26,14 @@ instance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // Token expired or unauthorized, log out the user
+      const role = localStorage.getItem('role');
       localStorage.removeItem('token');
       localStorage.removeItem('role');
-      window.location.href = '/user-login'; // Redirect to user login page
+      if (role === 'ROLE_ADMIN' || role === 'ROLE_ROOT_ADMIN') {
+        window.location.href = '/admin-login'; // Redirect to admin login page
+      } else {
+        window.location.href = '/user-login'; // Redirect to user login page
+      }
     }
     return Promise.reject(error);
   }

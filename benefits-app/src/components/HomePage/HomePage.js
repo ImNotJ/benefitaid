@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
-import './HomePage.css'; // New CSS file for HomePage
+import './HomePage.css';
 
 function HomePage() {
   const [commonQuiz, setCommonQuiz] = useState(null);
@@ -10,12 +10,9 @@ function HomePage() {
   const [eligibilityResults, setEligibilityResults] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
 
-  useEffect(() => {
-    fetchCommonQuiz();
-  }, []);
-
-  const fetchCommonQuiz = async () => {
+  const fetchCommonQuiz = useCallback(async () => {
     try {
       const response = await axios.get('/api/quizzes');
       const commonQuiz = response.data.find(quiz => quiz.quizName === 'Common Quiz');
@@ -26,12 +23,17 @@ function HomePage() {
     } catch (error) {
       console.error('Error fetching quizzes:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCommonQuiz();
+  }, [fetchCommonQuiz]);
 
   const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quizzes/${quizId}`);
-      setQuestions(response.data.questions);
+      const orderedQuestions = response.data.questionIds.map(id => response.data.questions.find(q => q.id === id));
+      setQuestions(orderedQuestions);
     } catch (error) {
       console.error('Error fetching questions:', error);
     }
@@ -47,25 +49,65 @@ function HomePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = 'random@example.com'; // Random email
+    const email = 'random@example.com'; // email
     const password = 'randomPassword123'; // Random password
-
+  
     const payload = {
       email,
       password,
       responses
     };
-
+  
     console.log('Submitting:', payload); // Log the payload
-
+  
     try {
-      const response = await axios.post('/api/eligibility/check', payload);
-      setEligibilityResults(response.data);
+      const response = await axios.post('/api/eligibility/check', payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      console.log('Response data:', response.data); // Log the response data
+  
+      const eligibleBenefits = response.data.filter(benefit => {
+        if (!benefit.requirements || benefit.requirements.length === 0) {
+          return false;
+        }
+        return benefit.requirements.some(requirement => {
+          console.log('Checking requirement:', requirement); // Log the requirement
+          return requirement.conditions.every(condition => {
+            const userResponse = responses[condition.questionId];
+            console.log('Checking condition:', condition); // Log the condition
+            console.log('User response:', userResponse); // Log the user response
+            if (userResponse === undefined) {
+              return false;
+            }
+            switch (condition.operator) {
+              case '<=':
+                return parseFloat(userResponse) <= parseFloat(condition.value);
+              case '>=':
+                return parseFloat(userResponse) >= parseFloat(condition.value);
+              case '<':
+                return parseFloat(userResponse) < parseFloat(condition.value);
+              case '>':
+                return parseFloat(userResponse) > parseFloat(condition.value);
+              case '==':
+                return userResponse === condition.value;
+              default:
+                return false;
+            }
+          });
+        });
+      });
+  
+      console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
+  
+      setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      console.error('Error response data:', error.response.data); // Log the error response data
+      console.error('Error response data:', error.response?.data); // Log the error response data
       setErrorMessage('Failed to check eligibility.');
       setSuccessMessage('');
     }
@@ -161,7 +203,8 @@ function HomePage() {
       </div>
       {commonQuiz && (
         <div className="common-quiz">
-          <h2>{commonQuiz.quizName}</h2>
+          <h4>Answer this simple quiz below to discover what state and federal benefits you may be eligible for!</h4>
+          <h5>Note: We don't require any personal or identifying information.</h5>
           {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
           <form onSubmit={handleSubmit}>
@@ -178,10 +221,35 @@ function HomePage() {
           {eligibilityResults && (
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
+              <h4>You are eligibile for the following benefits:</h4>
+              <h5>Select the respective link for more information about the benefits you're eligible for.</h5>
               <ul>
                 {eligibilityResults.map((benefit) => (
                   <li key={benefit.id}>
-                    {benefit.benefitName} - <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">Link</a>
+                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
+                      {benefit.benefitName}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <hr className="divider" />
+          <h4>Full list of benefits you could be eligible for:</h4>
+          <h5>Select the button below to toggle.</h5>
+          <div className="button-group">
+            <button onClick={() => setShowBenefits(!showBenefits)} className="btn btn-info">
+              {showBenefits ? 'Hide Benefits' : 'Show Benefits'}
+            </button>
+          </div>
+          {showBenefits && (
+            <div className="benefits-dropdown">
+              <ul>
+                {commonQuiz.benefits.map((benefit) => (
+                  <li key={benefit.id}>
+                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
+                      {benefit.benefitName}
+                    </a>
                   </li>
                 ))}
               </ul>

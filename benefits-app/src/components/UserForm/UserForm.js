@@ -10,6 +10,7 @@ function UserForm() {
   const [eligibilityResults, setEligibilityResults] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
 
   useEffect(() => {
     fetchQuizzes();
@@ -27,7 +28,8 @@ function UserForm() {
   const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quizzes/${quizId}`);
-      setQuestions(response.data.questions);
+      const orderedQuestions = response.data.questionIds.map(id => response.data.questions.find(q => q.id === id));
+      setQuestions(orderedQuestions);
     } catch (error) {
       console.error('Error fetching questions:', error);
     }
@@ -50,35 +52,77 @@ function UserForm() {
     e.preventDefault();
     const email = localStorage.getItem('email'); // Assuming email is stored in localStorage
     const password = localStorage.getItem('password'); // Assuming password is stored in localStorage
-  
+
     const payload = {
       email,
       password,
       responses
     };
-  
+
     console.log('Submitting payload:', payload); // Log the payload
-  
+
     try {
       const response = await axios.post('/api/eligibility/check', payload);
-      setEligibilityResults(response.data);
+
+      console.log('Response data:', response.data); // Log the response data
+
+      const eligibleBenefits = response.data.filter(benefit => {
+        if (!benefit.requirements || benefit.requirements.length === 0) {
+          return false;
+        }
+        return benefit.requirements.some(requirement => {
+          console.log('Checking requirement:', requirement); // Log the requirement
+          return requirement.conditions.every(condition => {
+            const userResponse = responses[condition.questionId];
+            console.log('Checking condition:', condition); // Log the condition
+            console.log('User response:', userResponse); // Log the user response
+            if (userResponse === undefined) {
+              return false;
+            }
+            switch (condition.operator) {
+              case '<=':
+                return parseFloat(userResponse) <= parseFloat(condition.value);
+              case '>=':
+                return parseFloat(userResponse) >= parseFloat(condition.value);
+              case '<':
+                return parseFloat(userResponse) < parseFloat(condition.value);
+              case '>':
+                return parseFloat(userResponse) > parseFloat(condition.value);
+              case '==':
+                return userResponse === condition.value;
+              default:
+                return false;
+            }
+          });
+        });
+      });
+
+      console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
+
+      setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      console.error('Error response data:', error.response.data); // Log the error response data
+      console.error('Error response data:', error.response?.data); // Log the error response data
       setErrorMessage('Failed to check eligibility.');
       setSuccessMessage('');
     }
   };
 
-  const handleBackToQuizzes = () => {
-    setSelectedQuiz(null);
-    setQuestions([]);
-    setResponses({});
-    setEligibilityResults(null);
-    setSuccessMessage('');
-    setErrorMessage('');
+  const handleBackToDashboard = () => {
+    if (selectedQuiz) {
+      // If a quiz is selected, go back to the list of quizzes
+      setSelectedQuiz(null);
+      setQuestions([]);
+      setResponses({});
+      setEligibilityResults(null);
+      setSuccessMessage('');
+      setErrorMessage('');
+    } else {
+      // If no quiz is selected, go back to the dashboard
+      window.location.href = '/user-dashboard'; // Redirect to user dashboard page
+    }
   };
 
   const handleLogout = () => {
@@ -170,8 +214,8 @@ function UserForm() {
   return (
     <div className="user-form">
       <div className="top-buttons">
-        <button onClick={handleBackToQuizzes} className="btn btn-secondary">
-          Back to Quizzes
+        <button onClick={handleBackToDashboard} className="btn btn-secondary">
+          {selectedQuiz ? 'Back to Quizzes' : 'Back to Dashboard'}
         </button>
         <button onClick={handleLogout} className="btn btn-danger">
           Logout
@@ -189,15 +233,42 @@ function UserForm() {
                 {renderInputField(question)}
               </div>
             ))}
-            <button type="submit" className="btn btn-primary">Submit</button>
+            <div className="form-group button-group">
+              <button type="submit" className="btn btn-primary">Submit</button>
+            </div>
           </form>
           {eligibilityResults && (
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
-              <ul>
+              <h4>You are eligibile for the following benefits:</h4>
+              <h5>Select the respective link for more information about the benefits you're eligible for.</h5>
+              <ul className="benefits-list">
                 {eligibilityResults.map((benefit) => (
                   <li key={benefit.id}>
-                    {benefit.benefitName} - <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">Link</a>
+                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
+                      {benefit.benefitName}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <hr className="divider" />
+          <h4>Benefits you could be eligible for based on this quiz:</h4>
+          <h5>Select the button below to toggle.</h5>
+          <div className="button-group">
+            <button onClick={() => setShowBenefits(!showBenefits)} className="btn btn-info">
+              {showBenefits ? 'Hide Benefits' : 'Show Benefits'}
+            </button>
+          </div>
+          {showBenefits && (
+            <div className="benefits-dropdown">
+              <ul className="benefits-list">
+                {selectedQuiz.benefits.map((benefit) => (
+                  <li key={benefit.id}>
+                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
+                      {benefit.benefitName}
+                    </a>
                   </li>
                 ))}
               </ul>
