@@ -62,7 +62,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://fairbenefits.org")); // Allow both testing and production environments
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://www.fairbenefits.org", "https://api.fairbenefits.org")); // Allow both testing and production environments
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With", "remember-me"));
         source.registerCorsConfiguration("/**", config);

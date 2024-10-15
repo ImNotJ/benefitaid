@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000", "https://fairbenefits.org") // Allow both testing and production environments
+                        .allowedOrigins("http://localhost:3000", "https://www.fairbenefits.org", "https://api.fairbenefits.org")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

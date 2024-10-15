@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8080', // Ensure this matches your backend server URL
+  baseURL: process.env.REACT_APP_API_BASE_URL, // Use the environment variable for the base URL
 });
 
 // Add a request interceptor to include the token in the headers
