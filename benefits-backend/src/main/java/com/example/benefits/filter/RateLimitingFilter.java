@@ -15,16 +15,33 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 
+/**
+ * Filter to limit the rate of incoming requests.
+ * This filter uses Bucket4j to implement rate limiting.
+ */
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final Bucket bucket;
 
+    /**
+     * Constructor to initialize the rate limiting bucket.
+     * The bucket is configured to allow 100 requests per minute.
+     */
     public RateLimitingFilter() {
         Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));
         this.bucket = Bucket.builder().addLimit(limit).build();
     }
 
+    /**
+     * Filters incoming requests and applies rate limiting.
+     *
+     * @param request     the HTTP request
+     * @param response    the HTTP response
+     * @param filterChain the filter chain
+     * @throws ServletException if an error occurs during filtering
+     * @throws IOException      if an I/O error occurs during filtering
+     */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {

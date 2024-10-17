@@ -1,3 +1,4 @@
+/* Styles for the user form container */
 .user-form {
   max-width: 600px;
   margin: 0 auto;
@@ -7,12 +8,14 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles for the top buttons container */
 .user-form .top-buttons {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
+/* Styles for the main heading */
 .user-form h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -20,10 +23,12 @@
   color: #333;
 }
 
+/* Styles for form groups */
 .user-form .form-group {
   margin-bottom: 15px;
 }
 
+/* Styles for form controls (input fields) */
 .user-form .form-control {
   width: 100%;
   padding: 10px;
@@ -32,25 +37,30 @@
   border-radius: 5px;
 }
 
+/* Styles for buttons */
 .user-form .btn {
   margin-top: 10px;
 }
 
+/* Styles for the button group container */
 .user-form .button-group {
   display: flex;
   justify-content: center;
   margin-top: 20px;
 }
 
+/* Styles for the quiz list */
 .user-form .quiz-list {
   list-style-type: none;
   padding: 0;
 }
 
+/* Styles for list items in the quiz list */
 .user-form .quiz-list li {
   margin-bottom: 10px;
 }
 
+/* Styles for link buttons */
 .user-form .btn-link {
   background: none;
   border: none;
@@ -59,42 +69,50 @@
   cursor: pointer;
 }
 
+/* Styles for the eligibility results container */
 .user-form .eligibility-results {
   margin-top: 20px;
 }
 
+/* Styles for the eligibility results heading */
 .user-form .eligibility-results h3 {
   text-align: center;
 }
 
+/* Styles for the eligibility results list */
 .user-form .eligibility-results ul {
   list-style-type: none;
   padding: 0;
 }
 
+/* Styles for list items in the eligibility results list */
 .user-form .eligibility-results ul li {
   padding: 10px;
   border: 1px solid #ccc;
   margin-top: 10px;
 }
 
+/* Styles for the benefits dropdown list */
 .user-form .benefits-dropdown ul {
   list-style-type: none;
   padding: 0;
 }
 
+/* Styles for list items in the benefits dropdown list */
 .user-form .benefits-dropdown ul li {
   padding: 10px;
   border: 1px solid #ccc;
   margin-top: 10px;
 }
 
+/* Styles for the divider */
 .user-form .divider {
   margin: 20px 0;
   border: 0;
   border-top: 1px solid #ccc;
 }
 
+/* Styles for alert messages */
 .alert {
   padding: 10px;
   margin-bottom: 20px;
@@ -102,12 +120,14 @@
   text-align: center;
 }
 
+/* Styles for success alert messages */
 .alert-success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
+/* Styles for danger alert messages */
 .alert-danger {
   background-color: #f8d7da;
   color: #721c24;

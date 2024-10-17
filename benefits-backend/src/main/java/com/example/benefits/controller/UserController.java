@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * REST controller for managing User entities.
+ */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -31,6 +34,12 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * Endpoint for user login.
+     *
+     * @param user the user credentials
+     * @return a ResponseEntity containing the JWT token and role if login is successful, otherwise a 401 status
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         logger.info("Attempting to log in");
@@ -46,6 +55,12 @@ public class UserController {
         return ResponseEntity.status(401).body("Invalid email or password");
     }
 
+    /**
+     * Endpoint to create a new user.
+     *
+     * @param user the user entity to create
+     * @return a ResponseEntity containing the created user entity or an error message
+     */
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
         if (userService.findByEmail(user.getEmail()) != null) {
@@ -60,27 +75,56 @@ public class UserController {
         }
     }
 
+    /**
+     * Endpoint to get a user by ID.
+     *
+     * @param id the ID of the user
+     * @return the user entity
+     */
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
+    /**
+     * Endpoint to get all users.
+     *
+     * @return a list of all user entities
+     */
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
+    /**
+     * Endpoint to update a user.
+     *
+     * @param id   the ID of the user to update
+     * @param user the updated user entity
+     * @return the updated user entity
+     */
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         user.setId(id);
         return userService.saveUser(user);
     }
 
+    /**
+     * Endpoint to delete a user by ID.
+     *
+     * @param id the ID of the user to delete
+     */
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
     }
 
+    /**
+     * Generates a JWT token for the given user.
+     *
+     * @param user the user entity
+     * @return the generated JWT token
+     */
     private String generateJwtToken(User user) {
         long expirationTime = 1000 * 60 * 60 * 3; // 3 hours
         return Jwts.builder()

@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageQuestions.css';
 
+/**
+ * ManageQuestions component for handling the management of questions.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function ManageQuestions() {
   const [questions, setQuestions] = useState([]);
   const [questionName, setQuestionName] = useState('');
@@ -17,6 +22,9 @@ function ManageQuestions() {
     fetchQuestions();
   }, []);
 
+  /**
+   * Fetches the questions from the API.
+   */
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
@@ -27,6 +35,11 @@ function ManageQuestions() {
     }
   };
 
+  /**
+   * Handles the addition or update of a question.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
 
@@ -62,6 +75,11 @@ function ManageQuestions() {
     }
   };
 
+  /**
+   * Handles the editing of a question.
+   *
+   * @param {Object} question - The question object to edit.
+   */
   const handleEditQuestion = (question) => {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
@@ -71,6 +89,11 @@ function ManageQuestions() {
     setErrorMessage('');
   };
 
+  /**
+   * Handles the deletion of a question.
+   *
+   * @param {string} id - The ID of the question to delete.
+   */
   const handleDeleteQuestion = async (id) => {
     try {
       const response = await axios.delete(`/api/questions/${id}`);
@@ -85,16 +108,25 @@ function ManageQuestions() {
     }
   };
 
+  /**
+   * Handles navigation back to the admin dashboard.
+   */
   const handleBackToDashboard = () => {
     navigate('/admin-dashboard');
   };
 
+  /**
+   * Handles the logout process.
+   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/admin-login');
   };
 
+  /**
+   * Clears all input fields.
+   */
   const handleClearFields = () => {
     setQuestionName('');
     setQuestionType('');

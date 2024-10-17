@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './HomePage.css';
 
+/**
+ * HomePage component for displaying the home page and handling the common quiz.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function HomePage() {
   const [commonQuiz, setCommonQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -12,6 +17,9 @@ function HomePage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
 
+  /**
+   * Fetches the common quiz from the API.
+   */
   const fetchCommonQuiz = useCallback(async () => {
     try {
       const response = await axios.get('/api/quizzes');
@@ -29,6 +37,11 @@ function HomePage() {
     fetchCommonQuiz();
   }, [fetchCommonQuiz]);
 
+  /**
+   * Fetches the questions for the specified quiz.
+   *
+   * @param {string} quizId - The ID of the quiz.
+   */
   const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quizzes/${quizId}`);
@@ -39,6 +52,11 @@ function HomePage() {
     }
   };
 
+  /**
+   * Handles input changes in the quiz form.
+   *
+   * @param {Event} e - The input change event.
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setResponses({
@@ -47,6 +65,11 @@ function HomePage() {
     });
   };
 
+  /**
+   * Handles the form submission for checking eligibility.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     const email = 'random@example.com'; // email
@@ -113,6 +136,12 @@ function HomePage() {
     }
   };
 
+  /**
+   * Renders the input field for a given question.
+   *
+   * @param {Object} question - The question object.
+   * @returns {React.ReactNode} The rendered input field.
+   */
   const renderInputField = (question) => {
     switch (question.questionType) {
       case 'numerical':

@@ -1,3 +1,4 @@
+/* Styles for the admin dashboard container */
 .admin-dashboard {
   max-width: 600px;
   margin: 0 auto;
@@ -8,22 +9,26 @@
   text-align: center;
 }
 
+/* Styles for the top buttons container */
 .admin-dashboard .top-buttons {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
+/* Styles for the heading */
 .admin-dashboard h2 {
   margin-bottom: 20px;
   font-size: 1.8em;
   color: #333;
 }
 
+/* Styles for the links container */
 .admin-dashboard .links {
   margin-top: 20px;
 }
 
+/* Styles for the buttons */
 .admin-dashboard .btn {
   margin: 10px;
 }

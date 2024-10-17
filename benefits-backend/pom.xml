@@ -1,13 +1,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <!-- Model version -->
     <modelVersion>4.0.0</modelVersion>
+    
+    <!-- Group ID -->
     <groupId>com.example</groupId>
+    
+    <!-- Artifact ID -->
     <artifactId>benefits-backend</artifactId>
+    
+    <!-- Version -->
     <version>0.0.1-SNAPSHOT</version>
+    
+    <!-- Name of the project -->
     <name>benefits-backend</name>
+    
+    <!-- Description of the project -->
     <description>Backend for Benefits Application</description>
+    
+    <!-- Packaging type -->
     <packaging>jar</packaging>
 
+    <!-- Parent project -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -15,10 +30,12 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <!-- Properties -->
     <properties>
         <java.version>17</java.version>
     </properties>
 
+    <!-- Dependencies -->
     <dependencies>
         <!-- Spring Boot Starter Web -->
         <dependency>
@@ -73,6 +90,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Bucket4j for rate limiting -->
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
             <artifactId>bucket4j-core</artifactId>
@@ -100,12 +118,14 @@
             <version>3.0.2</version> <!-- Latest stable version -->
         </dependency>
 
+        <!-- JSON Web Token (JWT) library -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
         </dependency>
 
+        <!-- Dotenv library for loading environment variables -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
@@ -113,12 +133,15 @@
         </dependency>
     </dependencies>
 
+    <!-- Build configuration -->
     <build>
         <plugins>
+            <!-- Spring Boot Maven Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

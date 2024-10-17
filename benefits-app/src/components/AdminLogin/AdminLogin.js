@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
 import axios from '../../utils/axiosConfig';
 
+/**
+ * AdminLogin component for handling admin login.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function AdminLogin() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -10,6 +15,11 @@ function AdminLogin() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
+  /**
+   * Handles the login process.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -25,6 +35,13 @@ function AdminLogin() {
     }
   };
 
+  /**
+   * Handles successful login by storing the token and role in localStorage
+   * and navigating to the specified path.
+   *
+   * @param {Object} data - The login response data.
+   * @param {string} redirectPath - The path to redirect to after successful login.
+   */
   const handleSuccessfulLogin = (data, redirectPath) => {
     console.log('Successful login data:', data);
     localStorage.setItem('token', data.token);
@@ -37,11 +54,17 @@ function AdminLogin() {
     }, 2000); // Redirect after 2 seconds
   };
 
+  /**
+   * Clears the current session by removing the token and role from localStorage.
+   */
   const clearCurrentSession = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
   };
 
+  /**
+   * Handles navigation back to the homepage.
+   */
   const handleBackToHomepage = () => {
     navigate('/');
   };

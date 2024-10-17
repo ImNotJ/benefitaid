@@ -6,9 +6,11 @@ import store from './store/store';
 import App from './App';
 import './index.css';
 
+// Get the root container element
 const container = document.getElementById('root');
 const root = createRoot(container);
 
+// Render the application
 root.render(
   <Provider store={store}>
     <Router>

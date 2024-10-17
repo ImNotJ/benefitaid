@@ -1,3 +1,4 @@
+/* Styles for the home page container */
 .home-page {
   max-width: 600px;
   margin: 0 auto;
@@ -7,6 +8,7 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles for the main heading */
 .home-page h1 {
   text-align: center;
   margin-bottom: 20px;
@@ -14,6 +16,7 @@
   color: #333;
 }
 
+/* Styles for secondary headings */
 .home-page h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -21,20 +24,24 @@
   color: #333;
 }
 
+/* Styles for the links container */
 .home-page .links {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
 }
 
+/* Styles for buttons in the links container */
 .home-page .links .btn {
   margin: 0 10px;
 }
 
+/* Styles for form groups */
 .home-page .form-group {
   margin-bottom: 15px;
 }
 
+/* Styles for form controls (input fields) */
 .home-page .form-control {
   width: 100%;
   padding: 10px;
@@ -43,52 +50,62 @@
   border-radius: 5px;
 }
 
+/* Styles for buttons */
 .home-page .btn {
   margin-top: 10px;
 }
 
+/* Styles for the button group container */
 .home-page .button-group {
   display: flex;
   justify-content: center;
   margin-top: 20px;
 }
 
+/* Styles for the eligibility results container */
 .home-page .eligibility-results {
   margin-top: 20px;
 }
 
+/* Styles for the eligibility results heading */
 .home-page .eligibility-results h3 {
   text-align: center;
 }
 
+/* Styles for the eligibility results list */
 .home-page .eligibility-results ul {
   list-style-type: none;
   padding: 0;
 }
 
+/* Styles for the eligibility results list items */
 .home-page .eligibility-results ul li {
   padding: 10px;
   border: 1px solid #ccc;
   margin-top: 10px;
 }
 
+/* Styles for the benefits dropdown list */
 .home-page .benefits-dropdown ul {
   list-style-type: none;
   padding: 0;
 }
 
+/* Styles for the benefits dropdown list items */
 .home-page .benefits-dropdown ul li {
   padding: 10px;
   border: 1px solid #ccc;
   margin-top: 10px;
 }
 
+/* Styles for the divider */
 .home-page .divider {
   margin: 20px 0;
   border: 0;
   border-top: 1px solid #ccc;
 }
 
+/* Styles for alert messages */
 .alert {
   padding: 10px;
   margin-bottom: 20px;
@@ -96,12 +113,14 @@
   text-align: center;
 }
 
+/* Styles for success alert messages */
 .alert-success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
+/* Styles for danger alert messages */
 .alert-danger {
   background-color: #f8d7da;
   color: #721c24;

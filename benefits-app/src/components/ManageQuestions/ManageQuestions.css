@@ -1,3 +1,4 @@
+/* Styles for the manage questions container */
 .manage-questions {
   max-width: 600px;
   margin: 0 auto;
@@ -7,12 +8,14 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles for the top buttons container */
 .manage-questions .top-buttons {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
+/* Styles for the main heading */
 .manage-questions h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -20,16 +23,19 @@
   color: #333;
 }
 
+/* Styles for form groups */
 .manage-questions .form-group {
   margin-bottom: 20px;
 }
 
+/* Styles for form labels */
 .manage-questions .form-group label {
   font-size: 1.1em;
   color: #333;
   font-weight: 600;
 }
 
+/* Styles for form controls (input fields) */
 .manage-questions .form-control {
   width: 100%;
   padding: 10px;
@@ -38,6 +44,7 @@
   border-radius: 5px;
 }
 
+/* Styles for form buttons container */
 .manage-questions .form-buttons {
   display: flex;
   justify-content: center;
@@ -45,10 +52,12 @@
   margin-top: 20px;
 }
 
+/* Styles for buttons */
 .manage-questions .btn {
   margin-top: 10px;
 }
 
+/* Styles for the question list */
 .manage-questions .question-list {
   list-style-type: none;
   padding: 0;
@@ -57,6 +66,7 @@
   align-items: center;
 }
 
+/* Styles for list items in the question list */
 .manage-questions .question-list li {
   display: flex;
   justify-content: space-between;
@@ -69,11 +79,13 @@
   max-width: 600px;
 }
 
+/* Styles for the question buttons container */
 .manage-questions .question-buttons {
   display: flex;
   gap: 10px;
 }
 
+/* Styles for alert messages */
 .manage-questions .alert {
   padding: 10px;
   margin-bottom: 20px;
@@ -81,12 +93,14 @@
   text-align: center;
 }
 
+/* Styles for success alert messages */
 .alert-success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
+/* Styles for danger alert messages */
 .alert-danger {
   background-color: #f8d7da;
   color: #721c24;

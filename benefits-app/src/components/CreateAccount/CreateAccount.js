@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import './CreateAccount.css';
 import axios from '../../utils/axiosConfig';
 
+/**
+ * CreateAccount component for handling user account creation.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function CreateAccount() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,6 +15,11 @@ function CreateAccount() {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
+  /**
+   * Handles the account creation process.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     try {
@@ -27,6 +37,9 @@ function CreateAccount() {
     }
   };
 
+  /**
+   * Handles navigation back to the homepage.
+   */
   const handleBackToHomepage = () => {
     navigate('/');
   };

@@ -15,10 +15,21 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
+/**
+ * Security configuration class for the application.
+ * This class configures CORS, CSRF, and security filters.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /**
+     * Configures the security filter chain.
+     *
+     * @param http the HttpSecurity object
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,11 +63,21 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Bean for BCryptPasswordEncoder.
+     *
+     * @return the BCryptPasswordEncoder bean
+     */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Bean for CORS filter.
+     *
+     * @return the CorsFilter bean
+     */
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -69,6 +90,11 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
+    /**
+     * Bean for JWT authentication filter.
+     *
+     * @return the JwtAuthenticationFilter bean
+     */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();

@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy the project files to the container
 COPY . .
 
-# Package the application
+# Package the application, skipping tests to speed up the build process
 RUN ./mvnw package -DskipTests
 
 # Expose the port the application runs on

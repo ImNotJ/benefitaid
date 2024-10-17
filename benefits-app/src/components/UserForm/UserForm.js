@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import './UserForm.css';
 
+/**
+ * UserForm component for handling the user form and eligibility check.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function UserForm() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
@@ -16,6 +21,9 @@ function UserForm() {
     fetchQuizzes();
   }, []);
 
+  /**
+   * Fetches the quizzes from the API.
+   */
   const fetchQuizzes = async () => {
     try {
       const response = await axios.get('/api/quizzes');
@@ -25,6 +33,11 @@ function UserForm() {
     }
   };
 
+  /**
+   * Fetches the questions for a selected quiz from the API.
+   *
+   * @param {string} quizId - The ID of the selected quiz.
+   */
   const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quizzes/${quizId}`);
@@ -35,11 +48,21 @@ function UserForm() {
     }
   };
 
+  /**
+   * Handles the selection of a quiz.
+   *
+   * @param {Object} quiz - The selected quiz object.
+   */
   const handleQuizSelect = (quiz) => {
     setSelectedQuiz(quiz);
     fetchQuestions(quiz.id);
   };
 
+  /**
+   * Handles input changes for the form fields.
+   *
+   * @param {Event} e - The input change event.
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setResponses({
@@ -48,6 +71,11 @@ function UserForm() {
     });
   };
 
+  /**
+   * Handles the form submission for eligibility check.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     const email = localStorage.getItem('email'); // Assuming email is stored in localStorage
@@ -110,6 +138,9 @@ function UserForm() {
     }
   };
 
+  /**
+   * Handles navigation back to the dashboard or quizzes list.
+   */
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       // If a quiz is selected, go back to the list of quizzes
@@ -125,12 +156,21 @@ function UserForm() {
     }
   };
 
+  /**
+   * Handles the logout process.
+   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     window.location.href = '/user-login'; // Redirect to user login page
   };
 
+  /**
+   * Renders the appropriate input field based on the question type.
+   *
+   * @param {Object} question - The question object.
+   * @returns {React.ReactNode} The rendered input field.
+   */
   const renderInputField = (question) => {
     switch (question.questionType) {
       case 'numerical':

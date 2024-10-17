@@ -16,17 +16,31 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Filter to authenticate requests using JWT tokens.
+ * This filter is executed once per request and checks the Authorization header for a valid JWT token.
+ */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Dotenv dotenv = Dotenv.load();
     private static final String SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
 
+    /**
+     * Filters incoming requests and authenticates them using JWT tokens.
+     *
+     * @param request  the HTTP request
+     * @param response the HTTP response
+     * @param chain    the filter chain
+     * @throws ServletException if an error occurs during filtering
+     * @throws IOException      if an I/O error occurs during filtering
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
         System.out.println("Request URI: " + path); // Debug log
 
+        // Skip authentication for specific paths
         if ("/api/admins/login".equals(path) || "/api/users/login".equals(path) || "/api/users".equals(path)) {
             chain.doFilter(request, response);
             return;

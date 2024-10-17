@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * REST controller for managing Admin entities.
+ */
 @RestController
 @RequestMapping("/api/admins")
 public class AdminController {
@@ -31,6 +34,12 @@ public class AdminController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * Endpoint for admin login.
+     *
+     * @param admin the admin credentials
+     * @return a ResponseEntity containing the JWT token and role if login is successful, otherwise a 401 status
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Admin admin) {
         logger.info("Attempting to log in");
@@ -46,32 +55,67 @@ public class AdminController {
         return ResponseEntity.status(401).body("Invalid username or password");
     }
 
+    /**
+     * Endpoint to create a new admin.
+     *
+     * @param admin the admin entity to create
+     * @return the created admin entity
+     */
     @PostMapping
     public Admin createAdmin(@Valid @RequestBody Admin admin) {
         return adminService.saveAdmin(admin);
     }
 
+    /**
+     * Endpoint to get an admin by ID.
+     *
+     * @param id the ID of the admin
+     * @return the admin entity
+     */
     @GetMapping("/{id}")
     public Admin getAdminById(@PathVariable Long id) {
         return adminService.getAdminById(id);
     }
 
+    /**
+     * Endpoint to get all admins.
+     *
+     * @return a list of all admin entities
+     */
     @GetMapping
     public List<Admin> getAllAdmins() {
         return adminService.getAllAdmins();
     }
 
+    /**
+     * Endpoint to update an admin.
+     *
+     * @param id    the ID of the admin to update
+     * @param admin the updated admin entity
+     * @return the updated admin entity
+     */
     @PutMapping("/{id}")
     public Admin updateAdmin(@PathVariable Long id, @Valid @RequestBody Admin admin) {
         admin.setId(id);
         return adminService.saveAdmin(admin);
     }
 
+    /**
+     * Endpoint to delete an admin by ID.
+     *
+     * @param id the ID of the admin to delete
+     */
     @DeleteMapping("/{id}")
     public void deleteAdmin(@PathVariable Long id) {
         adminService.deleteAdminById(id);
     }
 
+    /**
+     * Generates a JWT token for the given admin.
+     *
+     * @param admin the admin entity
+     * @return the generated JWT token
+     */
     private String generateJwtToken(Admin admin) {
         long expirationTime = 1000 * 60 * 60; // 1 hour
         return Jwts.builder()

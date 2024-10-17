@@ -8,11 +8,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service class for checking user eligibility for benefits.
+ */
 @Service
 public class EligibilityService {
+
     @Autowired
     private BenefitRepository benefitRepository;
 
+    /**
+     * Checks the eligibility of a user for various benefits.
+     *
+     * @param user the user entity containing the information to check eligibility
+     * @return a list of benefits the user is eligible for
+     */
     public List<Benefit> checkEligibility(User user) {
         List<Benefit> benefits = benefitRepository.findAll();
         // Implement eligibility logic based on user responses and benefit requirements

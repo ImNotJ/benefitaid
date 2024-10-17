@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { jwtDecode } from 'jwt-decode'; // Correct import statement
+import jwtDecode from 'jwt-decode'; // Correct import statement
 import HomePage from './components/HomePage/HomePage';
 import AdminLogin from './components/AdminLogin/AdminLogin';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
@@ -30,7 +30,6 @@ function App() {
       const timeout = expiryTime - currentTime;
 
       const onExpire = () => {
-        
         const role = localStorage.getItem('role');
         if (role === 'ROLE_ADMIN' || role === 'ROLE_ROOT_ADMIN') {
           navigate('/admin-login'); // Redirect to admin login page

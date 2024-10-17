@@ -9,6 +9,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Configuration class to initialize data in the database.
+ * This class is responsible for creating the root admin user if it does not exist.
+ */
 @Configuration
 public class DataInitializer {
 
@@ -18,6 +22,10 @@ public class DataInitializer {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * Method to initialize data after the bean is constructed.
+     * This method loads environment variables and creates the root admin user if it does not exist.
+     */
     @PostConstruct
     public void init() {
         Dotenv dotenv = Dotenv.load();

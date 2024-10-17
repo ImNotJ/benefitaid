@@ -2,9 +2,18 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 
+/**
+ * AdminDashboard component for managing admin-related tasks.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function AdminDashboard() {
   const navigate = useNavigate();
 
+  /**
+   * Handles the logout process by removing the token and role from localStorage
+   * and navigating to the admin login page.
+   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');

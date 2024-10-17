@@ -1,3 +1,4 @@
+/* Styles for the manage quizzes container */
 .manage-quizzes {
   max-width: 600px;
   margin: 0 auto;
@@ -7,12 +8,14 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles for the top buttons container */
 .manage-quizzes .top-buttons {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
+/* Styles for the main heading and subheadings */
 .manage-quizzes h2, .manage-quizzes h3 {
   text-align: center;
   margin-bottom: 20px;
@@ -20,16 +23,19 @@
   color: #333;
 }
 
+/* Styles for form groups */
 .manage-quizzes .form-group {
   margin-bottom: 20px;
 }
 
+/* Styles for form labels */
 .manage-quizzes .form-group label {
   font-size: 1.1em;
   color: #333;
   font-weight: 600;
 }
 
+/* Styles for form controls (input fields) */
 .manage-quizzes .form-control {
   width: 100%;
   padding: 10px;
@@ -38,15 +44,18 @@
   border-radius: 5px;
 }
 
+/* Styles for the dual list box container */
 .manage-quizzes .dual-list-box {
   display: flex;
   justify-content: space-between;
 }
 
+/* Styles for individual list boxes */
 .manage-quizzes .list-box {
   width: 48%;
 }
 
+/* Styles for list box headings */
 .manage-quizzes .list-box h3 {
   text-align: center;
   font-size: 1.1em;
@@ -54,6 +63,7 @@
   color: #555;
 }
 
+/* Styles for list box unordered lists */
 .manage-quizzes .list-box ul {
   list-style-type: none;
   padding: 0;
@@ -64,6 +74,7 @@
   overflow-y: auto;
 }
 
+/* Styles for list items in list boxes */
 .manage-quizzes .list-box ul li {
   display: flex;
   justify-content: space-between;
@@ -71,16 +82,19 @@
   margin-bottom: 5px;
 }
 
+/* Styles for question buttons container */
 .manage-quizzes .list-box ul li .question-buttons {
   display: flex;
   gap: 5px;
   justify-content: flex-end;
 }
 
+/* Styles for buttons in list items */
 .manage-quizzes .list-box ul li button {
   font-size: 0.8em;
 }
 
+/* Styles for form buttons container */
 .manage-quizzes .form-buttons {
   display: flex;
   justify-content: center;
@@ -88,15 +102,18 @@
   margin-top: 20px;
 }
 
+/* Styles for buttons */
 .manage-quizzes .btn {
   margin-top: 10px;
 }
 
+/* Styles for the quiz list */
 .manage-quizzes .quiz-list {
   list-style-type: none;
   padding: 0;
 }
 
+/* Styles for list items in the quiz list */
 .manage-quizzes .quiz-list li {
   display: flex;
   justify-content: space-between;
@@ -107,6 +124,7 @@
   margin-top: 10px;
 }
 
+/* Styles for alert messages */
 .manage-quizzes .alert {
   padding: 10px;
   margin-bottom: 20px;
@@ -114,12 +132,14 @@
   text-align: center;
 }
 
+/* Styles for success alert messages */
 .alert-success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
+/* Styles for danger alert messages */
 .alert-danger {
   background-color: #f8d7da;
   color: #721c24;

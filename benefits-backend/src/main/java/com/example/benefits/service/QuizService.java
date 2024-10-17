@@ -13,8 +13,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Service class for managing Quiz entities.
+ */
 @Service
 public class QuizService {
+
     @Autowired
     private QuizRepository quizRepository;
 
@@ -24,6 +28,13 @@ public class QuizService {
     @Autowired
     private BenefitRepository benefitRepository;
 
+    /**
+     * Saves a quiz entity.
+     * Sets the questions and benefits for the quiz before saving.
+     *
+     * @param quiz the quiz entity to save
+     * @return the saved quiz entity
+     */
     public Quiz saveQuiz(Quiz quiz) {
         Set<Question> questions = new HashSet<>();
         for (Long questionId : quiz.getQuestionIds()) {
@@ -46,14 +57,30 @@ public class QuizService {
         return quizRepository.save(quiz);
     }
 
+    /**
+     * Gets a quiz by ID.
+     *
+     * @param id the ID of the quiz
+     * @return the quiz entity, or null if not found
+     */
     public Quiz getQuizById(Long id) {
         return quizRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Gets all quizzes.
+     *
+     * @return a list of all quiz entities
+     */
     public List<Quiz> getAllQuizzes() {
         return quizRepository.findAll();
     }
 
+    /**
+     * Deletes a quiz by ID.
+     *
+     * @param id the ID of the quiz to delete
+     */
     public void deleteQuizById(Long id) {
         quizRepository.deleteById(id);
     }

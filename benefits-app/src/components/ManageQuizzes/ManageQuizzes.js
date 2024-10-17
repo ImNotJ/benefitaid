@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageQuizzes.css';
 
+/**
+ * ManageQuizzes component for handling the management of quizzes.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function ManageQuizzes() {
   const [quizzes, setQuizzes] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -21,6 +26,9 @@ function ManageQuizzes() {
     fetchBenefits();
   }, []);
 
+  /**
+   * Fetches the quizzes from the API.
+   */
   const fetchQuizzes = async () => {
     try {
       const response = await axios.get('/api/quizzes');
@@ -30,6 +38,9 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Fetches the questions from the API.
+   */
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
@@ -39,6 +50,9 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Fetches the benefits from the API.
+   */
   const fetchBenefits = async () => {
     try {
       const response = await axios.get('/api/benefits');
@@ -48,15 +62,20 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Handles the addition of a new quiz.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleAddQuiz = async (e) => {
     e.preventDefault();
-  
+
     if (!quizName || selectedQuestions.length === 0 || selectedBenefits.length === 0) {
       setErrorMessage('Quiz Name, Questions, and Benefits are required.');
       setSuccessMessage('');
       return;
     }
-  
+
     const newQuiz = { quizName, questionIds: selectedQuestions, benefitIds: selectedBenefits };
     try {
       if (editingQuizIndex !== null) {
@@ -77,6 +96,11 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Handles the deletion of a quiz.
+   *
+   * @param {string} id - The ID of the quiz to delete.
+   */
   const handleDeleteQuiz = async (id) => {
     try {
       await axios.delete(`/api/quizzes/${id}`);
@@ -90,6 +114,11 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Handles the editing of a quiz.
+   *
+   * @param {number} index - The index of the quiz to edit.
+   */
   const handleEditQuiz = (index) => {
     const quiz = quizzes[index];
     setQuizName(quiz.quizName);
@@ -98,6 +127,9 @@ function ManageQuizzes() {
     setEditingQuizIndex(index);
   };
 
+  /**
+   * Clears all input fields.
+   */
   const handleClearFields = () => {
     setQuizName('');
     setSelectedQuestions([]);
@@ -107,16 +139,29 @@ function ManageQuizzes() {
     setErrorMessage('');
   };
 
+  /**
+   * Handles navigation back to the admin dashboard.
+   */
   const handleBackToDashboard = () => {
     navigate('/admin-dashboard');
   };
 
+  /**
+   * Handles the logout process.
+   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/admin-login');
   };
 
+  /**
+   * Handles moving a question between available and selected lists.
+   *
+   * @param {string} id - The ID of the question to move.
+   * @param {string} from - The source list.
+   * @param {string} to - The destination list.
+   */
   const handleMoveQuestion = (id, from, to) => {
     if (from === 'available') {
       setSelectedQuestions((prevSelectedQuestions) => [...prevSelectedQuestions, id]);
@@ -125,6 +170,13 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Handles moving a benefit between available and selected lists.
+   *
+   * @param {string} id - The ID of the benefit to move.
+   * @param {string} from - The source list.
+   * @param {string} to - The destination list.
+   */
   const handleMoveBenefit = (id, from, to) => {
     if (from === 'available') {
       setSelectedBenefits((prevSelectedBenefits) => [...prevSelectedBenefits, id]);
@@ -133,6 +185,12 @@ function ManageQuizzes() {
     }
   };
 
+  /**
+   * Handles reordering a question in the selected list.
+   *
+   * @param {string} id - The ID of the question to reorder.
+   * @param {string} direction - The direction to move the question ('up' or 'down').
+   */
   const handleReorderQuestion = (id, direction) => {
     setSelectedQuestions((prevSelectedQuestions) => {
       const index = prevSelectedQuestions.indexOf(id);

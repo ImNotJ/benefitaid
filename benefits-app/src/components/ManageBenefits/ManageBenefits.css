@@ -1,3 +1,4 @@
+/* Styles for the manage benefits container */
 .manage-benefits {
   max-width: 600px;
   margin: 0 auto;
@@ -7,12 +8,14 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles for the top buttons container */
 .manage-benefits .top-buttons {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
+/* Styles for the main heading */
 .manage-benefits h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -20,6 +23,7 @@
   color: #333;
 }
 
+/* Styles for subheadings */
 .manage-benefits h3 {
   text-align: center;
   margin-bottom: 20px;
@@ -27,16 +31,19 @@
   color: #333;
 }
 
+/* Styles for form groups */
 .manage-benefits .form-group {
   margin-bottom: 20px;
 }
 
+/* Styles for form labels */
 .manage-benefits .form-group label {
   font-size: 1.1em;
   color: #333;
   font-weight: 600;
 }
 
+/* Styles for form controls (input fields) */
 .manage-benefits .form-control {
   width: 100%;
   padding: 10px;
@@ -45,6 +52,7 @@
   border-radius: 5px;
 }
 
+/* Styles for form buttons container */
 .manage-benefits .form-buttons {
   display: flex;
   justify-content: center;
@@ -52,10 +60,12 @@
   margin-top: 20px;
 }
 
+/* Styles for buttons */
 .manage-benefits .btn {
   margin-top: 10px;
 }
 
+/* Styles for benefit, requirement, and condition lists */
 .manage-benefits .benefit-list,
 .manage-benefits .requirement-list,
 .manage-benefits .condition-list {
@@ -63,6 +73,7 @@
   padding: 0;
 }
 
+/* Styles for list items in benefit, requirement, and condition lists */
 .manage-benefits .benefit-list li,
 .manage-benefits .requirement-list li,
 .manage-benefits .condition-list li {
@@ -75,11 +86,13 @@
   margin-top: 10px;
 }
 
+/* Styles for requirement and condition sections */
 .manage-benefits .requirement-section,
 .manage-benefits .condition-section {
   margin-top: 30px;
 }
 
+/* Styles for alert messages */
 .manage-benefits .alert {
   padding: 10px;
   margin-bottom: 20px;
@@ -87,12 +100,14 @@
   text-align: center;
 }
 
+/* Styles for success alert messages */
 .alert-success {
   background-color: #d4edda;
   color: #155724;
   border: 1px solid #c3e6cb;
 }
 
+/* Styles for danger alert messages */
 .alert-danger {
   background-color: #f8d7da;
   color: #721c24;
