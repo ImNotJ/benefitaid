@@ -67,7 +67,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.30</version> <!-- Latest stable version -->
-            <scope>runtime</scope>
         </dependency>
 
         <!-- Spring Boot DevTools -->
@@ -140,6 +139,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+                </configuration>
             </plugin>
             <!-- Maven Compiler Plugin -->
             <plugin>
