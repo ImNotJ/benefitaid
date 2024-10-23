@@ -11,24 +11,30 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4  # Updated from v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4  # Added Java setup
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Debug - List repository contents
         run: |
           pwd
           ls -la
-          
+
       - name: Build with Maven
         run: mvn clean package
-        
+
       - name: Debug - List target directory
         run: ls -la target/
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3  # Updated to v3
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3  # Updated to v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -39,13 +45,14 @@ jobs:
           docker push imnotj/benefits-backend:latest
 
       - name: Upload .env file as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4  # Updated from v2 to v4
         with:
           name: env-file
           path: .env
+          retention-days: 1  # Optional: specify how long to keep the artifact
 
       - name: SSH into EC2 and deploy
-        uses: appleboy/ssh-action@v0.1.3
+        uses: appleboy/ssh-action@v1.0.3  # Updated to latest version
         with:
           host: ec2-52-71-148-64.compute-1.amazonaws.com
           username: ec2-user
@@ -59,10 +66,10 @@ jobs:
             docker run --env-file /home/ec2-user/deployment/.env -d --name benefits-backend -p 8080:8080 imnotj/benefits-backend:latest
 
       - name: Download .env file on EC2
-        uses: appleboy/scp-action@v0.1.3
+        uses: appleboy/scp-action@v0.1.4  # Updated to latest version
         with:
           host: ec2-52-71-148-64.compute-1.amazonaws.com
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: .env
-          target: /home/ec2-user/deployment/.env
+          target: /home/ec2-user/deployment/
