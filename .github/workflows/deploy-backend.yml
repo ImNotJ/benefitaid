@@ -52,7 +52,7 @@ jobs:
         with:
           name: env-file
           path: .env
-          retention-days: 1  # Optional: specify how long to keep the artifact
+          working-directory: benefits-backend
 
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v1.0.3  # Updated to latest version
