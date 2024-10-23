@@ -50,6 +50,10 @@ jobs:
             --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -t imnotj/benefits-backend:latest .
+          # Clean any previous builds
+          docker system prune -f
+          # Build with no cache
+          docker build --no-cache -t imnotj/benefits-backend:latest .
           docker push imnotj/benefits-backend:latest
         working-directory: benefits-backend  # Set the working directory to benefits-backend
 
