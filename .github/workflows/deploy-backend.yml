@@ -65,4 +65,7 @@ jobs:
             docker pull imnotj/benefits-backend:latest
             docker stop benefits-backend || true
             docker rm benefits-backend || true
-            docker run -d --name benefits-backend -p 8080:8080 imnotj/benefits-backend:latest
+            docker run -d --name benefits-backend -p 8080:8080 \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              imnotj/benefits-backend:latest
