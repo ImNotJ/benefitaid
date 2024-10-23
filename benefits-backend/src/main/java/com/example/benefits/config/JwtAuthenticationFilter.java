@@ -1,8 +1,8 @@
 package com.example.benefits.config;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +23,16 @@ import java.io.IOException;
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Dotenv dotenv = Dotenv.load();
-    private static final String SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
+
+    @PostConstruct
+    public void init() {
+        // Ensure the secret key is set
+        if (secretKey == null) {
+            throw new IllegalStateException("JWT secret key is not set in environment variables");
+        }
+    }
 
     /**
      * Filters incoming requests and authenticates them using JWT tokens.
@@ -57,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 Claims claims = Jwts.parser()
-                        .setSigningKey(SECRET_KEY)
+                        .setSigningKey(secretKey)
                         .parseClaimsJws(token)
                         .getBody();
 

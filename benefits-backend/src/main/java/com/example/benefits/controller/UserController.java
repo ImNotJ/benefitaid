@@ -2,14 +2,15 @@ package com.example.benefits.controller;
 
 import com.example.benefits.entity.User;
 import com.example.benefits.service.UserService;
-import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,14 +26,23 @@ import java.util.logging.Logger;
 public class UserController {
 
     private static final Logger logger = Logger.getLogger(UserController.class.getName());
-    private static final Dotenv dotenv = Dotenv.load();
-    private static final String SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
+
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @PostConstruct
+    public void init() {
+        // Ensure the secret key is set
+        if (secretKey == null) {
+            throw new IllegalStateException("JWT secret key is not set in environment variables");
+        }
+    }
 
     /**
      * Endpoint for user login.
@@ -132,7 +142,7 @@ public class UserController {
                 .claim("role", user.getRole()) // Include role in JWT token
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 }

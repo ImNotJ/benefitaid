@@ -2,14 +2,15 @@ package com.example.benefits.controller;
 
 import com.example.benefits.entity.Admin;
 import com.example.benefits.service.AdminService;
-import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,14 +26,23 @@ import java.util.logging.Logger;
 public class AdminController {
 
     private static final Logger logger = Logger.getLogger(AdminController.class.getName());
-    private static final Dotenv dotenv = Dotenv.load();
-    private static final String SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
+
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
 
     @Autowired
     private AdminService adminService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @PostConstruct
+    public void init() {
+        // Ensure the secret key is set
+        if (secretKey == null) {
+            throw new IllegalStateException("JWT secret key is not set in environment variables");
+        }
+    }
 
     /**
      * Endpoint for admin login.
@@ -123,7 +133,7 @@ public class AdminController {
                 .claim("role", admin.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 }

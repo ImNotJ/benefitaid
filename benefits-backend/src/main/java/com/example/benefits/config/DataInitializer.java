@@ -2,8 +2,8 @@ package com.example.benefits.config;
 
 import com.example.benefits.entity.Admin;
 import com.example.benefits.repository.AdminRepository;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -22,17 +22,18 @@ public class DataInitializer {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Value("${ROOT_ADMIN_USERNAME}")
+    private String rootAdminUsername;
+
+    @Value("${ROOT_ADMIN_PASSWORD}")
+    private String rootAdminPassword;
+
     /**
      * Method to initialize data after the bean is constructed.
      * This method loads environment variables and creates the root admin user if it does not exist.
      */
     @PostConstruct
     public void init() {
-        Dotenv dotenv = Dotenv.load();
-
-        String rootAdminUsername = dotenv.get("ROOT_ADMIN_USERNAME");
-        String rootAdminPassword = dotenv.get("ROOT_ADMIN_PASSWORD");
-
         if (rootAdminUsername == null || rootAdminPassword == null) {
             throw new IllegalStateException("Root admin credentials are not set in environment variables");
         }
