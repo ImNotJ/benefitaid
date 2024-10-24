@@ -21,7 +21,7 @@ jobs:
 
     - name: Build project with Maven
       run: |
-        cd beneftitaid/benefits-backend  # Change to the correct directory
+        cd benefits-backend  # Change to the correct directory
         mvn clean package
 
     - name: Log in to Docker Hub
