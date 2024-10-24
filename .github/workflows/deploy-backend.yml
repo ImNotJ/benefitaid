@@ -20,13 +20,17 @@ jobs:
         distribution: 'adopt'  # You can use 'adopt', 'temurin', or 'zulu'
 
     - name: Build project with Maven
-      run: mvn clean package
+      run: |
+        cd beneftitaid/benefits-backend  # Change to the correct directory
+        mvn clean package
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Build Docker image
-      run: docker build -t imnotj/benefits-backend:latest .
+      run: |
+        cd beneftitaid/benefits-backend  # Ensure you're in the correct directory
+        docker build -t imnotj/benefits-backend:latest .
 
     - name: Push Docker image to Docker Hub
       run: docker push imnotj/benefits-backend:latest
