@@ -33,14 +33,12 @@ jobs:
         run: mvn clean package
         working-directory: benefits-backend
 
-      # List contents of the target directory to confirm JAR build
       - name: Debug - List target directory
         run: ls -la target/
         working-directory: benefits-backend
 
-      # Check JAR contents to ensure MySQL driver is included
-      - name: Check JAR Contents
-        run: jar tvf target/benefits-backend.jar
+      - name: Debug - Verify JAR contents
+        run: jar tvf target/benefits-backend-0.0.1-SNAPSHOT.jar
         working-directory: benefits-backend
 
       - name: Set up Docker Buildx
