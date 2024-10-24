@@ -1,57 +1,106 @@
-name: Deploy Benefits Backend
+name: Backend Deployment
 
 on:
   push:
     branches:
-      - main  # Adjust this to the branch you want to trigger the workflow
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v2
-      with:
-        java-version: '17'
-        distribution: 'adopt'  # You can use 'adopt', 'temurin', or 'zulu'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Build project with Maven
-      run: |
-        cd benefits-backend  # Change to the correct directory
-        mvn clean package
+      - name: Debug - List repository contents
+        run: |
+          pwd
+          ls -la
 
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      # Check for MySQL driver in dependency tree
+      - name: Check Dependencies
+        run: mvn dependency:tree
+        working-directory: benefits-backend
 
-    - name: Build Docker image
-      run: |
-        cd benefits-backend  # Ensure you're in the correct directory
-        docker build -t imnotj/benefits-backend:latest .
+      - name: Build with Maven
+        run: mvn clean package
+        working-directory: benefits-backend
 
-    - name: Push Docker image to Docker Hub
-      run: docker push imnotj/benefits-backend:latest
+      - name: Debug - List target directory
+        run: ls -la target/
+        working-directory: benefits-backend
 
-    - name: Set up SSH for EC2
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/benefits-backend.pem
-        chmod 600 ~/.ssh/benefits-backend.pem
+      - name: Debug - Verify JAR contents
+        run: jar tvf target/benefits-backend-0.0.1-SNAPSHOT.jar
+        working-directory: benefits-backend
 
-    - name: SSH into EC2 instance and deploy
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/benefits-backend.pem ec2-user@ec2-52-71-148-64.compute-1.amazonaws.com << 'EOF'
-          docker pull imnotj/benefits-backend:latest
-          docker stop benefits-backend || true
-          docker rm benefits-backend || true
-          docker run -d --name benefits-backend -p 8080:8080 \
-            -e ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
-            -e ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
-            -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-            -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            imnotj/benefits-backend:latest
-        EOF
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build \
+            --build-arg ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
+            --build-arg ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
+            --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -t imnotj/benefits-backend:latest .
+          docker push imnotj/benefits-backend:latest
+        working-directory: benefits-backend
+
+      # List Docker images for verification
+      - name: Debug - List Docker images
+        run: docker images
+
+      - name: SSH into EC2 and deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-52-71-148-64.compute-1.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p /home/ec2-user/deployment
+            cd /home/ec2-user/deployment
+            docker pull imnotj/benefits-backend:latest
+            docker stop benefits-backend || true
+            docker rm benefits-backend || true
+            docker run -d --name benefits-backend -p 8080:8080 \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              imnotj/benefits-backend:latest
+
+      # Debug environment variables in EC2 container
+      - name: Debug Environment Variables
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-52-71-148-64.compute-1.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker exec benefits-backend printenv DB_USERNAME
+            docker exec benefits-backend printenv DB_PASSWORD
+
+      # Debug Docker containers and logs to verify the backend container status
+      - name: Debug - Check running containers
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-52-71-148-64.compute-1.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker ps -a
+            docker logs benefits-backend
