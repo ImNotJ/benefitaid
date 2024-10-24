@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import jwtDecode from 'jwt-decode'; // Correct import statement
+import { jwtDecode } from 'jwt-decode';
 import HomePage from './components/HomePage/HomePage';
 import AdminLogin from './components/AdminLogin/AdminLogin';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard';
