@@ -1,9 +1,9 @@
-name: Deploy to EC2
+name: Deploy Benefits Backend
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust this to the branch you want to trigger the workflow
 
 jobs:
   build-and-deploy:
@@ -17,39 +17,36 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '17'
-        distribution: 'adopt'
 
-    - name: Build with Maven
+    - name: Build project with Maven
       run: mvn clean package
-
-    - name: Build Docker image
-      run: |
-        docker build -t imnotj/benefits-backend:latest .
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+    - name: Build Docker image
+      run: docker build -t imnotj/benefits-backend:latest .
+
     - name: Push Docker image to Docker Hub
       run: docker push imnotj/benefits-backend:latest
 
-    - name: Deploy to EC2
-      env:
-        ROOT_ADMIN_USERNAME: ${{ secrets.ROOT_ADMIN_USERNAME }}
-        ROOT_ADMIN_PASSWORD: ${{ secrets.ROOT_ADMIN_PASSWORD }}
-        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-        DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    - name: Set up SSH for EC2
       run: |
-        echo "Deploying to EC2..."
-        ssh -o StrictHostKeyChecking=no -i "~/aws-keys/benefits-backend.pem" ec2-user@ec2-52-71-148-64.compute-1.amazonaws.com << 'EOF'
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/benefits-backend.pem
+        chmod 600 ~/.ssh/benefits-backend.pem
+
+    - name: SSH into EC2 instance and deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/benefits-backend.pem ec2-user@ec2-52-71-148-64.compute-1.amazonaws.com << 'EOF'
           docker pull imnotj/benefits-backend:latest
           docker stop benefits-backend || true
           docker rm benefits-backend || true
           docker run -d --name benefits-backend -p 8080:8080 \
-            -e ROOT_ADMIN_USERNAME="${{ secrets.ROOT_ADMIN_USERNAME }}" \
-            -e ROOT_ADMIN_PASSWORD="${{ secrets.ROOT_ADMIN_PASSWORD }}" \
-            -e JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}" \
-            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
+            -e ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
+            -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             imnotj/benefits-backend:latest
         EOF
