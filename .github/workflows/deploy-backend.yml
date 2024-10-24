@@ -24,12 +24,23 @@ jobs:
           pwd
           ls -la
 
+      # Check for MySQL driver in dependency tree
+      - name: Check Dependencies
+        run: mvn dependency:tree
+        working-directory: benefits-backend
+
       - name: Build with Maven
         run: mvn clean package
         working-directory: benefits-backend
 
+      # List contents of the target directory to confirm JAR build
       - name: Debug - List target directory
         run: ls -la target/
+        working-directory: benefits-backend
+
+      # Check JAR contents to ensure MySQL driver is included
+      - name: Check JAR Contents
+        run: jar tvf target/benefits-backend.jar
         working-directory: benefits-backend
 
       - name: Set up Docker Buildx
@@ -53,6 +64,7 @@ jobs:
           docker push imnotj/benefits-backend:latest
         working-directory: benefits-backend
 
+      # List Docker images for verification
       - name: Debug - List Docker images
         run: docker images
 
@@ -73,6 +85,18 @@ jobs:
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               imnotj/benefits-backend:latest
 
+      # Debug environment variables in EC2 container
+      - name: Debug Environment Variables
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-52-71-148-64.compute-1.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker exec benefits-backend printenv DB_USERNAME
+            docker exec benefits-backend printenv DB_PASSWORD
+
+      # Debug Docker containers and logs to verify the backend container status
       - name: Debug - Check running containers
         uses: appleboy/ssh-action@v1.0.3
         with:
