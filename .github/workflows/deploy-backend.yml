@@ -55,8 +55,8 @@ jobs:
             --build-arg ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
             --build-arg ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
             --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --build-arg DB_USERNAME=admin \
+            --build-arg DB_PASSWORD=5247510625,Admin \
             -t imnotj/benefits-backend:latest .
           docker push imnotj/benefits-backend:latest
         working-directory: benefits-backend
@@ -87,8 +87,8 @@ jobs:
             docker stop benefits-backend || true
             docker rm benefits-backend || true
             docker run -d --name benefits-backend -p 8080:8080 \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_USERNAME=admin \
+              -e DB_PASSWORD=5247510625,Admin \
               imnotj/benefits-backend:latest
 
       - name: Debug Environment Variables
