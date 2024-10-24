@@ -68,6 +68,12 @@ jobs:
         run: docker run --rm imnotj/benefits-backend:latest ls -la /app/BOOT-INF/lib/
         working-directory: benefits-backend
 
+      - name: Debug - Verify JAR contents in Docker image
+        run: docker run --rm imnotj/benefits-backend:latest jar tvf /app/benefits-backend.jar | grep mysql
+
+      - name: Debug - Print classpath in Docker container
+        run: docker run --rm imnotj/benefits-backend:latest java -cp /app/benefits-backend.jar com.example.benefits.BenefitsApplication
+
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
