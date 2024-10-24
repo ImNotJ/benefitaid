@@ -27,19 +27,19 @@ jobs:
       # Check for MySQL driver in dependency tree
       - name: Check Dependencies
         run: mvn dependency:tree
-        working-directory: benefits-backend
+        working-directory: benefitaid/benefits-backend
 
       - name: Build with Maven
         run: mvn clean package
-        working-directory: benefits-backend
+        working-directory: benefitaid/benefits-backend
 
       - name: Debug - List target directory
         run: ls -la target/
-        working-directory: benefits-backend
+        working-directory: benefitaid/benefits-backend
 
       - name: Debug - Verify JAR contents
         run: jar tvf target/benefits-backend-0.0.1-SNAPSHOT.jar
-        working-directory: benefits-backend
+        working-directory: benefitaid/benefits-backend
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -60,7 +60,7 @@ jobs:
             --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -t imnotj/benefits-backend:latest .
           docker push imnotj/benefits-backend:latest
-        working-directory: benefits-backend
+        working-directory: benefitaid/benefits-backend
 
       # List Docker images for verification
       - name: Debug - List Docker images
