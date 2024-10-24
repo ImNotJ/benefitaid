@@ -20,9 +20,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: benefits-app
 
       - name: Build frontend
         run: npm run build
+        working-directory: benefits-app
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -32,4 +34,4 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy to S3
-        run: aws s3 sync build/ s3://benefits-frontend --delete
+        run: aws s3 sync benefits-app/build/ s3://benefits-frontend --delete
