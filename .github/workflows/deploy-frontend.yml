@@ -23,11 +23,14 @@ jobs:
           pwd
           ls -la
 
-      - name: Debug - List src/store/reducers contents
-        run: ls -la benefits-app/src/store/reducers
+      - name: Debug - List benefits-app/src/store contents
+        run: ls -la benefits-app/src/store
+
+      - name: Debug - List benefits-app/src/store/reducers contents
+        run: ls -la benefits-app/src/store/reducers || echo "Directory does not exist"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
         working-directory: benefits-app
 
       - name: Build frontend
