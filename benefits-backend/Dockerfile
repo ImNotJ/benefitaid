@@ -1,14 +1,8 @@
-# Build stage
-FROM maven:3.8.4-openjdk-17 as builder
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-# Runtime stage
+# Use an official OpenJDK runtime as a parent image
 FROM openjdk:17-jdk-slim
+
+# Set the working directory in the container
 WORKDIR /app
-COPY --from=builder /app/target/benefits-backend-0.0.1-SNAPSHOT.jar benefits-backend.jar
 
 # Accept build arguments and set environment variables
 ARG ROOT_ADMIN_USERNAME
@@ -23,11 +17,11 @@ ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
 ENV DB_USERNAME=${DB_USERNAME}
 ENV DB_PASSWORD=${DB_PASSWORD}
 
-# Add MySQL driver to classpath explicitly
-RUN mkdir -p /app/lib
-COPY --from=builder /root/.m2/repository/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar /app/lib/
+# Copy the JAR file from the host to the container
+COPY target/benefits-backend-0.0.1-SNAPSHOT.jar /app/benefits-backend.jar
 
-ENV CLASSPATH=/app/lib/*:$CLASSPATH
-
+# Expose the port the application runs on
 EXPOSE 8080
+
+# Run the JAR file
 ENTRYPOINT ["java", "-jar", "benefits-backend.jar"]
