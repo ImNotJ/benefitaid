@@ -29,7 +29,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        cd beneftitaid/benefits-backend  # Ensure you're in the correct directory
+        cd benefits-backend  # Ensure you're in the correct directory
         docker build -t imnotj/benefits-backend:latest .
 
     - name: Push Docker image to Docker Hub
