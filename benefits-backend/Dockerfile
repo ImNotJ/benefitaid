@@ -1,10 +1,22 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+# First stage: Build the application with Maven
+FROM maven:3.8.5-openjdk-17 AS build
 
-# Set the working directory in the container
+# Set the working directory inside the container for the build process
 WORKDIR /app
 
-# Accept build arguments and set environment variables
+# Copy the project files into the container
+COPY . .
+
+# Build the project using Maven and package it as a JAR file
+RUN mvn clean package -DskipTests
+
+# Second stage: Use the OpenJDK runtime for the application
+FROM openjdk:17-jdk-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Accept build arguments and set them as environment variables
 ARG ROOT_ADMIN_USERNAME
 ARG ROOT_ADMIN_PASSWORD
 ARG JWT_SECRET_KEY
@@ -17,11 +29,14 @@ ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
 ENV DB_USERNAME=${DB_USERNAME}
 ENV DB_PASSWORD=${DB_PASSWORD}
 
-# Copy the JAR file from the host to the container
-COPY target/benefits-backend-0.0.1-SNAPSHOT.jar /app/benefits-backend.jar
+# Copy the JAR file from the first stage (build stage) into the container
+COPY --from=build /app/target/benefits-backend-0.0.1-SNAPSHOT.jar /app/benefits-backend.jar
 
 # Expose the port the application runs on
 EXPOSE 8080
 
-# Run the JAR file
-ENTRYPOINT ["java", "-jar", "benefits-backend.jar"]
+# Debugging: Print environment variables to ensure they are set correctly
+RUN echo "DB_USERNAME=${DB_USERNAME}" && echo "DB_PASSWORD=${DB_PASSWORD}"
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/benefits-backend.jar"]
