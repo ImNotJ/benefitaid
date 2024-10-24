@@ -76,7 +76,7 @@ function AdminLogin() {
           Back to Homepage
         </button>
       </div>
-      <h2>Admin Login test</h2>
+      <h2>Admin Login</h2>
       {success && <div className="alert alert-success">{success}</div>}
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleLogin}>
