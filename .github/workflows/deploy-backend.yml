@@ -52,7 +52,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build \
+          docker build --no-cache \
             --build-arg ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
             --build-arg ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
             --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
@@ -79,6 +79,9 @@ jobs:
             docker stop benefits-backend || true
             docker rm benefits-backend || true
             docker run -d --name benefits-backend -p 8080:8080 \
+              -e ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
+              -e ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
+              -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               imnotj/benefits-backend:latest
