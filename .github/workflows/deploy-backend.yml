@@ -19,25 +19,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Debug - List repository contents
-        run: |
-          pwd
-          ls -la
-
-      - name: Check Dependencies
-        run: mvn dependency:tree
-        working-directory: benefits-backend
-
       - name: Build with Maven
         run: mvn clean package
-        working-directory: benefits-backend
-
-      - name: Debug - List target directory
-        run: ls -la target/
-        working-directory: benefits-backend
-
-      - name: Debug - Verify JAR contents
-        run: jar tvf target/benefits-backend-0.0.1-SNAPSHOT.jar
         working-directory: benefits-backend
 
       - name: Set up Docker Buildx
@@ -55,24 +38,11 @@ jobs:
             --build-arg ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
             --build-arg ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
             --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-            --build-arg DB_USERNAME=admin \
-            --build-arg DB_PASSWORD=5247510625,Admin \
+            --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -t imnotj/benefits-backend:latest .
           docker push imnotj/benefits-backend:latest
         working-directory: benefits-backend
-
-      - name: Debug - List Docker images
-        run: docker images
-
-      - name: Debug - Verify Docker image contents
-        run: docker run --rm imnotj/benefits-backend:latest ls -la /app/BOOT-INF/lib/
-        working-directory: benefits-backend
-
-      - name: Debug - Verify JAR contents in Docker image
-        run: docker run --rm imnotj/benefits-backend:latest jar tvf /app/benefits-backend.jar | grep mysql
-
-      - name: Debug - Print classpath in Docker container
-        run: docker run --rm imnotj/benefits-backend:latest java -cp /app/benefits-backend.jar com.example.benefits.BenefitsApplication
 
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -87,35 +57,9 @@ jobs:
             docker stop benefits-backend || true
             docker rm benefits-backend || true
             docker run -d --name benefits-backend -p 8080:8080 \
-              -e DB_USERNAME=admin \
-              -e DB_PASSWORD=5247510625,Admin \
+              -e ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
+              -e ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
+              -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               imnotj/benefits-backend:latest
-
-      - name: Debug Environment Variables
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ec2-52-71-148-64.compute-1.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker exec benefits-backend printenv DB_USERNAME
-            docker exec benefits-backend printenv DB_PASSWORD
-
-      - name: Debug - Check running containers
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ec2-52-71-148-64.compute-1.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker ps -a
-            docker logs benefits-backend
-
-      - name: Debug - Enable debug logging
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ec2-52-71-148-64.compute-1.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker exec benefits-backend java -Dlogging.level.org.springframework=DEBUG -jar /app/benefits-backend.jar

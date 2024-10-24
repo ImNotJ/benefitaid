@@ -35,8 +35,5 @@ COPY --from=build /app/target/benefits-backend-0.0.1-SNAPSHOT.jar /app/benefits-
 # Expose the port the application runs on
 EXPOSE 8080
 
-# Debugging: Print environment variables to ensure they are set correctly
-RUN echo "DB_USERNAME=${DB_USERNAME}" && echo "DB_PASSWORD=${DB_PASSWORD}"
-
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/benefits-backend.jar"]
