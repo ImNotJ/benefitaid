@@ -23,6 +23,7 @@ jobs:
         run: |
           pwd
           ls -la
+        working-directory: benefitaid
 
       # Check for MySQL driver in dependency tree
       - name: Check Dependencies
