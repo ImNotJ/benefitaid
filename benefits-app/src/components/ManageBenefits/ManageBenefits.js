@@ -16,7 +16,7 @@ const states = [
  * ManageBenefits component for handling the management of benefits.
  *
  * @returns {React.ReactNode} The rendered component.
- */
+ */ 
 function ManageBenefits() {
   const [benefits, setBenefits] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -308,75 +308,6 @@ function ManageBenefits() {
     return question ? question.questionName : '';
   };
 
-  /**
-   * Renders the appropriate input field based on the question type.
-   *
-   * @param {string} questionId - The ID of the question.
-   * @returns {React.ReactNode} The input field for the condition value.
-   */
-  const renderConditionValueInput = (questionId) => {
-    const question = questions.find(q => q.id === questionId);
-    if (!question) return null;
-
-    switch (question.questionType) {
-      case 'Numerical':
-        return (
-          <input
-            type="number"
-            id="currentValue"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        );
-      case 'Text':
-        return (
-          <input
-            type="text"
-            id="currentValue"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        );
-      case 'YesNo':
-        return (
-          <select
-            id="currentValue"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          >
-            <option value="">Select</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        );
-      case 'Date':
-        return (
-          <input
-            type="date"
-            id="currentValue"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        );
-      case 'Email':
-        return (
-          <input
-            type="email"
-            id="currentValue"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="manage-benefits">
       <div className="top-buttons">
@@ -519,7 +450,13 @@ function ManageBenefits() {
         </div>
         <div className="form-group">
           <label htmlFor="currentValue">Value</label>
-          {renderConditionValueInput(currentQuestionId)}
+          <input
+            type="number"
+            id="currentValue"
+            className="form-control"
+            value={currentValue}
+            onChange={(e) => setCurrentValue(e.target.value)}
+          />
         </div>
         <div className="form-buttons">
           <button type="button" onClick={handleAddCondition} className="btn btn-secondary">
