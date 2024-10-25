@@ -174,6 +174,8 @@ function ManageQuestions() {
             <option value="YesNo">Yes/No</option>
             <option value="Date">Date (MM/DD/YYYY)</option>
             <option value="Email">Email (text@domain)</option>
+            <option value="State">State</option>
+            <option value="ExistingBenefits">Existing Benefits</option>
           </select>
         </div>
         <div className="form-group">

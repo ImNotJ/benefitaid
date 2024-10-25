@@ -3,6 +3,15 @@ import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './HomePage.css';
 
+const states = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+  "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+  "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+  "Wisconsin", "Wyoming"
+];
+
 /**
  * HomePage component for displaying the home page and handling the common quiz.
  *
@@ -144,7 +153,7 @@ function HomePage() {
    */
   const renderInputField = (question) => {
     switch (question.questionType) {
-      case 'numerical':
+      case 'Numerical':
         return (
           <input
             type="number"
@@ -156,7 +165,7 @@ function HomePage() {
             required
           />
         );
-      case 'text':
+      case 'Text':
         return (
           <input
             type="text"
@@ -168,7 +177,7 @@ function HomePage() {
             required
           />
         );
-      case 'yesno':
+      case 'YesNo':
         return (
           <select
             id={question.id}
@@ -179,11 +188,11 @@ function HomePage() {
             required
           >
             <option value="">Select</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
           </select>
         );
-      case 'date':
+      case 'Date':
         return (
           <input
             type="date"
@@ -195,7 +204,7 @@ function HomePage() {
             required
           />
         );
-      case 'email':
+      case 'Email':
         return (
           <input
             type="email"
@@ -206,6 +215,24 @@ function HomePage() {
             onChange={handleInputChange}
             required
           />
+        );
+      case 'State':
+        return (
+          <select
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Select a state</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
         );
       default:
         return (

@@ -308,6 +308,17 @@ function ManageBenefits() {
     return question ? question.questionName : '';
   };
 
+  /**
+   * Gets the question type for a given question ID.
+   *
+   * @param {string} questionId - The ID of the question.
+   * @returns {string} The type of the question.
+   */
+  const getQuestionType = (questionId) => {
+    const question = questions.find(q => q.id === questionId);
+    return question ? question.questionType : '';
+  };
+
   return (
     <div className="manage-benefits">
       <div className="top-buttons">
@@ -375,7 +386,6 @@ function ManageBenefits() {
           <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
         </div>
       </form>
-
       <div className="requirement-section">
         <h3>Requirements</h3>
         <div className="form-group">
@@ -422,7 +432,11 @@ function ManageBenefits() {
             id="currentQuestionId"
             className="form-control"
             value={currentQuestionId}
-            onChange={(e) => setCurrentQuestionId(e.target.value)}
+            onChange={(e) => {
+              setCurrentQuestionId(e.target.value);
+              setCurrentOperator('');
+              setCurrentValue('');
+            }}
           >
             <option value="">Select a question</option>
             {questions.map((question) => (
@@ -432,32 +446,98 @@ function ManageBenefits() {
             ))}
           </select>
         </div>
-        <div className="form-group">
-          <label htmlFor="currentOperator">Operator</label>
-          <select
-            id="currentOperator"
-            className="form-control"
-            value={currentOperator}
-            onChange={(e) => setCurrentOperator(e.target.value)}
-          >
-            <option value="">Select an operator</option>
-            <option value="<">&lt;</option>
-            <option value="<=">&lt;=</option>
-            <option value="=">=</option>
-            <option value=">">&gt;</option>
-            <option value=">=">&gt;=</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label htmlFor="currentValue">Value</label>
-          <input
-            type="number"
-            id="currentValue"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        </div>
+        {currentQuestionId && (
+          <>
+            <div className="form-group">
+              <label htmlFor="currentOperator">Operator</label>
+              <select
+                id="currentOperator"
+                className="form-control"
+                value={currentOperator}
+                onChange={(e) => setCurrentOperator(e.target.value)}
+              >
+                <option value="">Select an operator</option>
+                {getQuestionType(currentQuestionId) === 'Numerical' && (
+                  <>
+                    <option value="<">&lt;</option>
+                    <option value="<=">&lt;=</option>
+                    <option value="=">=</option>
+                    <option value=">">&gt;</option>
+                    <option value=">=">&gt;=</option>
+                  </>
+                )}
+                {getQuestionType(currentQuestionId) === 'YesNo' && (
+                  <>
+                    <option value="=">=</option>
+                  </>
+                )}
+                {getQuestionType(currentQuestionId) === 'State' && (
+                  <>
+                    {states.map((state) => (
+                      <option key={state} value={state}>
+                        {state}
+                      </option>
+                    ))}
+                  </>
+                )}
+                {getQuestionType(currentQuestionId) === 'ExistingBenefits' && (
+                  <>
+                    <option value="=">=</option>
+                    <option value="!=">!=</option>
+                  </>
+                )}
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="currentValue">Value</label>
+              {getQuestionType(currentQuestionId) === 'Numerical' && (
+                <input
+                  type="number"
+                  id="currentValue"
+                  className="form-control"
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(e.target.value)}
+                />
+              )}
+              {getQuestionType(currentQuestionId) === 'YesNo' && (
+                <select
+                  id="currentValue"
+                  className="form-control"
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(e.target.value)}
+                >
+                  <option value="">Select</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              )}
+              {getQuestionType(currentQuestionId) === 'State' && (
+                <select
+                  id="currentValue"
+                  className="form-control"
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(e.target.value)}
+                >
+                  <option value="">Select a state</option>
+                  {states.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {getQuestionType(currentQuestionId) === 'ExistingBenefits' && (
+                <input
+                  type="text"
+                  id="currentValue"
+                  className="form-control"
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(e.target.value)}
+                />
+              )}
+            </div>
+          </>
+        )}
         <div className="form-buttons">
           <button type="button" onClick={handleAddCondition} className="btn btn-secondary">
             {editingConditionIndex !== null ? 'Update Condition' : 'Add Condition'}
