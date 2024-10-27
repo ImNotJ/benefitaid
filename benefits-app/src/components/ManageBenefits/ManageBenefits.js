@@ -338,11 +338,7 @@ function ManageBenefits() {
       case 'YesNo':
         return <option value="=">=</option>;
       case 'State':
-        return (
-          <>
-            <option value="=">=</option>
-          </>
-        );
+        return <option value="=">=</option>;
       case 'ExistingBenefits':
         return (
           <>
@@ -351,7 +347,7 @@ function ManageBenefits() {
           </>
         );
       default:
-        return <option value="">Select an operator</option>;
+        return null;
     }
   };
 
