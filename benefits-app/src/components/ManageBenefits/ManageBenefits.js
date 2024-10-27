@@ -452,7 +452,7 @@ function ManageBenefits() {
         <div className="form-group">
           <label htmlFor="currentValue">Value</label>
           <input
-            type="number"
+            type="text"
             id="currentValue"
             className="form-control"
             value={currentValue}
