@@ -386,7 +386,7 @@ function ManageBenefits() {
           <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
         </div>
       </form>
-      <div className="requirement-section">
+            <div className="requirement-section">
         <h3>Requirements</h3>
         <div className="form-group">
           <label htmlFor="requirementName">Requirement Name</label>
