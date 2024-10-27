@@ -323,32 +323,16 @@ function ManageBenefits() {
    * Renders the operator options based on the question type.
    */
   const renderOperatorOptions = () => {
-    const questionType = getQuestionType(currentQuestionId);
-    switch (questionType) {
-      case 'Numerical':
-        return (
-          <>
-            <option value="<">&lt;</option>
-            <option value="<=">&lt;=</option>
-            <option value="=">=</option>
-            <option value=">">&gt;</option>
-            <option value=">=">&gt;=</option>
-          </>
-        );
-      case 'YesNo':
-        return <option value="=">=</option>;
-      case 'State':
-        return <option value="=">=</option>;
-      case 'ExistingBenefits':
-        return (
-          <>
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-          </>
-        );
-      default:
-        return null;
-    }
+    return (
+      <>
+        <option value="<">&lt;</option>
+        <option value="<=">&lt;=</option>
+        <option value="=">=</option>
+        <option value=">">&gt;</option>
+        <option value=">=">&gt;=</option>
+        <option value="!=">!=</option>
+      </>
+    );
   };
 
   const handleQuestionChange = (e) => {
