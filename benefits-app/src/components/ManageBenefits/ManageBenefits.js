@@ -319,6 +319,42 @@ function ManageBenefits() {
     return question ? question.questionType : '';
   };
 
+  /**
+   * Renders the operator options based on the question type.
+   */
+  const renderOperatorOptions = () => {
+    const questionType = getQuestionType(currentQuestionId);
+    switch (questionType) {
+      case 'Numerical':
+        return (
+          <>
+            <option value="<">&lt;</option>
+            <option value="<=">&lt;=</option>
+            <option value="=">=</option>
+            <option value=">">&gt;</option>
+            <option value=">=">&gt;=</option>
+          </>
+        );
+      case 'YesNo':
+        return <option value="=">=</option>;
+      case 'State':
+        return states.map((state) => (
+          <option key={state} value={state}>
+            {state}
+          </option>
+        ));
+      case 'ExistingBenefits':
+        return (
+          <>
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="manage-benefits">
       <div className="top-buttons">
@@ -457,31 +493,7 @@ function ManageBenefits() {
                 onChange={(e) => setCurrentOperator(e.target.value)}
               >
                 <option value="">Select an operator</option>
-                {getQuestionType(currentQuestionId) === 'Numerical' && (
-                  <>
-                    <option value="<">&lt;</option>
-                    <option value="<=">&lt;=</option>
-                    <option value="=">=</option>
-                    <option value=">">&gt;</option>
-                    <option value=">=">&gt;=</option>
-                  </>
-                )}
-                {getQuestionType(currentQuestionId) === 'YesNo' && (
-                  <>
-                    <option value="=">=</option>
-                  </>
-                )}
-                {getQuestionType(currentQuestionId) === 'State' && (
-                  <>
-                    <option value="=">=</option>
-                  </>
-                )}
-                {getQuestionType(currentQuestionId) === 'ExistingBenefits' && (
-                  <>
-                    <option value="=">=</option>
-                    <option value="!=">!=</option>
-                  </>
-                )}
+                {renderOperatorOptions()}
               </select>
             </div>
             <div className="form-group">
