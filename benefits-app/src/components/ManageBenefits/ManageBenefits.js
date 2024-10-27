@@ -446,7 +446,7 @@ function ManageBenefits() {
             <option value="=">=</option>
             <option value=">">&gt;</option>
             <option value=">=">&gt;=</option>
-            <option value="!=">&gt;=</option>
+            <option value="!=">!=</option>
           </select>
         </div>
         <div className="form-group">
