@@ -473,11 +473,7 @@ function ManageBenefits() {
                 )}
                 {getQuestionType(currentQuestionId) === 'State' && (
                   <>
-                    {states.map((state) => (
-                      <option key={state} value={state}>
-                        {state}
-                      </option>
-                    ))}
+                    <option value="=">=</option>
                   </>
                 )}
                 {getQuestionType(currentQuestionId) === 'ExistingBenefits' && (
