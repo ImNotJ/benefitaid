@@ -128,10 +128,8 @@ function HomePage() {
                 return parseFloat(userResponse) < parseFloat(condition.value);
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
-              case '==':
-                return userResponse === condition.value;
               case '===':
-                return userResponse === condition.value;
+                return userResponse.valueOf() === condition.value;
               default:
                 return false;
             }
