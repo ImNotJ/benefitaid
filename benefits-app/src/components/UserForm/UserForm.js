@@ -103,7 +103,7 @@ function UserForm() {
 
       console.log('Response data:', response.data); // Log the response data
 
-      const eligibleBenefits = response.data.filter(benefit => {
+      const eligibleBenefits = selectedQuiz.benefits.filter(benefit => {
         if (!benefit.requirements || benefit.requirements.length === 0) {
           return false;
         }

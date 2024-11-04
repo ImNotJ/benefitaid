@@ -101,7 +101,7 @@ function HomePage() {
   
       console.log('Response data:', response.data); // Log the response data
   
-      const eligibleBenefits = response.data.filter(benefit => {
+      const eligibleBenefits = commonQuiz.benefits.filter(benefit => {
         if (!benefit.requirements || benefit.requirements.length === 0) {
           return false;
         }
