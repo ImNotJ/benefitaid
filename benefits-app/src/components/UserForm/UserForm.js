@@ -127,8 +127,6 @@ function UserForm() {
                 return parseFloat(userResponse) > parseFloat(condition.value);
               case '==':
                 return userResponse === condition.value;
-              case '===':
-                return userResponse === condition.value;
               default:
                 return false;
             }
