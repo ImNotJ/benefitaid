@@ -81,33 +81,38 @@ function HomePage() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = 'random@example.com'; // email
-    const password = 'randomPassword123'; // Random password
-  
+    const email = 'random@example.com'; // Dummy email
+    const password = 'randomPassword123'; // Dummy password
+
     const payload = {
       email,
       password,
       responses
     };
-  
+
     console.log('Submitting:', payload); // Log the payload
-  
+
     try {
       const response = await axios.post('/api/eligibility/check', payload, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-  
+
       console.log('Response data:', response.data); // Log the response data
-  
+
       const eligibleBenefits = commonQuiz.benefits.filter(benefit => {
         if (!benefit.requirements || benefit.requirements.length === 0) {
           return false;
         }
-        return benefit.requirements.some(requirement => {
+
+        let isEligible = true;
+        let hasRequired = false;
+
+        for (const requirement of benefit.requirements) {
           console.log('Checking requirement:', requirement); // Log the requirement
-          return requirement.conditions.every(condition => {
+
+          const meetsRequirement = requirement.conditions.every(condition => {
             const userResponse = responses[condition.questionId];
             console.log('Checking condition:', condition); // Log the condition
             console.log('User response:', userResponse); // Log the user response
@@ -123,17 +128,33 @@ function HomePage() {
                 return parseFloat(userResponse) < parseFloat(condition.value);
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
-              case '==':
+              case '===':
                 return userResponse === condition.value;
               default:
                 return false;
             }
           });
-        });
+
+          if (requirement.type === 'DISQUALIFIER' && meetsRequirement) {
+            isEligible = false;
+            break;
+          }
+
+          if (requirement.type === 'REQUIREMENT' && !meetsRequirement) {
+            isEligible = false;
+            break;
+          }
+
+          if (requirement.type === 'REQUIREMENT' && meetsRequirement) {
+            hasRequired = true;
+          }
+        }
+
+        return isEligible && (!benefit.requirements.some(req => req.type === 'REQUIREMENT') || hasRequired);
       });
-  
+
       console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
-  
+
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
