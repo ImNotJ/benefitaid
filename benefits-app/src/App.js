@@ -64,7 +64,7 @@ function App() {
       <Route path="/manage-questions" element={<PrivateRoute allowedRoles={['ROLE_ADMIN', 'ROLE_ROOT_ADMIN']}><ManageQuestions /></PrivateRoute>} />
       <Route path="/manage-benefits" element={<PrivateRoute allowedRoles={['ROLE_ADMIN', 'ROLE_ROOT_ADMIN']}><ManageBenefits /></PrivateRoute>} />
       <Route path="/manage-quizzes" element={<PrivateRoute allowedRoles={['ROLE_ADMIN', 'ROLE_ROOT_ADMIN']}><ManageQuizzes /></PrivateRoute>} />
-      <Route path="/user-form" element={<PrivateRoute allowedRoles={['ROLE_USER']}><UserForm /></PrivateRoute>} />
+      <Route path="/user-form" element={<UserForm />} />
       <Route path="/user-dashboard" element={<PrivateRoute allowedRoles={['ROLE_USER']}><UserDashboard /></PrivateRoute>} />
     </Routes>
   );
