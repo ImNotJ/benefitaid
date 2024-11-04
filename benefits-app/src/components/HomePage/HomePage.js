@@ -255,6 +255,7 @@ function HomePage() {
       <div className="links">
         <Link to="/user-login" className="btn btn-primary">User Login</Link>
         <Link to="/create-account" className="btn btn-secondary">Create Account</Link>
+        <Link to="/user-dashboard" className="btn btn-primary">User Dashboard</Link>
         <Link to="/user-form" className="btn btn-primary">Other Quizzes</Link>
       </div>
       {commonQuiz && (

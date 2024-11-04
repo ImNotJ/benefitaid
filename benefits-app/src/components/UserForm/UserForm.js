@@ -87,8 +87,8 @@ function UserForm() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = localStorage.getItem('email'); // Assuming email is stored in localStorage
-    const password = localStorage.getItem('password'); // Assuming password is stored in localStorage
+    const email = 'random@example.com'; // Dummy email
+    const password = 'randomPassword123'; // Dummy password
 
     const payload = {
       email,
