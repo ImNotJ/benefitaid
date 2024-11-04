@@ -129,11 +129,11 @@ function HomePage() {
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
               case '=':
-                return userResponse.valueOf() == condition.valueOf();
+                return userResponse.valueOf() === condition.valueOf();
               case '==':
-                return userResponse.valueOf() == condition.value.valueOf(); // Loose equality for type coercion
+                return userResponse.valueOf() === condition.value.valueOf(); // Loose equality for type coercion
               case '===':
-                return userResponse.valueOf() == condition.value.valueOf(); // Strict equality for exact match
+                return userResponse.valueOf() === condition.value.valueOf(); // Strict equality for exact match
               default:
                 return false;
             }
