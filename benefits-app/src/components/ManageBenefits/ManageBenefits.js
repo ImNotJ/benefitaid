@@ -13,7 +13,7 @@ const states = [
 ];
 
 const requirementTypes = [
-  "NEITHER", "REQUIREMENT", "`DISQUALI`FIER", "EXISTING"
+  "NEITHER", "REQUIREMENT", "DISQUALIFIER"
 ];
 
 /**
