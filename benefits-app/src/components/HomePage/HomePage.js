@@ -129,7 +129,7 @@ function HomePage() {
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
               case '===':
-                return userResponse.valueOf() === condition.value;
+                return userResponse.valueOf() === condition.valueOf();
               default:
                 return false;
             }
