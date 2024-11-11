@@ -12,10 +12,6 @@ const states = [
   "Wisconsin", "Wyoming"
 ];
 
-const requirementTypes = [
-  "NEITHER", "REQUIREMENT", "DISQUALIFIER"
-];
-
 /**
  * ManageBenefits component for handling the management of benefits.
  *
@@ -30,7 +26,6 @@ function ManageBenefits() {
   const [benefitUrl, setBenefitUrl] = useState('');
   const [requirements, setRequirements] = useState([]);
   const [requirementName, setRequirementName] = useState('');
-  const [requirementType, setRequirementType] = useState('NEITHER'); // New state for requirement type
   const [currentConditions, setCurrentConditions] = useState([]);
   const [currentQuestionId, setCurrentQuestionId] = useState('');
   const [currentOperator, setCurrentOperator] = useState('');
@@ -205,7 +200,6 @@ function ManageBenefits() {
 
     const newRequirement = {
       name: requirementName,
-      type: requirementType, // Include the requirement type
       conditions: currentConditions,
     };
 
@@ -219,7 +213,6 @@ function ManageBenefits() {
     }
 
     setRequirementName('');
-    setRequirementType('NEITHER'); // Reset the requirement type
     setCurrentConditions([]);
     setErrorMessage('');
   };
@@ -232,7 +225,6 @@ function ManageBenefits() {
   const handleEditRequirement = (index) => {
     const requirement = requirements[index];
     setRequirementName(requirement.name);
-    setRequirementType(requirement.type); // Set the requirement type
     setCurrentConditions(requirement.conditions);
     setEditingRequirementIndex(index);
   };
@@ -273,7 +265,6 @@ function ManageBenefits() {
     setBenefitUrl('');
     setRequirements([]);
     setRequirementName('');
-    setRequirementType('NEITHER'); // Reset the requirement type
     setCurrentConditions([]);
     setCurrentQuestionId('');
     setCurrentOperator('');
@@ -290,7 +281,6 @@ function ManageBenefits() {
    */
   const handleClearRequirementFields = () => {
     setRequirementName('');
-    setRequirementType('NEITHER'); // Reset the requirement type
     setCurrentConditions([]);
     setEditingRequirementIndex(null);
     setErrorMessage('');
@@ -398,21 +388,6 @@ function ManageBenefits() {
             onChange={(e) => setRequirementName(e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="requirementType">Requirement Type</label>
-          <select
-            id="requirementType"
-            className="form-control"
-            value={requirementType}
-            onChange={(e) => setRequirementType(e.target.value)}
-          >
-            {requirementTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
         <div className="form-buttons">
           <button type="button" onClick={handleAddRequirement} className="btn btn-secondary">
             {editingRequirementIndex !== null ? 'Update Requirement' : 'Add Requirement'}
@@ -422,7 +397,7 @@ function ManageBenefits() {
         <ul className="requirement-list">
           {requirements.map((requirement, index) => (
             <li key={index}>
-              <span>{requirement.name} ({requirement.type})</span>
+              <span>{requirement.name}</span>
               <ul>
                 {requirement.conditions.map((condition, i) => (
                   <li key={i}>
