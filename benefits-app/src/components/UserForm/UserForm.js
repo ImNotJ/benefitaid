@@ -317,7 +317,7 @@ function UserForm() {
               <h3>Eligibility Results</h3>
               <h4>You are eligible for the following benefits:</h4>
               <div className="benefits-grid">
-                {benefits.map((benefit) => (
+                {eligibilityResults.map((benefit) => (
                   <div key={benefit.id} className="benefit-card">
                     <div className="benefit-image">
                       {/* Will fall back to default image if none exists */}
@@ -373,7 +373,7 @@ function UserForm() {
           {showBenefits && (
             <div className="benefits-dropdown">
               <ul className="benefits-list">
-                {selectedQuiz.eligibilityResults.map((benefit) => (
+                {selectedQuiz.benefits.map((benefit) => (
                   <li key={benefit.id}>
                     <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
                       {benefit.benefitName}
