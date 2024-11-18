@@ -312,28 +312,61 @@ function UserForm() {
               <button type="submit" className="btn btn-primary">Submit</button>
             </div>
           </form>
+          // In HomePage.js, update the eligibility results section:
+
           {eligibilityResults && (
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
               <h4>You are eligible for the following benefits:</h4>
               <div className="benefits-grid">
                 {eligibilityResults.map((benefit) => (
-                  <div key={benefit.id} className="benefit-card">
+                  <div
+                    key={benefit.id}
+                    className="benefit-card"
+                    style={{ willChange: 'contents' }}
+                  >
                     <div className="benefit-image">
-                      {/* Will fall back to default image if none exists */}
-                      <img
-                        src={`/api/benefits/${benefit.id}/image`}
-                        alt={benefit.benefitName}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/static/default-benefit-image.jpg';
+                      <div className="image-placeholder"
+                        style={{
+                          height: '200px',
+                          backgroundColor: '#f0f0f0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
                         }}
-                      />
+                      >
+                        <img
+                          src={`/api/benefits/${benefit.id}/image`}
+                          alt={benefit.benefitName}
+                          style={{
+                            opacity: 0,
+                            transition: 'opacity 0.3s ease-in',
+                            position: 'absolute',
+                            width: '100%',
+                            height: '200px',
+                            objectFit: 'cover'
+                          }}
+                          onLoad={(e) => {
+                            e.target.style.opacity = 1;
+                          }}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/static/default-benefit-image.jpg';
+                          }}
+                        />
+                      </div>
                     </div>
                     <div className="benefit-content">
                       <h5>{benefit.benefitName}</h5>
-                      <div className={`benefit-description ${expandedBenefit === benefit.id ? 'expanded' : ''
-                        }`}>
+                      <div
+                        className={`benefit-description ${expandedBenefit === benefit.id ? 'expanded' : ''}`}
+                        style={{
+                          maxHeight: expandedBenefit === benefit.id ? '1000px' : '100px',
+                          transition: 'max-height 0.3s ease-out',
+                          overflow: 'hidden',
+                          willChange: 'max-height'
+                        }}
+                      >
                         <div dangerouslySetInnerHTML={{
                           __html: benefit.description || 'No description available.'
                         }} />
@@ -344,6 +377,7 @@ function UserForm() {
                           onClick={() => setExpandedBenefit(
                             expandedBenefit === benefit.id ? null : benefit.id
                           )}
+                          style={{ marginTop: '10px' }}
                         >
                           {expandedBenefit === benefit.id ? 'Read Less' : 'Read More'}
                         </button>
@@ -360,27 +394,6 @@ function UserForm() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-          <hr className="divider" />
-          <h4>Benefits you could be eligible for based on this quiz:</h4>
-          <h5>Select the button below to toggle.</h5>
-          <div className="button-group">
-            <button onClick={() => setShowBenefits(!showBenefits)} className="btn btn-info">
-              {showBenefits ? 'Hide Benefits' : 'Show Benefits'}
-            </button>
-          </div>
-          {showBenefits && (
-            <div className="benefits-dropdown">
-              <ul className="benefits-list">
-                {selectedQuiz.benefits.map((benefit) => (
-                  <li key={benefit.id}>
-                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
-                      {benefit.benefitName}
-                    </a>
-                  </li>
-                ))}
-              </ul>
             </div>
           )}
         </>
