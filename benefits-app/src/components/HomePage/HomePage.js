@@ -138,10 +138,8 @@ function HomePage() {
                 return parseFloat(userResponse) < parseFloat(condition.value);
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
-              case '=':
               case '==':
-              case '===':
-                return userResponse === conditionValue;
+                  return userResponse === condition.value;
               default:
                 return false;
             }
