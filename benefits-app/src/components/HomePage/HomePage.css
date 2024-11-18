@@ -1,6 +1,87 @@
 @import url('https://fonts.googleapis.com/css2?family=League+Gothic&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
+.legacy-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+.benefit-list li {
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.benefits-grid {
+  display: grid;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.benefit-card {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.benefit-image {
+  flex: 0 0 300px;
+}
+
+.benefit-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.benefit-content {
+  flex: 1;
+  padding: 15px;
+}
+
+.benefit-description {
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.benefit-description.expanded {
+  max-height: none;
+}
+
+.benefit-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.img-preview {
+  max-width: 300px;
+  height: auto;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.quill-editor {
+  margin-bottom: 15px;
+}
+
+.description-preview {
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
 .home-page .main-title {
   font-family: 'League Gothic', sans-serif;
   color: #FFA726;

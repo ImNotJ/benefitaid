@@ -25,6 +25,8 @@ function UserForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
+  const [expandedBenefit, setExpandedBenefit] = useState(null);
+
 
   useEffect(() => {
     fetchQuizzes();
@@ -87,7 +89,7 @@ function UserForm() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (Object.keys(responses).length === 0) {
       setErrorMessage('Please answer at least one question to check eligibility.');
       setSuccessMessage('');
@@ -197,7 +199,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Text':
@@ -209,7 +211,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'YesNo':
@@ -220,7 +222,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select</option>
             <option value="Yes">Yes</option>
@@ -236,7 +238,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Email':
@@ -248,7 +250,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'State':
@@ -259,7 +261,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select a state</option>
             {states.map((state) => (
@@ -278,7 +280,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
     }
@@ -313,17 +315,51 @@ function UserForm() {
           {eligibilityResults && (
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
-              <h4>You are eligibile for the following benefits:</h4>
-              <h5>Select the respective link for more information about the benefits you're eligible for.</h5>
-              <ul className="benefits-list">
-                {eligibilityResults.map((benefit) => (
-                  <li key={benefit.id}>
-                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
-                      {benefit.benefitName}
-                    </a>
-                  </li>
+              <h4>You are eligible for the following benefits:</h4>
+              <div className="benefits-grid">
+                {benefits.map((benefit) => (
+                  <div key={benefit.id} className="benefit-card">
+                    <div className="benefit-image">
+                      {/* Will fall back to default image if none exists */}
+                      <img
+                        src={`/api/benefits/${benefit.id}/image`}
+                        alt={benefit.benefitName}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/static/default-benefit-image.jpg';
+                        }}
+                      />
+                    </div>
+                    <div className="benefit-content">
+                      <h5>{benefit.benefitName}</h5>
+                      <div className={`benefit-description ${expandedBenefit === benefit.id ? 'expanded' : ''
+                        }`}>
+                        <div dangerouslySetInnerHTML={{
+                          __html: benefit.description || 'No description available.'
+                        }} />
+                      </div>
+                      {benefit.description && benefit.description.length > 200 && (
+                        <button
+                          className="btn btn-link"
+                          onClick={() => setExpandedBenefit(
+                            expandedBenefit === benefit.id ? null : benefit.id
+                          )}
+                        >
+                          {expandedBenefit === benefit.id ? 'Read Less' : 'Read More'}
+                        </button>
+                      )}
+                      <a
+                        href={benefit.benefitUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="benefit-link"
+                      >
+                        {benefit.displayLinkText || 'Learn More'}
+                      </a>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
           <hr className="divider" />

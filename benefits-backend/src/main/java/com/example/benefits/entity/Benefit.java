@@ -30,6 +30,26 @@ public class Benefit {
     @JsonManagedReference
     private Set<Requirement> requirements;
 
+    // Add default values for new fields
+    @Column(columnDefinition = "TEXT")
+    private String description = "No description available.";
+
+    @NotBlank
+    private String displayLinkText = "Learn More";
+
+    // New method to check if benefit has an image
+    public boolean hasImage() {
+        return imageData != null && imageData.length > 0;
+    }
+
+    @Lob
+    private byte[] imageData;
+    
+    private String imageContentType;
+    
+    @Column(length = 100)
+    private String imageFileName;
+
     // Getters and Setters
 
     /**
@@ -143,5 +163,45 @@ public class Benefit {
      */
     public void setRequirements(Set<Requirement> requirements) {
         this.requirements = requirements;
+    }
+
+    public String getDisplayLinkText() {
+        return displayLinkText;
+    }
+
+    public void setDisplayLinkText(String displayLinkText) {
+        this.displayLinkText = displayLinkText;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    public String getImageContentType() {
+        return imageContentType;
+    }
+
+    public void setImageContentType(String imageContentType) {
+        this.imageContentType = imageContentType;
+    }
+
+    public String getImageFileName() {
+        return imageFileName;
+    }
+
+    public void setImageFileName(String imageFileName) {
+        this.imageFileName = imageFileName;
     }
 }

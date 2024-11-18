@@ -36,6 +36,11 @@ function ManageBenefits() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const [description, setDescription] = useState('');
+  const [displayLinkText, setDisplayLinkText] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchBenefits();
@@ -73,31 +78,31 @@ function ManageBenefits() {
    */
   const handleAddBenefit = async (e) => {
     e.preventDefault();
-
-    // Custom validation
-    if (!benefitName || (!federal && !state) || !benefitUrl) {
-      setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
-      setSuccessMessage('');
+    if (!isValidUrl(benefitUrl)) {
+      setErrorMessage('Please enter a valid URL');
       return;
     }
 
-    const newBenefit = { benefitName, federal, state: federal ? null : state, benefitUrl, requirements };
+    const formData = new FormData();
+    formData.append('benefitName', benefitName);
+    formData.append('federal', federal);
+    formData.append('state', state);
+    formData.append('benefitUrl', benefitUrl);
+    formData.append('displayLinkText', displayLinkText);
+    formData.append('description', description);
+
     try {
-      if (editingBenefitIndex !== null) {
-        const benefitId = benefits[editingBenefitIndex].id;
-        await axios.put(`/api/benefits/${benefitId}`, newBenefit);
-        setEditingBenefitIndex(null);
-      } else {
-        await axios.post('/api/benefits', newBenefit);
+      const response = await axios.post('/api/benefits', formData);
+      if (selectedImage) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', selectedImage);
+        await axios.post(`/api/benefits/${response.data.id}/image`, imageFormData);
       }
       fetchBenefits();
       handleClearFields();
       setSuccessMessage('Benefit saved successfully!');
-      setErrorMessage('');
     } catch (error) {
-      console.error('Error saving benefit:', error);
       setErrorMessage('Failed to save benefit.');
-      setSuccessMessage('');
     }
   };
 
@@ -124,14 +129,38 @@ function ManageBenefits() {
    *
    * @param {number} index - The index of the benefit to edit.
    */
-  const handleEditBenefit = (index) => {
-    const benefit = benefits[index];
+  const handleEditBenefit = (benefit) => {
     setBenefitName(benefit.benefitName);
     setFederal(benefit.federal);
     setState(benefit.state || '');
     setBenefitUrl(benefit.benefitUrl);
-    setRequirements(benefit.requirements);
+    // Handle potentially missing fields
+    setDisplayLinkText(benefit.displayLinkText || 'Learn More');
+    setDescription(benefit.description || '');
+    // Reset image preview if exists
+    if (benefit.hasImage) {
+      setPreviewImage(`/api/benefits/${benefit.id}/image`);
+    } else {
+      setPreviewImage(null);
+    }
     setEditingBenefitIndex(index);
+  };
+
+  // Add warning for legacy benefits
+  const renderLegacyWarning = (benefit) => {
+    const missingFields = [];
+    if (!benefit.hasImage) missingFields.push('image');
+    if (!benefit.description) missingFields.push('description');
+    if (!benefit.displayLinkText) missingFields.push('display link text');
+
+    if (missingFields.length > 0) {
+      return (
+        <div className="legacy-warning">
+          Missing: {missingFields.join(', ')}. Please update this benefit.
+        </div>
+      );
+    }
+    return null;
   };
 
   /**
@@ -308,6 +337,24 @@ function ManageBenefits() {
     return question ? question.questionName : '';
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width !== 300 || img.height !== 200) {
+          alert('Image must be 300x200 pixels');
+          return;
+        }
+        setSelectedImage(file);
+        setPreviewImage(URL.createObjectURL(file));
+      };
+      img.src = URL.createObjectURL(file);
+    }
+  };
+
+
+
   return (
     <div className="manage-benefits">
       <div className="top-buttons">
@@ -373,6 +420,60 @@ function ManageBenefits() {
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">{editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}</button>
           <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="displayLinkText">Link Display Text</label>
+          <input
+            type="text"
+            id="displayLinkText"
+            className="form-control"
+            value={displayLinkText}
+            onChange={(e) => setDisplayLinkText(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <ReactQuill
+            value={description}
+            onChange={setDescription}
+            className="quill-editor"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPreview(!showPreview)}
+            className="btn btn-secondary mt-2"
+          >
+            {showPreview ? 'Hide Preview' : 'Show Preview'}
+          </button>
+          {showPreview && (
+            <div
+              className="description-preview"
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="image">Benefit Image (300x200 pixels)</label>
+          <input
+            type="file"
+            id="image"
+            className="form-control"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          <small className="text-muted">
+            Please upload an image that is exactly 300x200 pixels
+          </small>
+          {previewImage && (
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="img-preview mt-2"
+            />
+          )}
         </div>
       </form>
 
@@ -482,10 +583,15 @@ function ManageBenefits() {
       <ul className="benefit-list">
         {benefits.map((benefit, index) => (
           <li key={benefit.id}>
-            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : `${benefit.state}`}</span>
+            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : benefit.state}</span>
+            {renderLegacyWarning(benefit)}
             <div className="form-buttons">
-              <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">Edit</button>
-              <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">Delete</button>
+              <button onClick={() => handleEditBenefit(benefit, index)} className="btn btn-secondary">
+                Edit
+              </button>
+              <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">
+                Delete
+              </button>
             </div>
           </li>
         ))}
