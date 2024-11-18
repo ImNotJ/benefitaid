@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import axios from '../../utils/axiosConfig';
 import { isValidUrl } from '../../utils/validation';
 import './ManageBenefits.css';
@@ -436,10 +434,13 @@ function ManageBenefits() {
 
         <div className="form-group">
           <label htmlFor="description">Description</label>
-          <ReactQuill
+          <textarea
+            id="description"
+            className="form-control"
             value={description}
-            onChange={setDescription}
-            className="quill-editor"
+            onChange={(e) => setDescription(e.target.value)}
+            rows={6}
+            style={{ minHeight: '150px' }}
           />
           <button
             type="button"
