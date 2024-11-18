@@ -373,7 +373,7 @@ function UserForm() {
           {showBenefits && (
             <div className="benefits-dropdown">
               <ul className="benefits-list">
-                {selectedQuiz.benefits.map((benefit) => (
+                {selectedQuiz.eligibilityResults.map((benefit) => (
                   <li key={benefit.id}>
                     <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
                       {benefit.benefitName}

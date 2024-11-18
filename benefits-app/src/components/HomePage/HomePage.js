@@ -317,7 +317,7 @@ function HomePage() {
               <h3>Eligibility Results</h3>
               <h4>You are eligible for the following benefits:</h4>
               <div className="benefits-grid">
-                {benefits.map((benefit) => (
+                {eligibilityResults.map((benefit) => (
                   <div key={benefit.id} className="benefit-card">
                     <div className="benefit-image">
                       {/* Will fall back to default image if none exists */}

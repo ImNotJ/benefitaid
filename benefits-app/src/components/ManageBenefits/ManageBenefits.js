@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import axios from '../../utils/axiosConfig';
+import { isValidUrl } from '../../utils/validation';
 import './ManageBenefits.css';
 
 const states = [
@@ -129,21 +132,19 @@ function ManageBenefits() {
    *
    * @param {number} index - The index of the benefit to edit.
    */
-  const handleEditBenefit = (benefit) => {
+  const handleEditBenefit = (benefit, benefitIndex) => { // Added benefitIndex parameter
     setBenefitName(benefit.benefitName);
     setFederal(benefit.federal);
     setState(benefit.state || '');
     setBenefitUrl(benefit.benefitUrl);
-    // Handle potentially missing fields
     setDisplayLinkText(benefit.displayLinkText || 'Learn More');
     setDescription(benefit.description || '');
-    // Reset image preview if exists
     if (benefit.hasImage) {
       setPreviewImage(`/api/benefits/${benefit.id}/image`);
     } else {
       setPreviewImage(null);
     }
-    setEditingBenefitIndex(index);
+    setEditingBenefitIndex(benefitIndex);
   };
 
   // Add warning for legacy benefits
