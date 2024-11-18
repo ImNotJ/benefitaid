@@ -312,7 +312,6 @@ function HomePage() {
               <button type="submit" className="btn btn-primary">Check Eligibility</button>
             </div>
           </form>
-          // In HomePage.js, update the eligibility results section:
 
           {eligibilityResults && (
             <div className="eligibility-results">

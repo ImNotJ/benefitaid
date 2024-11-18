@@ -24,7 +24,6 @@ function UserForm() {
   const [eligibilityResults, setEligibilityResults] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
   const [expandedBenefit, setExpandedBenefit] = useState(null);
 
 
@@ -312,7 +311,6 @@ function UserForm() {
               <button type="submit" className="btn btn-primary">Submit</button>
             </div>
           </form>
-          // In HomePage.js, update the eligibility results section:
 
           {eligibilityResults && (
             <div className="eligibility-results">
