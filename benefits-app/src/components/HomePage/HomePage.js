@@ -81,6 +81,16 @@ function HomePage() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if at least one question is answered
+    const hasAtLeastOneResponse = Object.keys(responses).length > 0;
+    
+    if (!hasAtLeastOneResponse) {
+      setErrorMessage('Please answer at least one question to check eligibility.');
+      setSuccessMessage('');
+      return;
+    }
+    
     const email = 'random@example.com'; // Dummy email
     const password = 'randomPassword123'; // Dummy password
 
@@ -178,6 +188,7 @@ function HomePage() {
     switch (question.questionType) {
       case 'Numerical':
         return (
+        <div className="input-wrapper">
           <input
             type="number"
             id={question.id}
@@ -185,11 +196,13 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
           />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
       case 'Text':
         return (
+          <div className="input-wrapper">
           <input
             type="text"
             id={question.id}
@@ -198,25 +211,31 @@ function HomePage() {
             value={responses[question.id] || ''}
             onChange={handleInputChange}
             required
-          />
+            />
+            <small className="helper-text">Optional - Fill in for more accurate results</small>
+          </div>
         );
       case 'YesNo':
         return (
+        <div className="input-wrapper">
           <select
             id={question.id}
             name={question.id}
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          >
+            >
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        
             <option value="">Select</option>
             <option value="Yes">Yes</option>
             <option value="No">No</option>
           </select>
+        </div>
         );
       case 'Date':
         return (
+          <div className="input-wrapper">
           <input
             type="date"
             id={question.id}
@@ -224,11 +243,13 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          />
+            />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
       case 'Email':
         return (
+          <div className="input-wrapper">
           <input
             type="email"
             id={question.id}
@@ -236,19 +257,22 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          />
+            />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
       case 'State':
         return (
+        <div className="input-wrapper">
           <select
             id={question.id}
             name={question.id}
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          >
+            >
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        
             <option value="">Select a state</option>
             {states.map((state) => (
               <option key={state} value={state}>
@@ -256,9 +280,11 @@ function HomePage() {
               </option>
             ))}
           </select>
+        </div>
         );
       default:
         return (
+          <div className="input-wrapper">
           <input
             type="text"
             id={question.id}
@@ -266,25 +292,30 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          />
+            />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
     }
   };
 
   return (
     <div className="home-page">
-      <h1>Welcome to Fair Benefits!</h1>
+      <h1 className="main-title">Welcome to Fair Benefits!</h1>
+      <h2 className="subtitle">Complete this simple quiz below to discover what resources may be available for you.</h2>
+      
       <div className="links">
         <Link to="/user-login" className="btn btn-primary">User Login</Link>
         <Link to="/create-account" className="btn btn-secondary">Create Account</Link>
         <Link to="/user-dashboard" className="btn btn-primary">User Dashboard</Link>
         <Link to="/user-form" className="btn btn-primary">Other Quizzes</Link>
       </div>
+
       {commonQuiz && (
         <div className="common-quiz">
-          <h4>Answer this simple quiz below to discover what state and federal benefits you may be eligible for!</h4>
-          <h5>Note: We don't require any personal or identifying information.</h5>
+          <div className="completion-notice">
+            <p>The more questions you answer, the more accurate your results will be.</p>
+          </div>
           {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
           <form onSubmit={handleSubmit}>

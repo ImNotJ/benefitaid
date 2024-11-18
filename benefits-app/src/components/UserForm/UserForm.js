@@ -87,6 +87,12 @@ function UserForm() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (Object.keys(responses).length === 0) {
+      setErrorMessage('Please answer at least one question to check eligibility.');
+      setSuccessMessage('');
+      return;
+    }
     const email = 'random@example.com'; // Dummy email
     const password = 'randomPassword123'; // Dummy password
 
@@ -184,6 +190,7 @@ function UserForm() {
     switch (question.questionType) {
       case 'Numerical':
         return (
+        <div className="input-wrapper">
           <input
             type="number"
             id={question.id}
@@ -191,11 +198,13 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
           />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
       case 'Text':
         return (
+          <div className="input-wrapper">
           <input
             type="text"
             id={question.id}
@@ -204,25 +213,31 @@ function UserForm() {
             value={responses[question.id] || ''}
             onChange={handleInputChange}
             required
-          />
+            />
+            <small className="helper-text">Optional - Fill in for more accurate results</small>
+          </div>
         );
       case 'YesNo':
         return (
+        <div className="input-wrapper">
           <select
             id={question.id}
             name={question.id}
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          >
+            >
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        
             <option value="">Select</option>
             <option value="Yes">Yes</option>
             <option value="No">No</option>
           </select>
+        </div>
         );
       case 'Date':
         return (
+          <div className="input-wrapper">
           <input
             type="date"
             id={question.id}
@@ -230,11 +245,13 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          />
+            />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
       case 'Email':
         return (
+          <div className="input-wrapper">
           <input
             type="email"
             id={question.id}
@@ -242,19 +259,22 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          />
+            />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
       case 'State':
         return (
+        <div className="input-wrapper">
           <select
             id={question.id}
             name={question.id}
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          >
+            >
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        
             <option value="">Select a state</option>
             {states.map((state) => (
               <option key={state} value={state}>
@@ -262,9 +282,11 @@ function UserForm() {
               </option>
             ))}
           </select>
+        </div>
         );
       default:
         return (
+          <div className="input-wrapper">
           <input
             type="text"
             id={question.id}
@@ -272,8 +294,9 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            required
-          />
+            />
+          <small className="helper-text">Optional - Fill in for more accurate results</small>
+        </div>
         );
     }
   };
@@ -290,6 +313,12 @@ function UserForm() {
       </div>
       {selectedQuiz ? (
         <>
+        <h1 className="main-title">{selectedQuiz.quizName}</h1>
+        <h2 className="subtitle">Complete this simple quiz below to discover what disaster resources may be available for you.</h2>
+        
+        <div className="completion-notice">
+          <p>The more questions you answer, the more accurate your results will be.</p>
+        </div>
           <h2>{selectedQuiz.quizName}</h2>
           {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}

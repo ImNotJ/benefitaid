@@ -1,3 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Gothic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+.user-form .main-title {
+  font-family: 'League Gothic', sans-serif;
+  color: #FFA726;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2.5em;
+  letter-spacing: 0.5px;
+}
+
+.user-form .subtitle {
+  font-family: 'Roboto', sans-serif;
+  color: #1976D2;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.4em;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.user-form .completion-notice {
+  background-color: #E3F2FD;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.user-form .completion-notice p {
+  color: #1976D2;
+  margin: 0;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+.user-form .input-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.user-form .helper-text {
+  color: #666;
+  font-size: 0.85em;
+  margin-top: 5px;
+  display: block;
+  font-family: 'Roboto', sans-serif;
+}
+
+
 /* Styles for the user form container */
 .user-form {
   max-width: 600px;
