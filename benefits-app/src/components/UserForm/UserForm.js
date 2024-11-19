@@ -87,7 +87,7 @@ function UserForm() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (Object.keys(responses).length === 0) {
       setErrorMessage('Please answer at least one question to check eligibility.');
       setSuccessMessage('');
@@ -197,7 +197,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Text':
@@ -209,7 +209,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'YesNo':
@@ -220,7 +220,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select</option>
             <option value="Yes">Yes</option>
@@ -236,7 +236,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Email':
@@ -248,7 +248,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'State':
@@ -259,7 +259,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select a state</option>
             {states.map((state) => (
@@ -278,7 +278,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
     }
@@ -315,16 +315,36 @@ function UserForm() {
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
               <h4>You are eligibile for the following benefits:</h4>
-              <h5>Select the respective link for more information about the benefits you're eligible for.</h5>
-              <ul className="benefits-list">
+              <div className="benefits-grid">
                 {eligibilityResults.map((benefit) => (
-                  <li key={benefit.id}>
-                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
-                      {benefit.benefitName}
-                    </a>
-                  </li>
+                  <div key={benefit.id} className="benefit-card">
+                    <div className="benefit-image">
+                      {benefit.imageUrl ? (
+                        <img
+                          src={benefit.imageUrl}
+                          alt={benefit.benefitName}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/placeholder-image.png';
+                          }}
+                        />
+                      ) : (
+                        <div className="image-placeholder" />
+                      )}
+                    </div>
+                    <div className="benefit-content">
+                      <h4>{benefit.benefitName}</h4>
+                      <p>{benefit.federal ? 'Federal' : benefit.state}</p>
+                      <div className="benefit-description">
+                        {benefit.description}
+                      </div>
+                      <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer" className="benefit-link">
+                        Learn More
+                      </a>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
           <hr className="divider" />

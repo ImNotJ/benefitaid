@@ -81,16 +81,16 @@ function HomePage() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Check if at least one question is answered
     const hasAtLeastOneResponse = Object.keys(responses).length > 0;
-    
+
     if (!hasAtLeastOneResponse) {
       setErrorMessage('Please answer at least one question to check eligibility.');
       setSuccessMessage('');
       return;
     }
-    
+
     const email = 'random@example.com'; // Dummy email
     const password = 'randomPassword123'; // Dummy password
 
@@ -139,7 +139,7 @@ function HomePage() {
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
               case '==':
-                  return userResponse === condition.value;
+                return userResponse === condition.value;
               default:
                 return false;
             }
@@ -193,7 +193,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Text':
@@ -205,7 +205,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'YesNo':
@@ -216,7 +216,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select</option>
             <option value="Yes">Yes</option>
@@ -232,7 +232,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Email':
@@ -244,7 +244,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'State':
@@ -255,7 +255,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select a state</option>
             {states.map((state) => (
@@ -274,7 +274,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
     }
@@ -284,7 +284,7 @@ function HomePage() {
     <div className="home-page">
       <h1 className="main-title">Welcome to Fair Benefits!</h1>
       <h2 className="subtitle">Complete this simple quiz below to discover what resources may be available for you.</h2>
-      
+
       <div className="links">
         <Link to="/user-login" className="btn btn-primary">User Login</Link>
         <Link to="/create-account" className="btn btn-secondary">Create Account</Link>
@@ -314,16 +314,36 @@ function HomePage() {
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
               <h4>You are eligibile for the following benefits:</h4>
-              <h5>Select the respective link for more information about the benefits you're eligible for.</h5>
-              <ul>
+              <div className="benefits-grid">
                 {eligibilityResults.map((benefit) => (
-                  <li key={benefit.id}>
-                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
-                      {benefit.benefitName}
-                    </a>
-                  </li>
+                  <div key={benefit.id} className="benefit-card">
+                    <div className="benefit-image">
+                      {benefit.imageUrl ? (
+                        <img
+                          src={benefit.imageUrl}
+                          alt={benefit.benefitName}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/placeholder-image.png';
+                          }}
+                        />
+                      ) : (
+                        <div className="image-placeholder" />
+                      )}
+                    </div>
+                    <div className="benefit-content">
+                      <h4>{benefit.benefitName}</h4>
+                      <p>{benefit.federal ? 'Federal' : benefit.state}</p>
+                      <div className="benefit-description">
+                        {benefit.description}
+                      </div>
+                      <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer" className="benefit-link">
+                        Learn More
+                      </a>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
           <hr className="divider" />

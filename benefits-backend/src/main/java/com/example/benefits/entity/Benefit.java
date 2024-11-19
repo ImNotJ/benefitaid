@@ -30,6 +30,29 @@ public class Benefit {
     @JsonManagedReference
     private Set<Requirement> requirements;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    
+    @Column
+    private String imageUrl;
+    
+    // Add getters and setters
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     // Getters and Setters
 
     /**

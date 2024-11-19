@@ -36,6 +36,8 @@ function ManageBenefits() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     fetchBenefits();
@@ -74,14 +76,22 @@ function ManageBenefits() {
   const handleAddBenefit = async (e) => {
     e.preventDefault();
 
-    // Custom validation
-    if (!benefitName || (!federal && !state) || !benefitUrl) {
-      setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
+    if (!benefitName || (!federal && !state) || !benefitUrl || !description || !imageUrl) {
+      setErrorMessage('All fields are required.');
       setSuccessMessage('');
       return;
     }
 
-    const newBenefit = { benefitName, federal, state: federal ? null : state, benefitUrl, requirements };
+    const newBenefit = {
+      benefitName,
+      federal,
+      state: federal ? null : state,
+      benefitUrl,
+      description,
+      imageUrl,
+      requirements
+    };
+
     try {
       if (editingBenefitIndex !== null) {
         const benefitId = benefits[editingBenefitIndex].id;
@@ -130,6 +140,8 @@ function ManageBenefits() {
     setFederal(benefit.federal);
     setState(benefit.state || '');
     setBenefitUrl(benefit.benefitUrl);
+    setDescription(benefit.description || '');
+    setImageUrl(benefit.imageUrl || '');
     setRequirements(benefit.requirements);
     setEditingBenefitIndex(index);
   };
@@ -263,6 +275,8 @@ function ManageBenefits() {
     setFederal(false);
     setState('');
     setBenefitUrl('');
+    setDescription('');
+    setImageUrl('');
     setRequirements([]);
     setRequirementName('');
     setCurrentConditions([]);
@@ -370,6 +384,44 @@ function ManageBenefits() {
             onChange={(e) => setBenefitUrl(e.target.value)}
           />
         </div>
+
+        <div className="form-group">
+          <label htmlFor="imageUrl">Image URL</label>
+          <input
+            type="text"
+            id="imageUrl"
+            className="form-control"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="Enter logo URL"
+          />
+          {imageUrl && (
+            <div className="img-preview">
+              <img
+                src={imageUrl}
+                alt="Benefit logo preview"
+                style={{ maxWidth: '100px', height: 'auto' }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/placeholder-image.png';
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            className="form-control"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows="4"
+            placeholder="Enter benefit description"
+          />
+        </div>
+
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">{editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}</button>
           <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
@@ -479,17 +531,44 @@ function ManageBenefits() {
       </div>
 
       <h3>Existing Benefits</h3>
-      <ul className="benefit-list">
+      <div className="benefits-grid">
         {benefits.map((benefit, index) => (
-          <li key={benefit.id}>
-            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : `${benefit.state}`}</span>
-            <div className="form-buttons">
-              <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">Edit</button>
-              <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">Delete</button>
+          <div key={benefit.id} className="benefit-card">
+            <div className="benefit-image">
+              {benefit.imageUrl ? (
+                <img
+                  src={benefit.imageUrl}
+                  alt={benefit.benefitName}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder-image.png';
+                  }}
+                />
+              ) : (
+                <div className="image-placeholder" />
+              )}
             </div>
-          </li>
+            <div className="benefit-content">
+              <h4>{benefit.benefitName}</h4>
+              <p>{benefit.federal ? 'Federal' : benefit.state}</p>
+              <div className="benefit-description">
+                {benefit.description}
+              </div>
+              <div className="benefit-actions">
+                <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">
+                  Edit
+                </button>
+                <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">
+                  Delete
+                </button>
+                <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer" className="benefit-link">
+                  Learn More
+                </a>
+              </div>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
