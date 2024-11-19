@@ -1,286 +1,106 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
+import QuestionInput from './QuestionInput';
 import './UserForm.css';
 
-const states = [
-  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
-  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
-  "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
-  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
-  "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
-  "Wisconsin", "Wyoming"
-];
-
-/**
- * UserForm component for handling the user form and eligibility check.
- *
- * @returns {React.ReactNode} The rendered component.
- */
 function UserForm() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
+  const [errors, setErrors] = useState({});
   const [eligibilityResults, setEligibilityResults] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
 
   useEffect(() => {
     fetchQuizzes();
   }, []);
 
-  /**
-   * Fetches the quizzes from the API.
-   */
-  const fetchQuizzes = async () => {
-    try {
-      const response = await axios.get('/api/quizzes');
-      setQuizzes(response.data);
-    } catch (error) {
-      console.error('Error fetching quizzes:', error);
-    }
+  const handleInputChange = (questionId, value) => {
+    setResponses(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
   };
 
-  /**
-   * Fetches the questions for a selected quiz from the API.
-   *
-   * @param {string} quizId - The ID of the selected quiz.
-   */
-  const fetchQuestions = async (quizId) => {
-    try {
-      const response = await axios.get(`/api/quizzes/${quizId}`);
-      const orderedQuestions = response.data.questionIds.map(id => response.data.questions.find(q => q.id === id));
-      setQuestions(orderedQuestions);
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-    }
+  const handleError = (questionId, error) => {
+    setErrors(prev => ({
+      ...prev,
+      [questionId]: error
+    }));
   };
 
-  /**
-   * Handles the selection of a quiz.
-   *
-   * @param {Object} quiz - The selected quiz object.
-   */
-  const handleQuizSelect = (quiz) => {
-    setSelectedQuiz(quiz);
-    fetchQuestions(quiz.id);
-  };
+  const validateResponses = () => {
+    const newErrors = {};
+    let isValid = true;
 
-  /**
-   * Handles input changes for the form fields.
-   *
-   * @param {Event} e - The input change event.
-   */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setResponses({
-      ...responses,
-      [name]: value,
+    questions.forEach(question => {
+      const response = responses[question.id];
+
+      if (question.required && (!response || response.trim() === '')) {
+        newErrors[question.id] = 'This field is required';
+        isValid = false;
+      }
+
+      switch (question.questionType) {
+        case 'Email':
+          if (response && !isValidEmail(response)) {
+            newErrors[question.id] = 'Please enter a valid email address';
+            isValid = false;
+          }
+          break;
+        case 'Date':
+          if (response && !formatDate(response)) {
+            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
+            isValid = false;
+          }
+          break;
+        case 'Numerical':
+          if (response && isNaN(Number(response))) {
+            newErrors[question.id] = 'Please enter a valid number';
+            isValid = false;
+          }
+          break;
+        default:
+          break;
+      }
     });
+
+    setErrors(newErrors);
+    return isValid;
   };
 
-  /**
-   * Handles the form submission for eligibility check.
-   *
-   * @param {Event} e - The form submit event.
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (Object.keys(responses).length === 0) {
-      setErrorMessage('Please answer at least one question to check eligibility.');
-      setSuccessMessage('');
+    if (!validateResponses()) {
+      setErrorMessage('Please correct the errors before submitting');
       return;
     }
-    const email = 'random@example.com'; // Dummy email
-    const password = 'randomPassword123'; // Dummy password
 
-    const payload = {
-      email,
-      password,
-      responses
-    };
-
-    console.log('Submitting payload:', payload); // Log the payload
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
 
     try {
-      const response = await axios.post('/api/eligibility/check', payload);
-
-      console.log('Response data:', response.data); // Log the response data
-
-      const eligibleBenefits = selectedQuiz.benefits.filter(benefit => {
-        if (!benefit.requirements || benefit.requirements.length === 0) {
-          return false;
-        }
-        return benefit.requirements.some(requirement => {
-          console.log('Checking requirement:', requirement); // Log the requirement
-          return requirement.conditions.every(condition => {
-            const userResponse = responses[condition.questionId];
-            console.log('Checking condition:', condition); // Log the condition
-            console.log('User response:', userResponse); // Log the user response
-            if (userResponse === undefined) {
-              return false;
-            }
-            switch (condition.operator) {
-              case '<=':
-                return parseFloat(userResponse) <= parseFloat(condition.value);
-              case '>=':
-                return parseFloat(userResponse) >= parseFloat(condition.value);
-              case '<':
-                return parseFloat(userResponse) < parseFloat(condition.value);
-              case '>':
-                return parseFloat(userResponse) > parseFloat(condition.value);
-              case '==':
-                return userResponse === condition.value;
-              default:
-                return false;
-            }
-          });
-        });
+      const response = await axios.post('/api/eligibility/check', {
+        responses,
+        quizId: selectedQuiz.id
       });
 
-      console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
-
+      const eligibleBenefits = response.data;
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
-      setErrorMessage('');
+
+      // Scroll to results
+      document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      console.error('Error response data:', error.response?.data); // Log the error response data
-      setErrorMessage('Failed to check eligibility.');
-      setSuccessMessage('');
-    }
-  };
-
-  /**
-   * Handles navigation back to the dashboard or quizzes list.
-   */
-  const handleBackToDashboard = () => {
-    if (selectedQuiz) {
-      // If a quiz is selected, go back to the list of quizzes
-      setSelectedQuiz(null);
-      setQuestions([]);
-      setResponses({});
-      setEligibilityResults(null);
-      setSuccessMessage('');
-      setErrorMessage('');
-    } else {
-      // If no quiz is selected, go back to the dashboard
-      window.location.href = '/user-dashboard'; // Redirect to user dashboard page
-    }
-  };
-
-  /**
-   * Handles the logout process.
-   */
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    window.location.href = '/user-login'; // Redirect to user login page
-  };
-
-  /**
-   * Renders the appropriate input field based on the question type.
-   *
-   * @param {Object} question - The question object.
-   * @returns {React.ReactNode} The rendered input field.
-   */
-  const renderInputField = (question) => {
-    switch (question.questionType) {
-      case 'Numerical':
-        return (
-          <input
-            type="number"
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          />
-        );
-      case 'Text':
-        return (
-          <input
-            type="text"
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          />
-        );
-      case 'YesNo':
-        return (
-          <select
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          >
-            <option value="">Select</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        );
-      case 'Date':
-        return (
-          <input
-            type="date"
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          />
-        );
-      case 'Email':
-        return (
-          <input
-            type="email"
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          />
-        );
-      case 'State':
-        return (
-          <select
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          >
-            <option value="">Select a state</option>
-            {states.map((state) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </select>
-        );
-      default:
-        return (
-          <input
-            type="text"
-            id={question.id}
-            name={question.id}
-            className="form-control"
-            value={responses[question.id] || ''}
-            onChange={handleInputChange}
-
-          />
-        );
+      setErrorMessage('Failed to check eligibility. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -297,22 +117,50 @@ function UserForm() {
       {selectedQuiz ? (
         <>
           <h2 className="main-title">{selectedQuiz.quizName}</h2>
-          <p className="subtitle">Complete this simple quiz below to discover what resources may be available for you.</p>
-          {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+          <div className="completion-notice">
+            <p>Please answer all questions accurately to get the most relevant results.</p>
+          </div>
+
+          {(successMessage || errorMessage) && (
+            <div className={`alert ${successMessage ? 'alert-success' : 'alert-danger'}`}>
+              {successMessage || errorMessage}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit}>
             {questions.map((question) => (
               <div className="form-group" key={question.id}>
-                <label htmlFor={question.id}>{question.questionText}</label>
-                {renderInputField(question)}
+                <label htmlFor={`question-${question.id}`}>
+                  {question.questionText}
+                  {question.required && <span className="required">*</span>}
+                </label>
+
+                <QuestionInput
+                  question={question}
+                  value={responses[question.id]}
+                  onChange={handleInputChange}
+                  onError={handleError}
+                />
+
+                {errors[question.id] && (
+                  <div className="error-message">{errors[question.id]}</div>
+                )}
               </div>
             ))}
+
             <div className="form-group button-group">
-              <button type="submit" className="btn btn-primary">Submit</button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? 'Checking Eligibility...' : 'Check Eligibility'}
+              </button>
             </div>
           </form>
+
           {eligibilityResults && (
-            <div className="eligibility-results">
+            <div id="eligibility-results" className="eligibility-results">
               <h3>Eligibility Results</h3>
               <h4>You are eligibile for the following benefits:</h4>
               <div className="benefits-grid">
