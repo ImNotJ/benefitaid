@@ -531,44 +531,17 @@ function ManageBenefits() {
       </div>
 
       <h3>Existing Benefits</h3>
-      <div className="benefits-grid">
+      <ul className="benefit-list">
         {benefits.map((benefit, index) => (
-          <div key={benefit.id} className="benefit-card">
-            <div className="benefit-image">
-              {benefit.imageUrl ? (
-                <img
-                  src={benefit.imageUrl}
-                  alt={benefit.benefitName}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/placeholder-image.png';
-                  }}
-                />
-              ) : (
-                <div className="image-placeholder" />
-              )}
+          <li key={benefit.id}>
+            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : `${benefit.state}`}</span>
+            <div className="form-buttons">
+              <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">Edit</button>
+              <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">Delete</button>
             </div>
-            <div className="benefit-content">
-              <h4>{benefit.benefitName}</h4>
-              <p>{benefit.federal ? 'Federal' : benefit.state}</p>
-              <div className="benefit-description">
-                {benefit.description}
-              </div>
-              <div className="benefit-actions">
-                <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">
-                  Edit
-                </button>
-                <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">
-                  Delete
-                </button>
-                <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer" className="benefit-link">
-                  Learn More
-                </a>
-              </div>
-            </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
