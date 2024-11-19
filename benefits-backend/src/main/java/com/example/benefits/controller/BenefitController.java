@@ -4,6 +4,8 @@ import com.example.benefits.entity.Benefit;
 import com.example.benefits.entity.Requirement;
 import com.example.benefits.service.BenefitService;
 import com.example.benefits.service.RequirementService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -44,8 +46,30 @@ public class BenefitController {
      * @return the created benefit entity
      */
     @PostMapping
-    public Benefit createBenefit(@Valid @RequestBody Benefit benefit) {
-        return benefitService.saveBenefit(benefit);
+    public ResponseEntity<?> createBenefit(
+            @RequestPart("benefit") String benefitJson,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Benefit benefit = mapper.readValue(benefitJson, Benefit.class);
+            
+            if (image != null) {
+                BufferedImage img = ImageIO.read(image.getInputStream());
+                if (img.getWidth() != 300 || img.getHeight() != 200) {
+                    return ResponseEntity.badRequest()
+                        .body("Image dimensions must be 300x200 pixels");
+                }
+                benefit.setImageData(image.getBytes());
+                benefit.setImageContentType(image.getContentType());
+                benefit.setImageFileName(image.getOriginalFilename());
+            }
+            
+            Benefit savedBenefit = benefitService.saveBenefit(benefit);
+            return ResponseEntity.ok(savedBenefit);
+        } catch (IOException e) {
+            return ResponseEntity.status(500)
+                .body("Error processing request: " + e.getMessage());
+        }
     }
 
     /**
@@ -77,9 +101,32 @@ public class BenefitController {
      * @return the updated benefit entity
      */
     @PutMapping("/{id}")
-    public Benefit updateBenefit(@PathVariable Long id, @Valid @RequestBody Benefit benefit) {
-        benefit.setId(id);
-        return benefitService.saveBenefit(benefit);
+    public ResponseEntity<?> updateBenefit(
+            @PathVariable Long id,
+            @RequestPart("benefit") String benefitJson,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Benefit benefit = mapper.readValue(benefitJson, Benefit.class);
+            benefit.setId(id);
+            
+            if (image != null) {
+                BufferedImage img = ImageIO.read(image.getInputStream());
+                if (img.getWidth() != 300 || img.getHeight() != 200) {
+                    return ResponseEntity.badRequest()
+                        .body("Image dimensions must be 300x200 pixels");
+                }
+                benefit.setImageData(image.getBytes());
+                benefit.setImageContentType(image.getContentType());
+                benefit.setImageFileName(image.getOriginalFilename());
+            }
+            
+            Benefit updatedBenefit = benefitService.saveBenefit(benefit);
+            return ResponseEntity.ok(updatedBenefit);
+        } catch (IOException e) {
+            return ResponseEntity.status(500)
+                .body("Error processing request: " + e.getMessage());
+        }
     }
 
     /**

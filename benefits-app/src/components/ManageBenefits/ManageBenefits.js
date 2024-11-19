@@ -79,44 +79,54 @@ function ManageBenefits() {
     e.preventDefault();
 
     if (!benefitName || (!federal && !state) || !benefitUrl) {
-      setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
-      setSuccessMessage('');
-      return;
+        setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
+        setSuccessMessage('');
+        return;
     }
 
+    // Create benefit object
+    const benefitData = {
+        benefitName,
+        federal,
+        state: federal ? null : state,
+        benefitUrl,
+        displayLinkText: displayLinkText || 'Learn More',
+        description: description || '',
+        requirements
+    };
+
+    // Create FormData
     const formData = new FormData();
-    formData.append('benefitName', benefitName);
-    formData.append('federal', federal);
-    formData.append('state', federal ? '' : state);
-    formData.append('benefitUrl', benefitUrl);
-    formData.append('displayLinkText', displayLinkText || 'Learn More');
-    formData.append('description', description || '');
-    formData.append('requirements', JSON.stringify(requirements));
+    formData.append('benefit', JSON.stringify(benefitData));
     
     if (selectedImage) {
-      formData.append('image', selectedImage);
+        formData.append('image', selectedImage);
     }
 
     try {
-      if (editingBenefitIndex !== null) {
-        const benefitId = benefits[editingBenefitIndex].id;
-        await axios.put(`/api/benefits/${benefitId}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        setEditingBenefitIndex(null);
-      } else {
-        await axios.post('/api/benefits', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-      }
-      fetchBenefits();
-      handleClearFields();
-      setSuccessMessage('Benefit saved successfully!');
-      setErrorMessage('');
+        if (editingBenefitIndex !== null) {
+            const benefitId = benefits[editingBenefitIndex].id;
+            await axios.put(`/api/benefits/${benefitId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            setEditingBenefitIndex(null);
+        } else {
+            await axios.post('/api/benefits', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        }
+        fetchBenefits();
+        handleClearFields();
+        setSuccessMessage('Benefit saved successfully!');
+        setErrorMessage('');
     } catch (error) {
-      console.error('Error saving benefit:', error);
-      setErrorMessage('Failed to save benefit.');
-      setSuccessMessage('');
+        console.error('Error saving benefit:', error);
+        setErrorMessage('Failed to save benefit: ' + (error.response?.data || error.message));
+        setSuccessMessage('');
     }
   };
 
