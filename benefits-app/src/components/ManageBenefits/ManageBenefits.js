@@ -40,7 +40,6 @@ function ManageBenefits() {
   const [description, setDescription] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchBenefits();
