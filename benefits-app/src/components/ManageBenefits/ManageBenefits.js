@@ -589,3 +589,5 @@ function ManageBenefits() {
     </div>
   );
 }
+
+export default ManageBenefits;
