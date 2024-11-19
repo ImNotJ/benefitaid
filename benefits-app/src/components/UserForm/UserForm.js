@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import QuestionInput from './QuestionInput';
 import { isValidEmail, formatDate } from '../../utils/validation';
@@ -137,7 +137,8 @@ function UserForm() {
     }
   };
 
-  const handleBackToDashboard = useCallback(() => {
+  // eslint-disable-next-line no-unused-vars
+  const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
       setQuestions([]);
@@ -149,29 +150,22 @@ function UserForm() {
     } else {
       navigate('/user-dashboard');
     }
-  }, [selectedQuiz, navigate]);
+  };
 
-  const handleLogout = useCallback(() => {
+  // eslint-disable-next-line no-unused-vars
+  const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/user-login');
-  }, [navigate]);
+  };
 
   return (
     <div className="user-form">
       <div className="top-buttons">
-        <button 
-          type="button"
-          onClick={() => handleBackToDashboard()}
-          className="btn btn-secondary"
-        >
+        <button onClick={handleBackToDashboard} className="btn btn-secondary">
           {selectedQuiz ? 'Back to Quizzes' : 'Back to Dashboard'}
         </button>
-        <button 
-          type="button"
-          onClick={() => handleLogout()}
-          className="btn btn-danger"
-        >
+        <button onClick={handleLogout} className="btn btn-danger">
           Logout
         </button>
       </div>
