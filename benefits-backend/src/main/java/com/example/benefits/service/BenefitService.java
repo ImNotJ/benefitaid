@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 /**
  * Service class for managing Benefit entities.
  */
@@ -29,8 +31,10 @@ public class BenefitService {
      * @return the saved benefit entity
      */
     public Benefit saveBenefit(Benefit benefit) {
-        for (Requirement requirement : benefit.getRequirements()) {
-            requirement.setBenefit(benefit);
+        if (benefit.getRequirements() != null) {
+            for (Requirement requirement : benefit.getRequirements()) {
+                requirement.setBenefit(benefit);
+            }
         }
         return benefitRepository.save(benefit);
     }
@@ -42,7 +46,8 @@ public class BenefitService {
      * @return the benefit entity, or null if not found
      */
     public Benefit getBenefitById(Long id) {
-        return benefitRepository.findById(id).orElse(null);
+        return benefitRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Benefit not found"));
     }
 
     /**

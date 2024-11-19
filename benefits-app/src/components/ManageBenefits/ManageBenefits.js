@@ -51,14 +51,14 @@ function ManageBenefits() {
    */
   const fetchBenefits = async () => {
     try {
-        const response = await axios.get('/api/benefits');
-        console.log('Fetched benefits:', response.data);
-        setBenefits(response.data);
+      const response = await axios.get('/api/benefits');
+      console.log('Fetched benefits:', response.data);
+      setBenefits(response.data);
     } catch (error) {
-        console.error('Error fetching benefits:', error);
-        setErrorMessage('Failed to fetch benefits: ' + error.message);
+      console.error('Error fetching benefits:', error);
+      setErrorMessage('Failed to fetch benefits: ' + error.message);
     }
-};
+  };
 
   /**
    * Fetches the questions from the API.
@@ -81,79 +81,61 @@ function ManageBenefits() {
     e.preventDefault();
 
     if (!benefitName || (!federal && !state) || !benefitUrl) {
-        setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
-        setSuccessMessage('');
-        return;
+      setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
+      setSuccessMessage('');
+      return;
     }
 
-    // Create benefit object
-    const benefitData = {
+    try {
+      let benefitId;
+
+      // First update/create the benefit without the image
+      const benefitData = {
         benefitName,
         federal,
         state: federal ? null : state,
         benefitUrl,
         displayLinkText: displayLinkText || 'Learn More',
         description: description || '',
-        requirements: requirements || []
-    };
+        requirements: requirements.map(req => ({
+          name: req.name,
+          conditions: req.conditions
+        }))
+      };
 
-    // Log the data being sent
-    console.log('Sending benefit data:', benefitData);
+      console.log('Sending benefit data:', benefitData);
 
-    try {
-        let response;
-        if (editingBenefitIndex !== null) {
-            const benefitId = benefits[editingBenefitIndex].id;
-            
-            // For regular benefit update without image
-            response = await axios.put(`/api/benefits/${benefitId}`, benefitData);
-            
-            // If there's a new image, send it separately
-            if (selectedImage) {
-                const imageFormData = new FormData();
-                imageFormData.append('image', selectedImage);
-                await axios.put(`/api/benefits/${benefitId}/image`, imageFormData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-            }
-            
-            setEditingBenefitIndex(null);
-        } else {
-            // For creating new benefit
-            response = await axios.post('/api/benefits', benefitData);
-            
-            // If there's an image, send it separately
-            if (selectedImage && response.data.id) {
-                const imageFormData = new FormData();
-                imageFormData.append('image', selectedImage);
-                await axios.put(`/api/benefits/${response.data.id}/image`, imageFormData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-            }
-        }
+      if (editingBenefitIndex !== null) {
+        benefitId = benefits[editingBenefitIndex].id;
+        await axios.put(`/api/benefits/${benefitId}`, benefitData);
+      } else {
+        const response = await axios.post('/api/benefits', benefitData);
+        benefitId = response.data.id;
+      }
 
-        fetchBenefits();
-        handleClearFields();
-        setSuccessMessage('Benefit saved successfully!');
-        setErrorMessage('');
+      // If there's a new image, upload it separately
+      if (selectedImage && benefitId) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', selectedImage);
+
+        await axios.put(`/api/benefits/${benefitId}/image`, imageFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+
+      fetchBenefits();
+      handleClearFields();
+      setSuccessMessage('Benefit saved successfully!');
+      setErrorMessage('');
     } catch (error) {
-        console.error('Error details:', error.response?.data);
-        let errorMessage = 'Failed to save benefit. ';
-        
-        if (error.response?.data) {
-            errorMessage += typeof error.response.data === 'string' 
-                ? error.response.data 
-                : JSON.stringify(error.response.data);
-        }
-        
-        setErrorMessage(errorMessage);
-        setSuccessMessage('');
+      console.error('Error details:', error.response?.data);
+      const errorMsg = error.response?.data?.message || error.response?.data || error.message;
+      setErrorMessage('Failed to save benefit: ' + errorMsg);
+      setSuccessMessage('');
     }
-};
+  };
 
   /**
    * Handles the deletion of a benefit.
@@ -172,7 +154,7 @@ function ManageBenefits() {
       setSuccessMessage('');
     }
   };
-  
+
 
   /**
    * Handles the editing of a benefit.
@@ -190,10 +172,10 @@ function ManageBenefits() {
     setDisplayLinkText(benefit.displayLinkText || '');
     setDescription(benefit.description || '');
     if (benefit.imageUrl) {
-        setPreviewImage(`/api/benefits/${benefit.id}/image`);
+      setPreviewImage(`/api/benefits/${benefit.id}/image`);
     }
     setEditingBenefitIndex(index);
-};
+  };
 
   /**
    * Handles the addition of a new condition.
@@ -501,7 +483,7 @@ function ManageBenefits() {
             </div>
           )}
         </div>
-        
+
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">{editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}</button>
           <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>
