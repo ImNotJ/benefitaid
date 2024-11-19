@@ -36,10 +36,6 @@ function ManageBenefits() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const [displayLinkText, setDisplayLinkText] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     fetchBenefits();
@@ -52,11 +48,9 @@ function ManageBenefits() {
   const fetchBenefits = async () => {
     try {
       const response = await axios.get('/api/benefits');
-      console.log('Fetched benefits:', response.data);
       setBenefits(response.data);
     } catch (error) {
       console.error('Error fetching benefits:', error);
-      setErrorMessage('Failed to fetch benefits: ' + error.message);
     }
   };
 
@@ -80,59 +74,29 @@ function ManageBenefits() {
   const handleAddBenefit = async (e) => {
     e.preventDefault();
 
+    // Custom validation
     if (!benefitName || (!federal && !state) || !benefitUrl) {
       setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
       setSuccessMessage('');
       return;
     }
 
+    const newBenefit = { benefitName, federal, state: federal ? null : state, benefitUrl, requirements };
     try {
-      let benefitId;
-
-      // First update/create the benefit without the image
-      const benefitData = {
-        benefitName,
-        federal,
-        state: federal ? null : state,
-        benefitUrl,
-        displayLinkText: displayLinkText || 'Learn More',
-        description: description || '',
-        requirements: requirements.map(req => ({
-          name: req.name,
-          conditions: req.conditions
-        }))
-      };
-
-      console.log('Sending benefit data:', benefitData);
-
       if (editingBenefitIndex !== null) {
-        benefitId = benefits[editingBenefitIndex].id;
-        await axios.put(`/api/benefits/${benefitId}`, benefitData);
+        const benefitId = benefits[editingBenefitIndex].id;
+        await axios.put(`/api/benefits/${benefitId}`, newBenefit);
+        setEditingBenefitIndex(null);
       } else {
-        const response = await axios.post('/api/benefits', benefitData);
-        benefitId = response.data.id;
+        await axios.post('/api/benefits', newBenefit);
       }
-
-      // If there's a new image, upload it separately
-      if (selectedImage && benefitId) {
-        const imageFormData = new FormData();
-        imageFormData.append('image', selectedImage);
-
-        await axios.put(`/api/benefits/${benefitId}/image`, imageFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      }
-
       fetchBenefits();
       handleClearFields();
       setSuccessMessage('Benefit saved successfully!');
       setErrorMessage('');
     } catch (error) {
-      console.error('Error details:', error.response?.data);
-      const errorMsg = error.response?.data?.message || error.response?.data || error.message;
-      setErrorMessage('Failed to save benefit: ' + errorMsg);
+      console.error('Error saving benefit:', error);
+      setErrorMessage('Failed to save benefit.');
       setSuccessMessage('');
     }
   };
@@ -155,7 +119,6 @@ function ManageBenefits() {
     }
   };
 
-
   /**
    * Handles the editing of a benefit.
    *
@@ -163,17 +126,11 @@ function ManageBenefits() {
    */
   const handleEditBenefit = (index) => {
     const benefit = benefits[index];
-    console.log('Editing benefit:', benefit);
     setBenefitName(benefit.benefitName);
     setFederal(benefit.federal);
     setState(benefit.state || '');
     setBenefitUrl(benefit.benefitUrl);
-    setRequirements(benefit.requirements || []);
-    setDisplayLinkText(benefit.displayLinkText || '');
-    setDescription(benefit.description || '');
-    if (benefit.imageUrl) {
-      setPreviewImage(`/api/benefits/${benefit.id}/image`);
-    }
+    setRequirements(benefit.requirements);
     setEditingBenefitIndex(index);
   };
 
@@ -317,10 +274,6 @@ function ManageBenefits() {
     setEditingConditionIndex(null);
     setSuccessMessage('');
     setErrorMessage('');
-    setDisplayLinkText('');
-    setDescription('');
-    setSelectedImage(null);
-    setPreviewImage(null);
   };
 
   /**
@@ -353,25 +306,6 @@ function ManageBenefits() {
   const getQuestionName = (questionId) => {
     const question = questions.find(q => q.id === questionId);
     return question ? question.questionName : '';
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width !== 300 || img.height !== 200) {
-          setErrorMessage('Image must be exactly 300x200 pixels');
-          setSelectedImage(null);
-          setPreviewImage(null);
-          return;
-        }
-        setSelectedImage(file);
-        setPreviewImage(URL.createObjectURL(file));
-        setErrorMessage('');
-      };
-      img.src = URL.createObjectURL(file);
-    }
   };
 
   return (
@@ -436,54 +370,6 @@ function ManageBenefits() {
             onChange={(e) => setBenefitUrl(e.target.value)}
           />
         </div>
-
-        <div className="form-group">
-          <label htmlFor="displayLinkText">Link Display Text</label>
-          <input
-            type="text"
-            id="displayLinkText"
-            className="form-control"
-            value={displayLinkText}
-            onChange={(e) => setDisplayLinkText(e.target.value)}
-            placeholder="e.g., Learn More (optional)"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="description">Description</label>
-          <textarea
-            id="description"
-            className="form-control"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows="4"
-            placeholder="Enter benefit description (optional)"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="image">Benefit Image (300x200 pixels)</label>
-          <input
-            type="file"
-            id="image"
-            className="form-control"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-          <small className="text-muted">
-            Please upload an image that is exactly 300x200 pixels
-          </small>
-          {previewImage && (
-            <div className="image-preview">
-              <img
-                src={previewImage}
-                alt="Preview"
-                className="preview-img"
-              />
-            </div>
-          )}
-        </div>
-
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">{editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}</button>
           <button type="button" onClick={handleClearFields} className="btn btn-secondary">Clear</button>

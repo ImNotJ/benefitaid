@@ -25,8 +25,6 @@ function HomePage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
-  const [expandedBenefit, setExpandedBenefit] = useState(null);
-
 
   /**
    * Fetches the common quiz from the API.
@@ -83,16 +81,16 @@ function HomePage() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     // Check if at least one question is answered
     const hasAtLeastOneResponse = Object.keys(responses).length > 0;
-
+    
     if (!hasAtLeastOneResponse) {
       setErrorMessage('Please answer at least one question to check eligibility.');
       setSuccessMessage('');
       return;
     }
-
+    
     const email = 'random@example.com'; // Dummy email
     const password = 'randomPassword123'; // Dummy password
 
@@ -141,7 +139,7 @@ function HomePage() {
               case '>':
                 return parseFloat(userResponse) > parseFloat(condition.value);
               case '==':
-                return userResponse === condition.value;
+                  return userResponse === condition.value;
               default:
                 return false;
             }
@@ -195,7 +193,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           />
         );
       case 'Text':
@@ -207,7 +205,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           />
         );
       case 'YesNo':
@@ -218,7 +216,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           >
             <option value="">Select</option>
             <option value="Yes">Yes</option>
@@ -234,7 +232,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           />
         );
       case 'Email':
@@ -246,7 +244,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           />
         );
       case 'State':
@@ -257,7 +255,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           >
             <option value="">Select a state</option>
             {states.map((state) => (
@@ -276,7 +274,7 @@ function HomePage() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
+            
           />
         );
     }
@@ -286,7 +284,7 @@ function HomePage() {
     <div className="home-page">
       <h1 className="main-title">Welcome to Fair Benefits!</h1>
       <h2 className="subtitle">Complete this simple quiz below to discover what resources may be available for you.</h2>
-
+      
       <div className="links">
         <Link to="/user-login" className="btn btn-primary">User Login</Link>
         <Link to="/create-account" className="btn btn-secondary">Create Account</Link>
@@ -312,87 +310,20 @@ function HomePage() {
               <button type="submit" className="btn btn-primary">Check Eligibility</button>
             </div>
           </form>
-
           {eligibilityResults && (
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
-              <h4>You are eligible for the following benefits:</h4>
-              <div className="benefits-grid">
+              <h4>You are eligibile for the following benefits:</h4>
+              <h5>Select the respective link for more information about the benefits you're eligible for.</h5>
+              <ul>
                 {eligibilityResults.map((benefit) => (
-                  <div
-                    key={benefit.id}
-                    className="benefit-card"
-                    style={{ willChange: 'contents' }}
-                  >
-                    <div className="benefit-image">
-                      <div className="image-placeholder"
-                        style={{
-                          height: '200px',
-                          backgroundColor: '#f0f0f0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <img
-                          src={`/api/benefits/${benefit.id}/image`}
-                          alt={benefit.benefitName}
-                          style={{
-                            opacity: 0,
-                            transition: 'opacity 0.3s ease-in',
-                            position: 'absolute',
-                            width: '100%',
-                            height: '200px',
-                            objectFit: 'cover'
-                          }}
-                          onLoad={(e) => {
-                            e.target.style.opacity = 1;
-                          }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/static/default-benefit-image.jpg';
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <div className="benefit-content">
-                      <h5>{benefit.benefitName}</h5>
-                      <div
-                        className={`benefit-description ${expandedBenefit === benefit.id ? 'expanded' : ''}`}
-                        style={{
-                          maxHeight: expandedBenefit === benefit.id ? '1000px' : '100px',
-                          transition: 'max-height 0.3s ease-out',
-                          overflow: 'hidden',
-                          willChange: 'max-height'
-                        }}
-                      >
-                        <div dangerouslySetInnerHTML={{
-                          __html: benefit.description || 'No description available.'
-                        }} />
-                      </div>
-                      {benefit.description && benefit.description.length > 200 && (
-                        <button
-                          className="btn btn-link"
-                          onClick={() => setExpandedBenefit(
-                            expandedBenefit === benefit.id ? null : benefit.id
-                          )}
-                          style={{ marginTop: '10px' }}
-                        >
-                          {expandedBenefit === benefit.id ? 'Read Less' : 'Read More'}
-                        </button>
-                      )}
-                      <a
-                        href={benefit.benefitUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="benefit-link"
-                      >
-                        {benefit.displayLinkText || 'Learn More'}
-                      </a>
-                    </div>
-                  </div>
+                  <li key={benefit.id}>
+                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
+                      {benefit.benefitName}
+                    </a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
           <hr className="divider" />
