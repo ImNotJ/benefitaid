@@ -18,8 +18,6 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
-
-
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
@@ -71,65 +69,65 @@ function UserForm() {
   const validateResponses = () => {
     const newErrors = {};
     let isValid = true;
-
-    questions.forEach(question => {
-      const response = responses[question.id];
-
-      // Only validate format if user provided an answer
+  
+    // Only validate format of provided responses
+    Object.entries(responses).forEach(([questionId, response]) => {
+      const question = questions.find(q => q.id.toString() === questionId);
+      if (!question) return;
+  
+      // Only validate if user has entered a response
       if (response && response.trim() !== '') {
         switch (question.questionType) {
           case 'Email':
             if (!isValidEmail(response)) {
-              newErrors[question.id] = 'Please enter a valid email address';
+              newErrors[questionId] = 'Please enter a valid email address';
               isValid = false;
             }
             break;
           case 'Date':
             if (!formatDate(response)) {
-              newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
+              newErrors[questionId] = 'Please enter a valid date in MM/DD/YYYY format';
               isValid = false;
             }
             break;
           case 'Numerical':
             if (isNaN(Number(response))) {
-              newErrors[question.id] = 'Please enter a valid number';
+              newErrors[questionId] = 'Please enter a valid number';
               isValid = false;
             }
             break;
-          // No validation needed for other types
           default:
             break;
         }
       }
     });
-
+  
     setErrors(newErrors);
     return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!validateResponses()) {
-      setErrorMessage('Please correct the errors before submitting');
+      setErrorMessage('Please correct any formatting errors in your responses');
       return;
     }
-
+  
     setLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
-
+  
     try {
       const response = await axios.post('/api/eligibility/check', {
         responses,
         quizId: selectedQuiz.id
       });
-
+  
       const eligibleBenefits = response.data;
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
-
-      // Scroll to results
+      
       document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       console.error('Error checking eligibility:', error);
@@ -172,7 +170,7 @@ function UserForm() {
         <>
           <h2 className="main-title">{selectedQuiz.quizName}</h2>
           <div className="completion-notice">
-            <p>The more questions you answer, the more accurate your results will be.</p>
+            <p>Please answer all questions accurately to get the most relevant results.</p>
           </div>
 
           {(successMessage || errorMessage) && (
@@ -186,10 +184,11 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
+                  {question.required && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
-                  question={{ ...question, required: false }} // Ensure required is always false
+                  question={question}
                   value={responses[question.id]}
                   onChange={handleInputChange}
                   onError={handleError}
