@@ -41,7 +41,6 @@ function ManageBenefits() {
   const [displayLinkText, setDisplayLinkText] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchBenefits();
@@ -79,31 +78,71 @@ function ManageBenefits() {
    */
   const handleAddBenefit = async (e) => {
     e.preventDefault();
+  
+    // Validation checks
     if (!isValidUrl(benefitUrl)) {
       setErrorMessage('Please enter a valid URL');
       return;
     }
-
-    const formData = new FormData();
-    formData.append('benefitName', benefitName);
-    formData.append('federal', federal);
-    formData.append('state', state);
-    formData.append('benefitUrl', benefitUrl);
-    formData.append('displayLinkText', displayLinkText);
-    formData.append('description', description);
-
+  
+    if (!benefitName || (!federal && !state) || !benefitUrl) {
+      setErrorMessage('Benefit Name, Federal/State, and Benefit URL are required.');
+      setSuccessMessage('');
+      return;
+    }
+  
     try {
-      const response = await axios.post('/api/benefits', formData);
-      if (selectedImage) {
-        const imageFormData = new FormData();
-        imageFormData.append('image', selectedImage);
-        await axios.post(`/api/benefits/${response.data.id}/image`, imageFormData);
+      if (editingBenefitIndex !== null) {
+        // Handling edit case
+        const benefitId = benefits[editingBenefitIndex].id;
+        const formData = new FormData();
+        formData.append('benefitName', benefitName);
+        formData.append('federal', federal);
+        formData.append('state', federal ? null : state);
+        formData.append('benefitUrl', benefitUrl);
+        formData.append('displayLinkText', displayLinkText);
+        formData.append('description', description);
+        formData.append('requirements', JSON.stringify(requirements));
+  
+        await axios.put(`/api/benefits/${benefitId}`, formData);
+        
+        // Handle image update if there's a new image
+        if (selectedImage) {
+          const imageFormData = new FormData();
+          imageFormData.append('image', selectedImage);
+          await axios.post(`/api/benefits/${benefitId}/image`, imageFormData);
+        }
+        
+        setEditingBenefitIndex(null);
+      } else {
+        // Handling new benefit case
+        const formData = new FormData();
+        formData.append('benefitName', benefitName);
+        formData.append('federal', federal);
+        formData.append('state', federal ? null : state);
+        formData.append('benefitUrl', benefitUrl);
+        formData.append('displayLinkText', displayLinkText);
+        formData.append('description', description);
+        formData.append('requirements', JSON.stringify(requirements));
+  
+        const response = await axios.post('/api/benefits', formData);
+        
+        // Handle image upload for new benefit
+        if (selectedImage) {
+          const imageFormData = new FormData();
+          imageFormData.append('image', selectedImage);
+          await axios.post(`/api/benefits/${response.data.id}/image`, imageFormData);
+        }
       }
+  
       fetchBenefits();
       handleClearFields();
       setSuccessMessage('Benefit saved successfully!');
+      setErrorMessage('');
     } catch (error) {
+      console.error('Error saving benefit:', error);
       setErrorMessage('Failed to save benefit.');
+      setSuccessMessage('');
     }
   };
 
@@ -142,8 +181,10 @@ function ManageBenefits() {
     } else {
       setPreviewImage(null);
     }
-    setEditingBenefitIndex(benefitIndex);
+    setRequirements(benefit.requirements);
+    setEditingBenefitIndex(index);
   };
+
 
   // Add warning for legacy benefits
   const renderLegacyWarning = (benefit) => {
@@ -442,13 +483,7 @@ function ManageBenefits() {
             rows={6}
             style={{ minHeight: '150px' }}
           />
-          <button
-            type="button"
-            onClick={() => setShowPreview(!showPreview)}
-            className="btn btn-secondary mt-2"
-          >
-            {showPreview ? 'Hide Preview' : 'Show Preview'}
-          </button>
+
           {showPreview && (
             <div
               className="description-preview"
