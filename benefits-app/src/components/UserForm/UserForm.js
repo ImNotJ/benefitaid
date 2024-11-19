@@ -87,7 +87,7 @@ function UserForm() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (Object.keys(responses).length === 0) {
       setErrorMessage('Please answer at least one question to check eligibility.');
       setSuccessMessage('');
@@ -197,7 +197,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Text':
@@ -209,7 +209,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'YesNo':
@@ -220,7 +220,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select</option>
             <option value="Yes">Yes</option>
@@ -236,7 +236,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'Email':
@@ -248,7 +248,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
       case 'State':
@@ -259,7 +259,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           >
             <option value="">Select a state</option>
             {states.map((state) => (
@@ -278,7 +278,7 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-            
+
           />
         );
     }
@@ -296,7 +296,8 @@ function UserForm() {
       </div>
       {selectedQuiz ? (
         <>
-          <h2>{selectedQuiz.quizName}</h2>
+          <h2 className="main-title">DISASTER RESOURCES - Fair Benefits</h2>
+          <h3 className="subtitle">Complete this quiz to check your eligibility for disaster resources</h3>
           {successMessage && <div className="alert alert-success">{successMessage}</div>}
           {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
           <form onSubmit={handleSubmit}>
@@ -350,7 +351,7 @@ function UserForm() {
         </>
       ) : (
         <>
-          <h2>Available Quizzes</h2>
+          <h2 className="main-title">Available Quizzes</h2>          
           <ul className="quiz-list">
             {quizzes.map((quiz) => (
               <li key={quiz.id}>
