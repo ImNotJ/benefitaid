@@ -4,6 +4,8 @@ import com.example.benefits.entity.Benefit;
 import com.example.benefits.entity.Question;
 import com.example.benefits.entity.User;
 import com.example.benefits.entity.Requirement;
+import com.example.benefits.entity.Requirement.RequirementType;
+
 
 import com.example.benefits.repository.BenefitRepository;
 import com.example.benefits.repository.QuestionRepository;
@@ -28,6 +30,19 @@ public class EligibilityService {
     private QuestionRepository questionRepository;
 
     public List<Benefit> checkEligibility(User user) {
+        // Check if at least one response exists
+        if (user.getResponses() == null || user.getResponses().isEmpty()) {
+            throw new IllegalArgumentException("At least one question must be answered");
+        }
+
+        // Check if any response has a non-empty value
+        boolean hasValidResponse = user.getResponses().values().stream()
+            .anyMatch(response -> response != null && !response.trim().isEmpty());
+
+        if (!hasValidResponse) {
+            throw new IllegalArgumentException("At least one question must be answered");
+        }
+
         List<Benefit> allBenefits = benefitRepository.findAll();
         Map<Long, Question> questionMap = questionRepository.findAll().stream()
             .collect(Collectors.toMap(Question::getId, q -> q));
@@ -44,7 +59,7 @@ public class EligibilityService {
 
         // First check INVALID requirements - if any are met, user is not eligible
         boolean hasInvalidMatch = benefit.getRequirements().stream()
-            .filter(req -> req.getType() == Requirement.RequirementType.INVALID)
+            .filter(req -> req.getType() == RequirementType.INVALID)
             .anyMatch(req -> meetsRequirement(req, responses, questionMap));
         
         if (hasInvalidMatch) {
@@ -53,36 +68,34 @@ public class EligibilityService {
 
         // Check NECESSARY requirements - all must be met
         boolean meetsAllNecessary = benefit.getRequirements().stream()
-            .filter(req -> req.getType() == Requirement.RequirementType.NECESSARY)
+            .filter(req -> req.getType() == RequirementType.NECESSARY)
             .allMatch(req -> meetsRequirement(req, responses, questionMap));
 
         if (!meetsAllNecessary) {
             return false;
         }
 
-        // Check GENERAL_NECESSARY requirements - all must be met
+        // Check GENERAL_NECESSARY requirements - all must be met if they exist
         List<Requirement> generalNecessaryReqs = benefit.getRequirements().stream()
-            .filter(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY)
+            .filter(req -> req.getType() == RequirementType.GENERAL_NECESSARY)
             .collect(Collectors.toList());
 
         if (!generalNecessaryReqs.isEmpty()) {
             boolean meetsAllGeneralNecessary = generalNecessaryReqs.stream()
                 .allMatch(req -> meetsRequirement(req, responses, questionMap));
             
-            // If meets all GENERAL_NECESSARY, user is eligible regardless of GENERAL requirements
             if (meetsAllGeneralNecessary) {
                 return true;
             }
         }
 
-        // If no GENERAL_NECESSARY requirements exist or they weren't all met,
-        // check if at least one GENERAL requirement is met
+        // Check GENERAL requirements - must meet at least one if they exist
         List<Requirement> generalReqs = benefit.getRequirements().stream()
-            .filter(req -> req.getType() == Requirement.RequirementType.GENERAL)
+            .filter(req -> req.getType() == RequirementType.GENERAL)
             .collect(Collectors.toList());
 
+        // If no GENERAL requirements exist and we've passed all other checks, user is eligible
         if (generalReqs.isEmpty()) {
-            // If no GENERAL requirements and we've passed all other checks, user is eligible
             return true;
         }
 
@@ -97,7 +110,8 @@ public class EligibilityService {
                 String response = responses.get(condition.getQuestionId());
                 Question question = questionMap.get(condition.getQuestionId());
                 
-                if (response == null || question == null) {
+                // Missing response or question fails the condition
+                if (response == null || response.trim().isEmpty() || question == null) {
                     return false;
                 }
 
