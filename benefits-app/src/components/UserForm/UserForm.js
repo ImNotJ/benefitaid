@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import QuestionInput from './QuestionInput';
+import { isValidEmail, formatDate } from '../../utils/validation';
 import { useNavigate } from 'react-router-dom';
 import './UserForm.css';
 
@@ -67,34 +68,68 @@ function UserForm() {
     }));
   };
 
+  const validateResponses = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    questions.forEach(question => {
+      const response = responses[question.id];
+
+      if (question.required && (!response || response.trim() === '')) {
+        newErrors[question.id] = 'This field is required';
+        isValid = false;
+      }
+
+      switch (question.questionType) {
+        case 'Email':
+          if (response && !isValidEmail(response)) {
+            newErrors[question.id] = 'Please enter a valid email address';
+            isValid = false;
+          }
+          break;
+        case 'Date':
+          if (response && !formatDate(response)) {
+            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
+            isValid = false;
+          }
+          break;
+        case 'Numerical':
+          if (response && isNaN(Number(response))) {
+            newErrors[question.id] = 'Please enter a valid number';
+            isValid = false;
+          }
+          break;
+        default:
+          break;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Check if at least one question has been answered
-    const hasAnyResponse = Object.values(responses).some(response => 
-      response !== undefined && response !== null && response.toString().trim() !== ''
-    );
-  
-    if (!hasAnyResponse) {
-      setErrorMessage('Please answer at least one question to check eligibility.');
+
+    if (!validateResponses()) {
+      setErrorMessage('Please correct the errors before submitting');
       return;
     }
-  
+
     setLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
-  
+
     try {
       const response = await axios.post('/api/eligibility/check', {
         responses,
         quizId: selectedQuiz.id
       });
-  
+
       const eligibleBenefits = response.data;
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
-  
+
       // Scroll to results
       document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
