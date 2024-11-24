@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import QuestionInput from './QuestionInput';
 import { isValidEmail, formatDate } from '../../utils/validation';
-import { useNavigate } from 'react-router-dom';
 import './UserForm.css';
 
 function UserForm() {
