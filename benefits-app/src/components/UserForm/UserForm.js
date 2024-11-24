@@ -18,8 +18,6 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
-
-  
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
