@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import QuestionInput from './QuestionInput';
-import { isValidEmail, formatDate } from '../../utils/validation';
 import './UserForm.css';
 
 function UserForm() {
-  const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -15,60 +13,6 @@ function UserForm() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showBenefits, setShowBenefits] = useState(false);
-
-  useEffect(() => {
-    fetchQuizzes();
-  }, []);
-
-  const fetchQuizzes = async () => {
-    try {
-      const response = await axios.get('/api/quizzes');
-      setQuizzes(response.data);
-    } catch (error) {
-      console.error('Error fetching quizzes:', error);
-      setErrorMessage('Failed to load quizzes. Please try again.');
-    }
-  };
-
-  const handleQuizSelect = async (quiz) => {
-    setSelectedQuiz(quiz);
-    try {
-      const response = await axios.get(`/api/quizzes/${quiz.id}`);
-      const orderedQuestions = response.data.questionIds
-        .map(id => response.data.questions.find(q => q.id === id))
-        .filter(Boolean);
-      setQuestions(orderedQuestions);
-      setResponses({});
-      setErrors({});
-      setEligibilityResults(null);
-      setSuccessMessage('');
-      setErrorMessage('');
-    } catch (error) {
-      console.error('Error fetching quiz questions:', error);
-      setErrorMessage('Failed to load quiz questions. Please try again.');
-    }
-  };
-
-  const handleBackToDashboard = () => {
-    if (selectedQuiz) {
-      setSelectedQuiz(null);
-      setQuestions([]);
-      setResponses({});
-      setErrors({});
-      setEligibilityResults(null);
-      setSuccessMessage('');
-      setErrorMessage('');
-    } else {
-      navigate('/user-dashboard');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/user-login');
-  };
 
   useEffect(() => {
     fetchQuizzes();
