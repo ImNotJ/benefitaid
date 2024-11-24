@@ -1,7 +1,7 @@
+// benefits-app/src/components/ManageQuestions/ManageQuestions.js
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../utils/axiosConfig';
-import './ManageQuestions.css';
+import axios from 'axios';
 
 /**
  * ManageQuestions component for handling the management of questions.
@@ -13,25 +13,24 @@ function ManageQuestions() {
   const [questionName, setQuestionName] = useState('');
   const [questionType, setQuestionType] = useState('');
   const [questionText, setQuestionText] = useState('');
+  const [options, setOptions] = useState(''); // New state for options
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchQuestions();
   }, []);
 
   /**
-   * Fetches the questions from the API.
+   * Fetches all questions from the API.
    */
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Fetch questions response:', response); // Debug log
       setQuestions(response.data);
     } catch (error) {
-      console.error('Fetch questions error:', error); // Debug log
+      console.error('Error fetching questions:', error);
     }
   };
 
@@ -50,7 +49,14 @@ function ManageQuestions() {
       return;
     }
 
-    const newQuestion = { questionName, questionType, questionText };
+    // Include options only for MultiChoice questions
+    const newQuestion = {
+      questionName,
+      questionType,
+      questionText,
+      options: questionType === 'MultiChoice' ? options : null,
+    };
+
     try {
       let response;
       if (editingQuestionId) {
@@ -62,91 +68,58 @@ function ManageQuestions() {
         console.log('Add question response:', response); // Debug log
         setSuccessMessage('Question added successfully!');
       }
-      fetchQuestions();
+
+      // Reset form fields
       setQuestionName('');
       setQuestionType('');
       setQuestionText('');
+      setOptions('');
       setEditingQuestionId(null);
       setErrorMessage('');
+
+      // Refresh the question list
+      fetchQuestions();
     } catch (error) {
-      console.error('Add or update question error:', error); // Debug log
-      setErrorMessage('Failed to add or update question.');
+      console.error('Error saving question:', error);
+      setErrorMessage('Failed to save question.');
       setSuccessMessage('');
     }
   };
 
   /**
-   * Handles the editing of a question.
+   * Handles the edit action for a question.
    *
-   * @param {Object} question - The question object to edit.
+   * @param {Object} question - The question to edit.
    */
   const handleEditQuestion = (question) => {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
+    setOptions(question.options || ''); // Populate options if available
     setEditingQuestionId(question.id);
-    setSuccessMessage('');
-    setErrorMessage('');
   };
 
   /**
-   * Handles the deletion of a question.
+   * Handles the delete action for a question.
    *
-   * @param {string} id - The ID of the question to delete.
+   * @param {number} id - The ID of the question to delete.
    */
   const handleDeleteQuestion = async (id) => {
     try {
-      const response = await axios.delete(`/api/questions/${id}`);
-      console.log('Delete question response:', response); // Debug log
-      fetchQuestions();
+      await axios.delete(`/api/questions/${id}`);
       setSuccessMessage('Question deleted successfully!');
       setErrorMessage('');
+      fetchQuestions();
     } catch (error) {
-      console.error('Delete question error:', error); // Debug log
+      console.error('Error deleting question:', error);
       setErrorMessage('Failed to delete question.');
       setSuccessMessage('');
     }
   };
 
-  /**
-   * Handles navigation back to the admin dashboard.
-   */
-  const handleBackToDashboard = () => {
-    navigate('/admin-dashboard');
-  };
-
-  /**
-   * Handles the logout process.
-   */
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/admin-login');
-  };
-
-  /**
-   * Clears all input fields.
-   */
-  const handleClearFields = () => {
-    setQuestionName('');
-    setQuestionType('');
-    setQuestionText('');
-    setEditingQuestionId(null);
-    setSuccessMessage('');
-    setErrorMessage('');
-  };
-
   return (
     <div className="manage-questions">
-      <div className="top-buttons">
-        <button onClick={handleBackToDashboard} className="btn btn-secondary">
-          Back to Dashboard
-        </button>
-        <button onClick={handleLogout} className="btn btn-secondary">
-          Logout
-        </button>
-      </div>
-      <h2>Manage Questions</h2>
+      <h2>{editingQuestionId ? 'Edit Question' : 'Add Question'}</h2>
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <form onSubmit={handleAddOrUpdateQuestion}>
@@ -171,11 +144,10 @@ function ManageQuestions() {
             <option value="">Select</option>
             <option value="Numerical">Numerical</option>
             <option value="Text">Text</option>
-            <option value="YesNo">Yes/No</option>
-            <option value="Date">Date (MM/DD/YYYY)</option>
-            <option value="Email">Email (text@domain)</option>
+            <option value="Email">Email</option>
+            <option value="Date">Date</option>
             <option value="State">State</option>
-            <option value="ExistingBenefits">Existing Benefits</option>
+            <option value="MultiChoice">MultiChoice</option>
           </select>
         </div>
         <div className="form-group">
@@ -188,26 +160,78 @@ function ManageQuestions() {
             onChange={(e) => setQuestionText(e.target.value)}
           />
         </div>
+        {questionType === 'MultiChoice' && (
+          <div className="form-group">
+            <label htmlFor="options">Options (comma-separated)</label>
+            <input
+              type="text"
+              id="options"
+              className="form-control"
+              value={options}
+              onChange={(e) => setOptions(e.target.value)}
+            />
+          </div>
+        )}
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">
             {editingQuestionId ? 'Update Question' : 'Add Question'}
           </button>
-          <button type="button" onClick={handleClearFields} className="btn btn-secondary">
-            Clear
-          </button>
+          {editingQuestionId && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setQuestionName('');
+                setQuestionType('');
+                setQuestionText('');
+                setOptions('');
+                setEditingQuestionId(null);
+                setErrorMessage('');
+                setSuccessMessage('');
+              }}
+            >
+              Cancel
+            </button>
+          )}
         </div>
       </form>
-      <ul className="question-list">
-        {questions.map((question) => (
-          <li key={question.id}>
-            <span>{question.id}: {question.questionName}</span>
-            <div className="question-buttons">
-              <button onClick={() => handleEditQuestion(question)} className="btn btn-secondary">Edit</button>
-              <button onClick={() => handleDeleteQuestion(question.id)} className="btn btn-danger">Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+
+      <h2>Existing Questions</h2>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Text</th>
+            <th>Options</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {questions.map((question) => (
+            <tr key={question.id}>
+              <td>{question.questionName}</td>
+              <td>{question.questionType}</td>
+              <td>{question.questionText}</td>
+              <td>{question.options || 'N/A'}</td>
+              <td>
+                <button
+                  className="btn btn-sm btn-info"
+                  onClick={() => handleEditQuestion(question)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleDeleteQuestion(question.id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+// benefits-app/src/components/ManageBenefits/ManageBenefits.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
@@ -26,6 +28,7 @@ function ManageBenefits() {
   const [benefitUrl, setBenefitUrl] = useState('');
   const [requirements, setRequirements] = useState([]);
   const [requirementName, setRequirementName] = useState('');
+  const [requirementType, setRequirementType] = useState(''); // New state for requirement type
   const [currentConditions, setCurrentConditions] = useState([]);
   const [currentQuestionId, setCurrentQuestionId] = useState('');
   const [currentOperator, setCurrentOperator] = useState('');
@@ -204,14 +207,15 @@ function ManageBenefits() {
    * Handles the addition of a new requirement.
    */
   const handleAddRequirement = () => {
-    if (!requirementName || currentConditions.length === 0) {
-      setErrorMessage('Requirement name and at least one condition are required.');
+    if (!requirementName || !requirementType || currentConditions.length === 0) {
+      setErrorMessage('Requirement name, type, and at least one condition are required.');
       setSuccessMessage('');
       return;
     }
 
     const newRequirement = {
       name: requirementName,
+      type: requirementType, // Include the requirement type
       conditions: currentConditions,
     };
 
@@ -225,6 +229,7 @@ function ManageBenefits() {
     }
 
     setRequirementName('');
+    setRequirementType(''); // Clear the requirement type
     setCurrentConditions([]);
     setErrorMessage('');
   };
@@ -237,6 +242,7 @@ function ManageBenefits() {
   const handleEditRequirement = (index) => {
     const requirement = requirements[index];
     setRequirementName(requirement.name);
+    setRequirementType(requirement.type); // Set the requirement type
     setCurrentConditions(requirement.conditions);
     setEditingRequirementIndex(index);
   };
@@ -279,6 +285,7 @@ function ManageBenefits() {
     setImageUrl('');
     setRequirements([]);
     setRequirementName('');
+    setRequirementType(''); // Clear the requirement type
     setCurrentConditions([]);
     setCurrentQuestionId('');
     setCurrentOperator('');
@@ -295,6 +302,7 @@ function ManageBenefits() {
    */
   const handleClearRequirementFields = () => {
     setRequirementName('');
+    setRequirementType(''); // Clear the requirement type
     setCurrentConditions([]);
     setEditingRequirementIndex(null);
     setErrorMessage('');
@@ -440,6 +448,22 @@ function ManageBenefits() {
             onChange={(e) => setRequirementName(e.target.value)}
           />
         </div>
+        <div className="form-group">
+          <label htmlFor="requirementType">Requirement Type</label>
+          <select
+            id="requirementType"
+            className="form-control"
+            value={requirementType}
+            onChange={(e) => setRequirementType(e.target.value)}
+          >
+            <option value="">Select a type</option>
+            <option value="Invalid">Invalid</option>
+            <option value="Auto">Auto</option>
+            <option value="Necessary">Necessary</option>
+            <option value="General + Necessary">General + Necessary</option>
+            <option value="General">General</option>
+          </select>
+        </div>
         <div className="form-buttons">
           <button type="button" onClick={handleAddRequirement} className="btn btn-secondary">
             {editingRequirementIndex !== null ? 'Update Requirement' : 'Add Requirement'}
@@ -449,7 +473,7 @@ function ManageBenefits() {
         <ul className="requirement-list">
           {requirements.map((requirement, index) => (
             <li key={index}>
-              <span>{requirement.name}</span>
+              <span>{requirement.name} ({requirement.type})</span>
               <ul>
                 {requirement.conditions.map((condition, i) => (
                   <li key={i}>
