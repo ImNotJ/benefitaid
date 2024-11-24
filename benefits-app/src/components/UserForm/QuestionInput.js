@@ -1,3 +1,4 @@
+// QuestionInput.js
 import React from 'react';
 import { isValidEmail, formatDate } from '../../utils/validation';
 
@@ -6,27 +7,25 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     const newValue = e.target.value;
     let error = null;
 
-    // Only validate format if there's a value
-    if (newValue) {
-      switch (question.questionType) {
-        case 'Email':
-          if (!isValidEmail(newValue)) {
-            error = 'Please enter a valid email address';
-          }
-          break;
-        case 'Date':
-          if (!formatDate(newValue)) {
-            error = 'Please enter a date in MM/DD/YYYY format';
-          }
-          break;
-        case 'Numerical':
-          if (isNaN(Number(newValue))) {
-            error = 'Please enter a valid number';
-          }
-          break;
-        default:
-          break;
-      }
+    // Frontend validation based on question type
+    switch (question.questionType) {
+      case 'Email':
+        if (newValue && !isValidEmail(newValue)) {
+          error = 'Please enter a valid email address';
+        }
+        break;
+      case 'Date':
+        if (newValue && !formatDate(newValue)) {
+          error = 'Please enter a date in MM/DD/YYYY format';
+        }
+        break;
+      case 'Numerical':
+        if (newValue && isNaN(Number(newValue))) {
+          error = 'Please enter a valid number';
+        }
+        break;
+      default:
+        break;
     }
 
     onChange(question.id, newValue);
@@ -75,18 +74,6 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     case 'MultiChoiceSingle':
       return (
         <div className="form-control radio-group">
-          {/* Add a "None" option */}
-          <div className="radio-option">
-            <input
-              type="radio"
-              id={`${question.id}-none`}
-              name={`question-${question.id}`}
-              value=""
-              checked={!value}
-              onChange={(e) => onChange(question.id, '')}
-            />
-            <label htmlFor={`${question.id}-none`}>None</label>
-          </div>
           {question.options?.split(',').map((option) => (
             <div key={option} className="radio-option">
               <input
