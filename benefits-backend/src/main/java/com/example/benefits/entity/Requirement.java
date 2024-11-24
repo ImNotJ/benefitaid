@@ -19,10 +19,6 @@ public class Requirement {
     @NotBlank
     private String name;
 
-    @NotBlank
-    @Enumerated(EnumType.STRING)
-    private RequirementType type; // GENERAL, NECESSARY, INVALID, GENERAL_NECESSARY
-
     @ElementCollection
     @CollectionTable(name = "requirement_conditions", joinColumns = @JoinColumn(name = "requirement_id"))
     private Set<Condition> conditions;
@@ -31,13 +27,6 @@ public class Requirement {
     @JoinColumn(name = "benefit_id", nullable = false)
     @JsonBackReference
     private Benefit benefit;
-
-    public enum RequirementType {
-        GENERAL,
-        NECESSARY,
-        INVALID,
-        GENERAL_NECESSARY
-    }
 
     // Getters and Setters
 
@@ -111,13 +100,5 @@ public class Requirement {
      */
     public void setBenefit(Benefit benefit) {
         this.benefit = benefit;
-    }
-
-    public RequirementType getType() {
-        return type;
-    }
-
-    public void setType(RequirementType type) {
-        this.type = type;
     }
 }

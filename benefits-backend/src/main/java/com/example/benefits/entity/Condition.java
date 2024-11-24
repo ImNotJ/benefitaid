@@ -1,11 +1,5 @@
 package com.example.benefits.entity;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
 
@@ -19,7 +13,7 @@ public class Condition {
     private Long questionId;
 
     @NotBlank
-    private String operator; // =, !=, >, <, >=, <=
+    private String operator;
 
     @NotBlank
     private String value;
@@ -78,87 +72,5 @@ public class Condition {
      */
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public boolean evaluate(String userResponse, Question question) {
-        if (userResponse == null || userResponse.trim().isEmpty()) {
-            return false;
-        }
-
-        switch (question.getQuestionType()) {
-            case "Numerical":
-                return evaluateNumerical(userResponse);
-            case "Date":
-                return evaluateDate(userResponse);
-            case "MultiChoiceSingle":
-            case "MultiChoiceMulti":
-                return evaluateMultiChoice(userResponse);
-            default:
-                return evaluateText(userResponse);
-        }
-    }
-
-    private boolean evaluateNumerical(String userResponse) {
-        try {
-            double userValue = Double.parseDouble(userResponse);
-            double conditionValue = Double.parseDouble(value);
-            
-            switch (operator) {
-                case "=": return userValue == conditionValue;
-                case "!=": return userValue != conditionValue;
-                case ">": return userValue > conditionValue;
-                case "<": return userValue < conditionValue;
-                case ">=": return userValue >= conditionValue;
-                case "<=": return userValue <= conditionValue;
-                default: return false;
-            }
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean evaluateDate(String userResponse) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-            Date userDate = sdf.parse(userResponse);
-            Date conditionDate = sdf.parse(value);
-            
-            int comparison = userDate.compareTo(conditionDate);
-            switch (operator) {
-                case "=": return comparison == 0;
-                case "!=": return comparison != 0;
-                case ">": return comparison > 0;
-                case "<": return comparison < 0;
-                case ">=": return comparison >= 0;
-                case "<=": return comparison <= 0;
-                default: return false;
-            }
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
-    private boolean evaluateMultiChoice(String userResponse) {
-        List<String> userSelections = Arrays.asList(userResponse.split(","));
-        
-        switch (operator) {
-            case "=":
-                return userSelections.contains(value.trim());
-            case "!=":
-                return !userSelections.contains(value.trim());
-            default:
-                return false;
-        }
-    }
-
-    private boolean evaluateText(String userResponse) {
-        switch (operator) {
-            case "=":
-                return userResponse.equals(value);
-            case "!=":
-                return !userResponse.equals(value);
-            default:
-                return false;
-        }
     }
 }
