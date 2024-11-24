@@ -61,9 +61,11 @@ function ManageQuestions() {
       let response;
       if (editingQuestionId) {
         response = await axios.put(`/api/questions/${editingQuestionId}`, newQuestion);
+        console.log('Update question response:', response); // Debug log
         setSuccessMessage('Question updated successfully!');
       } else {
         response = await axios.post('/api/questions', newQuestion);
+        console.log('Add question response:', response); // Debug log
         setSuccessMessage('Question added successfully!');
       }
 
