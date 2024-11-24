@@ -1,10 +1,8 @@
 package com.example.benefits.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * Entity class representing a Question.
@@ -24,6 +22,12 @@ public class Question {
 
     @NotBlank
     private String questionText;
+
+    // New field for storing options for MultiChoice questions
+    @ElementCollection
+    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "option_value")
+    private List<String> options;
 
     // Getters and Setters
 
@@ -97,5 +101,23 @@ public class Question {
      */
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
+    }
+
+    /**
+     * Gets the options for MultiChoice questions.
+     *
+     * @return the list of options
+     */
+    public List<String> getOptions() {
+        return options;
+    }
+
+    /**
+     * Sets the options for MultiChoice questions.
+     *
+     * @param options the list of options to set
+     */
+    public void setOptions(List<String> options) {
+        this.options = options;
     }
 }
