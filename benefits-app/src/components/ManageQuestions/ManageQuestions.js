@@ -13,8 +13,6 @@ function ManageQuestions() {
   const [questionName, setQuestionName] = useState('');
   const [questionType, setQuestionType] = useState('');
   const [questionText, setQuestionText] = useState('');
-  const [options, setOptions] = useState([]);
-  const [optionInput, setOptionInput] = useState('');
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -52,13 +50,7 @@ function ManageQuestions() {
       return;
     }
 
-    const newQuestion = {
-      name: questionName,
-      type: questionType,
-      text: questionText,
-      options: questionType === 'MultiChoice' ? options : [],
-    };
-
+    const newQuestion = { questionName, questionType, questionText };
     try {
       let response;
       if (editingQuestionId) {
@@ -74,7 +66,6 @@ function ManageQuestions() {
       setQuestionName('');
       setQuestionType('');
       setQuestionText('');
-      setOptions([]);
       setEditingQuestionId(null);
       setErrorMessage('');
     } catch (error) {
@@ -90,10 +81,9 @@ function ManageQuestions() {
    * @param {Object} question - The question object to edit.
    */
   const handleEditQuestion = (question) => {
-    setQuestionName(question.name);
-    setQuestionType(question.type);
-    setQuestionText(question.text);
-    setOptions(question.options || []);
+    setQuestionName(question.questionName);
+    setQuestionType(question.questionType);
+    setQuestionText(question.questionText);
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
@@ -141,29 +131,9 @@ function ManageQuestions() {
     setQuestionName('');
     setQuestionType('');
     setQuestionText('');
-    setOptions([]);
     setEditingQuestionId(null);
     setSuccessMessage('');
     setErrorMessage('');
-  };
-
-  /**
-   * Handles the addition of an option for MultiChoice questions.
-   */
-  const handleAddOption = () => {
-    if (optionInput.trim()) {
-      setOptions([...options, optionInput.trim()]);
-      setOptionInput('');
-    }
-  };
-
-  /**
-   * Handles the removal of an option for MultiChoice questions.
-   *
-   * @param {number} index - The index of the option to remove.
-   */
-  const handleRemoveOption = (index) => {
-    setOptions(options.filter((_, i) => i !== index));
   };
 
   return (
@@ -201,10 +171,11 @@ function ManageQuestions() {
             <option value="">Select</option>
             <option value="Numerical">Numerical</option>
             <option value="Text">Text</option>
-            <option value="Email">Email</option>
-            <option value="Date">Date</option>
+            <option value="YesNo">Yes/No</option>
+            <option value="Date">Date (MM/DD/YYYY)</option>
+            <option value="Email">Email (text@domain)</option>
             <option value="State">State</option>
-            <option value="MultiChoice">MultiChoice</option>
+            <option value="ExistingBenefits">Existing Benefits</option>
           </select>
         </div>
         <div className="form-group">
@@ -217,31 +188,6 @@ function ManageQuestions() {
             onChange={(e) => setQuestionText(e.target.value)}
           />
         </div>
-        {questionType === 'MultiChoice' && (
-          <div className="form-group">
-            <label htmlFor="options">Options</label>
-            <div className="input-group">
-              <input
-                type="text"
-                id="optionInput"
-                className="form-control"
-                value={optionInput}
-                onChange={(e) => setOptionInput(e.target.value)}
-              />
-              <div className="input-group-append">
-                <button type="button" onClick={handleAddOption} className="btn btn-primary">Add Option</button>
-              </div>
-            </div>
-            <ul className="list-group mt-2">
-              {options.map((option, index) => (
-                <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                  {option}
-                  <button type="button" onClick={() => handleRemoveOption(index)} className="btn btn-danger btn-sm">Remove</button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">
             {editingQuestionId ? 'Update Question' : 'Add Question'}
@@ -254,7 +200,7 @@ function ManageQuestions() {
       <ul className="question-list">
         {questions.map((question) => (
           <li key={question.id}>
-            <span>{question.id}: {question.name}</span>
+            <span>{question.id}: {question.questionName}</span>
             <div className="question-buttons">
               <button onClick={() => handleEditQuestion(question)} className="btn btn-secondary">Edit</button>
               <button onClick={() => handleDeleteQuestion(question.id)} className="btn btn-danger">Delete</button>
