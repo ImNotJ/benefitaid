@@ -61,25 +61,28 @@ function ManageQuestions() {
       setErrorMessage('Name, type, and text are required.');
       return false;
     }
-
+  
     if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
+      // Filter out empty options
       const validOptions = options.filter(opt => opt.trim() !== '');
       if (validOptions.length < 2) {
         setErrorMessage('Multi-choice questions require at least 2 options.');
         return false;
       }
+      // Only save the non-empty options
+      setOptions(validOptions);
     }
-
+  
     return true;
   };
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
-
+  
     if (!validateQuestion()) {
       return;
     }
-
+  
     const questionData = {
       questionName,
       questionType,
@@ -88,7 +91,7 @@ function ManageQuestions() {
         ? options.filter(opt => opt.trim() !== '').join(',')
         : null
     };
-
+  
     try {
       if (editingQuestionId) {
         await axios.put(`/api/questions/${editingQuestionId}`, questionData);
@@ -97,7 +100,7 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-
+  
       fetchQuestions();
       handleClearFields();
     } catch (error) {
@@ -316,5 +319,6 @@ function ManageQuestions() {
     </div>
   );
 }
+
 
 export default ManageQuestions;
