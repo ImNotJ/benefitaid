@@ -1,176 +1,144 @@
+/* Styles for the manage benefits container */
 .manage-benefits {
-  padding: 20px;
-  max-width: 1200px;
+  max-width: 600px;
   margin: 0 auto;
-}
-
-/* Sections */
-.section {
-  background: white;
-  border-radius: 8px;
   padding: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.section h3 {
+/* Styles for the top buttons container */
+.manage-benefits .top-buttons {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Styles for the main heading */
+.manage-benefits h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.8em;
   color: #333;
 }
 
-/* Forms */
-.form-group {
+/* Styles for subheadings */
+.manage-benefits h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.4em; /* Smaller font size for subheadings */
+  color: #333;
+}
+
+/* Styles for form groups */
+.manage-benefits .form-group {
   margin-bottom: 20px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
+/* Styles for form labels */
+.manage-benefits .form-group label {
+  font-size: 1.1em;
+  color: #333;
+  font-weight: 600;
 }
 
-.form-group label::after {
-  content: " *";
-  color: #dc3545;
-}
-
-.form-control {
+/* Styles for form controls (input fields) */
+.manage-benefits .form-control {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: border-color 0.2s ease;
-}
-
-.form-control:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-}
-
-/* Image Preview */
-.image-preview {
-  margin-top: 10px;
   padding: 10px;
-  border: 1px dashed #ddd;
-  border-radius: 4px;
-  text-align: center;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
-.image-preview img {
-  max-width: 200px;
-  max-height: 100px;
-  object-fit: contain;
+
+/* Styles for form buttons container */
+.manage-benefits .form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
 }
-/* Requirements Section */
-.requirements-section {
+
+/* Styles for buttons */
+.manage-benefits .btn {
+  margin-top: 10px;
+}
+
+/* Styles for benefit, requirement, and condition lists */
+.manage-benefits .benefit-list,
+.manage-benefits .requirement-list,
+.manage-benefits .condition-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Styles for list items in benefit, requirement, and condition lists */
+.manage-benefits .benefit-list li,
+.manage-benefits .requirement-list li,
+.manage-benefits .condition-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Styles for requirement and condition sections */
+.manage-benefits .requirement-section,
+.manage-benefits .condition-section {
   margin-top: 30px;
 }
 
-.requirement-form {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 6px;
+/* Styles for alert messages */
+.manage-benefits .alert {
+  padding: 10px;
   margin-bottom: 20px;
+  border-radius: 5px;
+  text-align: center;
 }
 
-.conditions-section {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #dee2e6;
-}
-/* Conditions */
-.condition-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  margin-bottom: 10px;
+/* Styles for success alert messages */
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
-.condition-actions {
-  display: flex;
-  gap: 8px;
-}
-/* Requirements Display */
-.requirement-item {
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-.requirement-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+/* Styles for danger alert messages */
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
-.requirement-type {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-.requirement-type.general {
-  background: #e3f2fd;
-  color: #0d47a1;
-}
-.requirement-type.necessary {
-  background: #fce4ec;
-  color: #c2185b;
-}
-.requirement-type.invalid {
-  background: #ffebee;
-  color: #b71c1c;
-}
-.requirement-type.general_necessary {
-  background: #f3e5f5;
-  color: #7b1fa2;
-}
-.requirement-conditions {
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 4px;
-  margin-bottom: 10px;
-}
-
-.condition-display {
-  padding: 5px 0;
-  border-bottom: 1px dashed #dee2e6;
-}
-
-.condition-display:last-child {
-  border-bottom: none;
-}
-
-/* Benefits Grid */
 .benefits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   margin-top: 20px;
 }
 
 .benefit-card {
-  background: white;
-  border: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
+  background: white;
   transition: box-shadow 0.3s ease;
 }
 
 .benefit-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .benefit-image {
-  height: 120px;
-  background: #f8f9fa;
+  width: 100%;
+  height: 100px;
+  background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,98 +146,69 @@
 }
 
 .benefit-image img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  padding: 10px;
 }
 
 .benefit-content {
   padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.benefit-scope {
-  color: #666;
-  font-size: 0.875rem;
-  margin-bottom: 10px;
+.benefit-content h4 {
+  margin: 0 0 10px 0;
+  color: #333;
 }
 
 .benefit-description {
-  font-size: 0.875rem;
+  color: #666;
   margin-bottom: 15px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   line-height: 1.5;
 }
 
-.requirements-summary {
-  font-size: 0.875rem;
-  margin-bottom: 15px;
-}
-.requirement-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
-}
 .benefit-actions {
-  display: flex;
-  gap: 8px;
   margin-top: auto;
-}
-
-/* Buttons */
-.btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-}
-.btn-sm {
-  padding: 4px 8px;
-  font-size: 0.8125rem;
-}
-.btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #0056b3;
-}
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #545b62;
-}
-.btn-danger {
-  background: #dc3545;
-  color: white;
-}
-.btn-danger:hover {
-  background: #c82333;
-}
-.form-buttons {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
 }
 
-/* Alerts */
-.alert {
-  padding: 12px 20px;
+.benefit-link {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
   border-radius: 4px;
-  margin-bottom: 20px;
+  transition: background-color 0.2s ease;
+  text-align: center;
 }
-.alert-success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+
+.benefit-link:hover {
+  background: #0056b3;
+  color: white;
+  text-decoration: none;
 }
-.alert-danger {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+
+.img-preview {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f9f9f9;
+  display: flex;
+  justify-content: center;
+}
+
+.img-preview img {
+  max-width: 100px;
+  height: auto;
+  object-fit: contain;
 }

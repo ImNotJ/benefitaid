@@ -1,16 +1,11 @@
 package com.example.benefits.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
-import org.springframework.data.annotation.Transient;
 /**
  * Entity class representing a Question.
  */
@@ -25,13 +20,10 @@ public class Question {
     private String questionName;
 
     @NotBlank
-    private String questionType; // Text, Numerical, Date, Email, MultiChoiceSingle, MultiChoiceMulti
+    private String questionType;
 
     @NotBlank
     private String questionText;
-    
-    @Column(columnDefinition = "TEXT")
-    private String options;
 
     // Getters and Setters
 
@@ -105,19 +97,5 @@ public class Question {
      */
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
-    }
-    public String getOptions() {
-        return options;
-    }
-    public void setOptions(String options) {
-        this.options = options;
-    }
-    // Helper method to get options as list
-    @Transient
-    public List<String> getOptionsList() {
-        if (options == null || options.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(options.split(","));
     }
 }
