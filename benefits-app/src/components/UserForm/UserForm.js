@@ -18,46 +18,12 @@ function UserForm() {
 
   const fetchQuizzes = async () => {
     try {
-      // First, attempt login with dummy credentials
-      const loginPayload = {
-        email: 'random@example.com',
-        password: 'randomPassword123'
-      };
-
-      // Perform login
-      await axios.post('/api/users/login', loginPayload);
-
-      // After successful login, fetch quizzes
       const response = await axios.get('/api/quizzes');
       setQuizzes(response.data);
     } catch (error) {
       console.error('Error fetching quizzes:', error);
-      if (error.response) {
-        // Handle specific error cases
-        if (error.response.status === 401) {
-          setErrorMessage('Authentication failed. Please try again later.');
-        } else if (error.response.status === 500) {
-          setErrorMessage('Server error. Please try again later.');
-        }
-      } else {
-        setErrorMessage('Failed to load quizzes. Please try again later.');
-      }
     }
   };
-
-  // Also update useEffect to handle any cleanup
-  useEffect(() => {
-    fetchQuizzes();
-
-    // Cleanup function
-    return () => {
-      // Clear any states if needed when component unmounts
-      setQuizzes([]);
-      setSelectedQuiz(null);
-      setResponses({});
-      setEligibilityResults(null);
-    };
-  }, []);
 
   const fetchQuestions = async (quizId) => {
     try {
@@ -106,6 +72,15 @@ function UserForm() {
     });
   };
 
+  const email = localStorage.getItem('email');
+  const password = localStorage.getItem('password');
+
+  const payload = {
+    email,
+    password,
+    responses
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -115,8 +90,17 @@ function UserForm() {
       return;
     }
 
+    const email = localStorage.getItem('email');
+    const password = localStorage.getItem('password');
+
+    const payload = {
+      email,
+      password,
+      responses
+    };
+
     try {
-      const response = await axios.post('/api/eligibility/check', responses);
+      const response = await axios.post('/api/eligibility/check', payload);
       setEligibilityResults(response.data);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
@@ -126,7 +110,6 @@ function UserForm() {
       setSuccessMessage('');
     }
   };
-
   const renderInputField = (question) => {
     switch (question.questionType) {
       case 'MULTI_CHOICE':
