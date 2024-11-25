@@ -150,6 +150,25 @@ function ManageBenefits() {
       setErrorMessage('Please fill in all required benefit fields');
       return false;
     }
+  
+    // Validate all requirements and their conditions
+    for (const requirement of requirements) {
+      if (!requirement.name || !requirement.type) {
+        setErrorMessage('All requirements must have a name and type');
+        return false;
+      }
+  
+      if (!requirement.conditions || requirement.conditions.length === 0) {
+        setErrorMessage('Each requirement must have at least one condition');
+        return false;
+      }
+  
+      if (!validateConditions(requirement.conditions)) {
+        setErrorMessage('Invalid conditions found in requirements');
+        return false;
+      }
+    }
+  
     return true;
   };
 
@@ -198,7 +217,16 @@ function ManageBenefits() {
   const handleAddBenefit = async (e) => {
     e.preventDefault();
     if (!validateBenefit()) return;
-
+  
+    // Ensure requirements have the correct structure
+    const formattedRequirements = requirements.map(req => ({
+      ...req,
+      conditions: req.conditions.map(cond => ({
+        ...cond,
+        questionId: parseInt(cond.questionId) // Ensure questionId is a number
+      }))
+    }));
+  
     const benefitData = {
       benefitName,
       federal,
@@ -206,22 +234,31 @@ function ManageBenefits() {
       benefitUrl,
       description,
       imageUrl,
-      requirements
+      requirements: formattedRequirements
     };
-
+  
     try {
+      console.log('Sending benefit data:', benefitData); // Debug log
+  
       if (editingBenefitIndex !== null) {
         const benefitId = benefits[editingBenefitIndex].id;
-        await axios.put(`/api/benefits/${benefitId}`, benefitData);
+        const response = await axios.put(`/api/benefits/${benefitId}`, benefitData);
+        console.log('Update response:', response); // Debug log
       } else {
-        await axios.post('/api/benefits', benefitData);
+        const response = await axios.post('/api/benefits', benefitData);
+        console.log('Create response:', response); // Debug log
       }
-
-      fetchBenefits();
+      
+      await fetchBenefits();
       handleClearBenefitFields();
       setSuccessMessage('Benefit saved successfully!');
     } catch (error) {
-      setErrorMessage('Failed to save benefit: ' + (error.response?.data?.message || error.message));
+      console.error('Error saving benefit:', error);
+      console.error('Error response:', error.response); // Debug log
+      setErrorMessage(
+        'Failed to save benefit: ' + 
+        (error.response?.data?.message || error.response?.data || error.message)
+      );
     }
   };
 
@@ -268,21 +305,37 @@ function ManageBenefits() {
       setErrorMessage('Please fill in all condition fields');
       return;
     }
-
+  
+    const question = questions.find(q => q.id === parseInt(currentQuestionId));
+    if (!question) {
+      setErrorMessage('Invalid question selected');
+      return;
+    }
+  
+    // For multi-choice questions, validate that the value is one of the options
+    if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
+      const options = question.options?.split(',').map(opt => opt.trim()) || [];
+      if (!options.includes(currentValue)) {
+        setErrorMessage('Selected value must be one of the question options');
+        return;
+      }
+    }
+  
     const newCondition = {
       questionId: parseInt(currentQuestionId),
       operator: currentOperator,
       value: currentValue
     };
-
+  
     if (editingConditionIndex !== null) {
       const updatedConditions = [...currentConditions];
       updatedConditions[editingConditionIndex] = newCondition;
       setCurrentConditions(updatedConditions);
+      setEditingConditionIndex(null);
     } else {
       setCurrentConditions([...currentConditions, newCondition]);
     }
-
+  
     handleClearConditionFields();
   };
 
@@ -307,6 +360,19 @@ function ManageBenefits() {
   const handleDeleteCondition = (index) => {
     const updatedConditions = currentConditions.filter((_, i) => i !== index);
     setCurrentConditions(updatedConditions);
+  };
+
+  const validateConditions = (conditions) => {
+    return conditions.every(condition => {
+      const question = questions.find(q => q.id === condition.questionId);
+      if (!question) return false;
+  
+      if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
+        const options = question.options?.split(',').map(opt => opt.trim()) || [];
+        return options.includes(condition.value);
+      }
+      return true;
+    });
   };
 
   /**
