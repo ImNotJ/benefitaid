@@ -88,11 +88,6 @@ function UserForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (Object.keys(responses).length === 0) {
-      setErrorMessage('Please answer at least one question to check eligibility.');
-      setSuccessMessage('');
-      return;
-    }
     const email = 'random@example.com'; // Dummy email
     const password = 'randomPassword123'; // Dummy password
 
@@ -133,6 +128,8 @@ function UserForm() {
                 return parseFloat(userResponse) > parseFloat(condition.value);
               case '==':
                 return userResponse === condition.value;
+              case '!=':
+                return userResponse !== condition.value;
               default:
                 return false;
             }
@@ -197,7 +194,6 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           />
         );
       case 'Text':
@@ -209,7 +205,6 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           />
         );
       case 'YesNo':
@@ -220,7 +215,6 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           >
             <option value="">Select</option>
             <option value="Yes">Yes</option>
@@ -236,7 +230,6 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           />
         );
       case 'Email':
@@ -248,7 +241,6 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           />
         );
       case 'State':
@@ -259,12 +251,28 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           >
             <option value="">Select a state</option>
             {states.map((state) => (
               <option key={state} value={state}>
                 {state}
+              </option>
+            ))}
+          </select>
+        );
+      case 'MultiChoice':
+        return (
+          <select
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+          >
+            <option value="">Select</option>
+            {question.options.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
               </option>
             ))}
           </select>
@@ -278,7 +286,6 @@ function UserForm() {
             className="form-control"
             value={responses[question.id] || ''}
             onChange={handleInputChange}
-
           />
         );
     }
@@ -314,7 +321,7 @@ function UserForm() {
           {eligibilityResults && (
             <div className="eligibility-results">
               <h3>Eligibility Results</h3>
-              <h4>You are eligibile for the following benefits:</h4>
+              <h4>You are eligible for the following benefits:</h4>
               <div className="benefits-grid">
                 {eligibilityResults.map((benefit) => (
                   <div key={benefit.id} className="benefit-card">
