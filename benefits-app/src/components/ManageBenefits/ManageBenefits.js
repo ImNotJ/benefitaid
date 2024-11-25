@@ -48,10 +48,10 @@ function ManageBenefits() {
   const navigate = useNavigate();
 
   const requirementTypes = [
-    { value: 'GENERAL', label: 'General (One Required)' },
-    { value: 'NECESSARY', label: 'Necessary (Must Meet)' },
+    { value: 'GENERAL', label: 'General (Must Meet At Least One General Requirement)' },
+    { value: 'NECESSARY', label: 'Necessary (Must Meet All)' },
     { value: 'INVALID', label: 'Invalid (Disqualifying)' },
-    { value: 'GENERAL_NECESSARY', label: 'General + Necessary (Must Meet One)' }
+    { value: 'GENERAL_NECESSARY', label: 'General + Necessary (Must Meet All These AND At Least One General)' }
   ];
 
   useEffect(() => {
