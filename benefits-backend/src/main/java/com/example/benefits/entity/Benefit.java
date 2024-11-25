@@ -26,7 +26,7 @@ public class Benefit {
     @NotBlank
     private String benefitUrl;
 
-    @OneToMany(mappedBy = "benefit", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "benefit", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<Requirement> requirements;
 
