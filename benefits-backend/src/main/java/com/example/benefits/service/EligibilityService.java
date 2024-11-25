@@ -17,6 +17,12 @@ public class EligibilityService {
     @Autowired
     private BenefitRepository benefitRepository;
 
+    /**
+     * Checks the eligibility of a user for various benefits.
+     *
+     * @param user the user entity containing the information to check eligibility
+     * @return a list of benefits the user is eligible for
+     */
     public List<Benefit> checkEligibility(User user) {
         List<Benefit> benefits = benefitRepository.findAll();
         return benefits.stream()
@@ -74,6 +80,8 @@ public class EligibilityService {
             return false;
         }
 
+        // Retrieve the question type (we may need to fetch it from the repository)
+        // For this example, let's assume we have a method getQuestionById()
         Question question = getQuestionById(condition.getQuestionId());
 
         switch (question.getQuestionType()) {
@@ -128,6 +136,7 @@ public class EligibilityService {
     }
 
     private boolean evaluateMultiChoiceCondition(String userResponse, Condition condition) {
+        // userResponse is a comma-separated string of selected options
         String[] userOptions = userResponse.split(",");
         String[] conditionValues = condition.getValue().split(",");
 
@@ -150,6 +159,7 @@ public class EligibilityService {
 
     private Question getQuestionById(Long questionId) {
         // Implement this method to retrieve the question by ID from the repository
+        // For this example, we'll return a dummy question
         return new Question(); // Replace with actual implementation
     }
 }
