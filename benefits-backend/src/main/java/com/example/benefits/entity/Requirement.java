@@ -1,5 +1,7 @@
 package com.example.benefits.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
@@ -17,15 +19,13 @@ public class Requirement {
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String type; // Add a field to store the requirement type
-
     @ElementCollection
     @CollectionTable(name = "requirement_conditions", joinColumns = @JoinColumn(name = "requirement_id"))
     private Set<Condition> conditions;
 
     @ManyToOne
     @JoinColumn(name = "benefit_id", nullable = false)
+    @JsonBackReference
     private Benefit benefit;
 
     // Getters and Setters
@@ -64,24 +64,6 @@ public class Requirement {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * Gets the type of the requirement.
-     *
-     * @return the type of the requirement
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets the type of the requirement.
-     *
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        this.type = type;
     }
 
     /**
