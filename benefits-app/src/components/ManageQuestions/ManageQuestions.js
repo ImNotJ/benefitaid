@@ -296,7 +296,6 @@ function ManageQuestions() {
                   <td>{question.questionText}</td>
                   <td>
                     {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      question.options &&
                       typeof question.options === 'string' &&
                       question.options.split(',').join(', ')}
                   </td>
