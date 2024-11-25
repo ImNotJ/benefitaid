@@ -126,7 +126,7 @@ function ManageQuestions() {
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
-  };  
+  };
 
   /**
    * Handles the deletion of a question.
