@@ -57,17 +57,6 @@ function ManageQuestions() {
     return true;
   };
 
-  const handleEditQuestion = (question) => {
-    setQuestionName(question.questionName);
-    setQuestionType(question.questionType);
-    setQuestionText(question.questionText);
-    // Parse options string into array
-    setOptions(question.options ? question.options.split(',') : ['']);
-    setEditingQuestionId(question.id);
-    setSuccessMessage('');
-    setErrorMessage('');
-  };
-
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
 
@@ -80,7 +69,7 @@ function ManageQuestions() {
       questionType,
       questionText,
       options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '').join(',')
+        ? options.filter(opt => opt.trim() !== '')
         : null
     };
 
@@ -92,7 +81,6 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-
       setQuestionName('');
       setQuestionType('');
       setQuestionText('');
@@ -104,6 +92,16 @@ function ManageQuestions() {
       console.error('Save question error:', error);
       setErrorMessage('Failed to save question.');
     }
+  };
+
+  const handleEditQuestion = (question) => {
+    setQuestionName(question.questionName);
+    setQuestionType(question.questionType);
+    setQuestionText(question.questionText);
+    setOptions(question.options && Array.isArray(question.options) ? question.options : ['']);
+    setEditingQuestionId(question.id);
+    setSuccessMessage('');
+    setErrorMessage('');
   };
 
   const handleDeleteQuestion = async (id) => {
@@ -258,7 +256,7 @@ function ManageQuestions() {
                   <td>{question.questionName}</td>
                   <td>{question.questionType}</td>
                   <td>{question.questionText}</td>
-                  <td>{question.options}</td>
+                  <td>{question.options ? question.options.join(', ') : ''}</td>
                   <td>
                     <button
                       onClick={() => handleEditQuestion(question)}
