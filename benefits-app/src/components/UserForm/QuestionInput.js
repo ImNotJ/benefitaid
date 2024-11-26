@@ -1,4 +1,3 @@
-// QuestionInput.js
 import React from 'react';
 import { isValidEmail, formatDate } from '../../utils/validation';
 
@@ -74,7 +73,7 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     case 'MultiChoiceSingle':
       return (
         <div className="form-control radio-group">
-          {question.options && question.options.split(',').map((option) => (
+          {question.options && question.options.map((option) => (
             <div key={option} className="radio-option">
               <input
                 type="radio"
@@ -94,7 +93,7 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
       const selectedOptions = value ? value.split(',') : [];
       return (
         <div className="form-control checkbox-group">
-          {question.options && question.options.split(',').map((option) => (
+          {question.options && question.options.map((option) => (
             <div key={option} className="checkbox-option">
               <input
                 type="checkbox"
