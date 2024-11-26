@@ -222,7 +222,6 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
-                  {question.required && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
