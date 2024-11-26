@@ -1,18 +1,34 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
-import QuestionInput from '../UserForm/QuestionInput';
+import axios from '../../utils/axiosConfig';
+import './HomePage.css';
 
+const states = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+  "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+  "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+  "Wisconsin", "Wyoming"
+];
+
+/**
+ * HomePage component for displaying the home page and handling the common quiz.
+ *
+ * @returns {React.ReactNode} The rendered component.
+ */
 function HomePage() {
   const [commonQuiz, setCommonQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
-  const [errors, setErrors] = useState({});
   const [eligibilityResults, setEligibilityResults] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false); // State to manage dropdown visibility
 
+  /**
+   * Fetches the common quiz from the API.
+   */
   const fetchCommonQuiz = useCallback(async () => {
     try {
       const response = await axios.get('/api/quizzes');
@@ -30,6 +46,11 @@ function HomePage() {
     fetchCommonQuiz();
   }, [fetchCommonQuiz]);
 
+  /**
+   * Fetches the questions for the specified quiz.
+   *
+   * @param {string} quizId - The ID of the quiz.
+   */
   const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quizzes/${quizId}`);
@@ -40,6 +61,11 @@ function HomePage() {
     }
   };
 
+  /**
+   * Handles input changes in the quiz form.
+   *
+   * @param {Event} e - The input change event.
+   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setResponses({
@@ -48,16 +74,15 @@ function HomePage() {
     });
   };
 
-  const handleError = (questionId, error) => {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [questionId]: error,
-    }));
-  };
-
+  /**
+   * Handles the form submission for checking eligibility.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if at least one question is answered
     const hasAtLeastOneResponse = Object.keys(responses).length > 0;
 
     if (!hasAtLeastOneResponse) {
@@ -66,8 +91,8 @@ function HomePage() {
       return;
     }
 
-    const email = 'random@example.com';
-    const password = 'randomPassword123';
+    const email = 'random@example.com'; // Dummy email
+    const password = 'randomPassword123'; // Dummy password
 
     const payload = {
       email,
@@ -75,7 +100,7 @@ function HomePage() {
       responses
     };
 
-    console.log('Submitting:', payload);
+    console.log('Submitting:', payload); // Log the payload
 
     try {
       const response = await axios.post('/api/eligibility/check', payload, {
@@ -84,7 +109,7 @@ function HomePage() {
         }
       });
 
-      console.log('Response data:', response.data);
+      console.log('Response data:', response.data); // Log the response data
 
       const eligibleBenefits = commonQuiz.benefits.filter(benefit => {
         if (!benefit.requirements || benefit.requirements.length === 0) {
@@ -95,11 +120,12 @@ function HomePage() {
         let hasRequired = false;
 
         for (const requirement of benefit.requirements) {
-          console.log('Checking requirement:', requirement);
+          console.log('Checking requirement:', requirement); // Log the requirement
 
           const meetsRequirement = requirement.conditions.every(condition => {
             const userResponse = responses[condition.questionId];
-            console.log('Checking condition:', condition);
+            console.log('Checking condition:', condition); // Log the condition
+            console.log('User response:', userResponse); // Log the user response
             if (userResponse === undefined) {
               return false;
             }
@@ -137,16 +163,120 @@ function HomePage() {
         return isEligible && (!benefit.requirements.some(req => req.type === 'REQUIREMENT') || hasRequired);
       });
 
-      console.log('Eligible benefits:', eligibleBenefits);
+      console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
 
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      console.error('Error response data:', error.response?.data);
+      console.error('Error response data:', error.response?.data); // Log the error response data
       setErrorMessage('Failed to check eligibility.');
       setSuccessMessage('');
+    }
+  };
+
+  /**
+   * Renders the input field for a given question.
+   *
+   * @param {Object} question - The question object.
+   * @returns {React.ReactNode} The rendered input field.
+   */
+  const renderInputField = (question) => {
+    switch (question.questionType) {
+      case 'Numerical':
+        return (
+          <input
+            type="number"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          />
+        );
+      case 'Text':
+        return (
+          <input
+            type="text"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          />
+        );
+      case 'YesNo':
+        return (
+          <select
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          >
+            <option value="">Select</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        );
+      case 'Date':
+        return (
+          <input
+            type="date"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          />
+        );
+      case 'Email':
+        return (
+          <input
+            type="email"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          />
+        );
+      case 'State':
+        return (
+          <select
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          >
+            <option value="">Select a state</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
+        );
+      default:
+        return (
+          <input
+            type="text"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+
+          />
+        );
     }
   };
 
@@ -167,28 +297,13 @@ function HomePage() {
           <div className="completion-notice">
             <p>The more questions you answer, the more accurate your results will be.</p>
           </div>
-          {(successMessage || errorMessage) && (
-            <div className={`alert ${successMessage ? 'alert-success' : 'alert-danger'}`}>
-              {successMessage || errorMessage}
-            </div>
-          )}
+          {successMessage && <div className="alert alert-success">{successMessage}</div>}
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
           <form onSubmit={handleSubmit}>
             {questions.map((question) => (
               <div className="form-group" key={question.id}>
-                <label htmlFor={`question-${question.id}`}>
-                  {question.questionText}
-                </label>
-
-                <QuestionInput
-                  question={question}
-                  value={responses[question.id]}
-                  onChange={handleInputChange}
-                  onError={handleError}
-                />
-
-                {errors[question.id] && (
-                  <div className="error-message">{errors[question.id]}</div>
-                )}
+                <label htmlFor={question.id}>{question.questionText}</label>
+                {renderInputField(question)}
               </div>
             ))}
             <div className="form-group button-group">
