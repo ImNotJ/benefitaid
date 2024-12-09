@@ -18,6 +18,8 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
+
+
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
@@ -116,17 +118,18 @@ function UserForm() {
     try {
       const response = await axios.post('/api/eligibility/check', {
         responses,
-        quizId: selectedQuiz.id,
-        email: 'dummy@example.com', // Dummy login email
-        password: 'dummyPassword'   // Dummy login password
+        quizId: selectedQuiz.id
       });
 
       const eligibleBenefits = response.data;
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
+
+      // Scroll to results
+      document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      setErrorMessage('Failed to check eligibility.');
+      setErrorMessage('Failed to check eligibility. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -135,7 +138,7 @@ function UserForm() {
   const handleQuizSelect = async (quiz) => {
     setSelectedQuiz(quiz);
     try {
-      const response = await axios.get(`/api/quizzes/${quiz.id}/questions`);
+      const response = await axios.get(`/api/quizzes/${quiz.id}`);
       const orderedQuestions = response.data.questionIds
         .map(id => response.data.questions.find(q => q.id === id))
         .filter(Boolean);
@@ -179,6 +182,7 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
+                  {question.required && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
@@ -208,7 +212,7 @@ function UserForm() {
           {eligibilityResults && (
             <div id="eligibility-results" className="eligibility-results">
               <h3>Eligibility Results</h3>
-              <h4>You are eligible for the following benefits:</h4>
+              <h4>You are eligibile for the following benefits:</h4>
               <div className="benefits-grid">
                 {eligibilityResults.map((benefit) => (
                   <div key={benefit.id} className="benefit-card">
