@@ -5,8 +5,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 
 /**
  * Entity class representing a Requirement.
@@ -23,8 +21,7 @@ public class Requirement {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @JsonDeserialize(using = RequirementTypeDeserializer.class)
-    private RequirementType type;
+    private RequirementType type; // GENERAL, NECESSARY, INVALID, GENERAL_NECESSARY
 
     @ElementCollection
     @CollectionTable(name = "requirement_conditions", joinColumns = @JoinColumn(name = "requirement_id"))
