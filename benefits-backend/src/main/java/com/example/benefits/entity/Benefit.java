@@ -1,6 +1,6 @@
 package com.example.benefits.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -27,7 +27,7 @@ public class Benefit {
     private String benefitUrl;
 
     @OneToMany(mappedBy = "benefit", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("benefit")
+    @JsonManagedReference
     private Set<Requirement> requirements;
 
     @Column(columnDefinition = "TEXT")
