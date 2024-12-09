@@ -18,6 +18,8 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
+
+  
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
@@ -72,6 +74,11 @@ function UserForm() {
 
     questions.forEach(question => {
       const response = responses[question.id];
+
+      if (question.required && (!response || response.trim() === '')) {
+        newErrors[question.id] = 'This field is required';
+        isValid = false;
+      }
 
       switch (question.questionType) {
         case 'Email':
@@ -180,6 +187,7 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
+                  {question.required && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
