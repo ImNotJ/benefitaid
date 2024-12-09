@@ -209,16 +209,11 @@ function ManageBenefits() {
       requirements
     };
 
-    // Print the payload to the console
-    console.log('Benefit Data:', benefitData);
-
     try {
       if (editingBenefitIndex !== null) {
         const benefitId = benefits[editingBenefitIndex].id;
-        console.log('Updating Benefit ID:', benefitId);
         await axios.put(`/api/benefits/${benefitId}`, benefitData);
       } else {
-        console.log('Creating New Benefit');
         await axios.post('/api/benefits', benefitData);
       }
 
@@ -726,7 +721,7 @@ function ManageBenefits() {
                   <h5>Requirements:</h5>
                   {benefit.requirements.map((req, reqIndex) => (
                     <div key={reqIndex} className="requirement-summary">
-                      <span className={`requirement-type ${(req.type || '').toLowerCase()}`}>
+                      <span className={`requirement-type ${req.type.toLowerCase()}`}>
                         {req.type}
                       </span>
                       {req.name}
