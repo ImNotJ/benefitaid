@@ -200,35 +200,30 @@ function ManageBenefits() {
     if (!validateBenefit()) return;
 
     const benefitData = {
-        benefitName,
-        federal,
-        state: federal ? null : state,
-        benefitUrl,
-        description,
-        imageUrl,
-        requirements
+      benefitName,
+      federal,
+      state: federal ? null : state,
+      benefitUrl,
+      description,
+      imageUrl,
+      requirements
     };
 
-    // Print the payload to the console
-    console.log('Benefit Data:', benefitData);
-
     try {
-        if (editingBenefitIndex !== null) {
-            const benefitId = benefits[editingBenefitIndex].id;
-            console.log('Updating Benefit ID:', benefitId);
-            await axios.put(`/api/benefits/${benefitId}`, benefitData);
-        } else {
-            console.log('Creating New Benefit');
-            await axios.post('/api/benefits', benefitData);
-        }
+      if (editingBenefitIndex !== null) {
+        const benefitId = benefits[editingBenefitIndex].id;
+        await axios.put(`/api/benefits/${benefitId}`, benefitData);
+      } else {
+        await axios.post('/api/benefits', benefitData);
+      }
 
-        fetchBenefits();
-        handleClearBenefitFields();
-        setSuccessMessage('Benefit saved successfully!');
+      fetchBenefits();
+      handleClearBenefitFields();
+      setSuccessMessage('Benefit saved successfully!');
     } catch (error) {
-        setErrorMessage('Failed to save benefit: ' + (error.response?.data?.message || error.message));
+      setErrorMessage('Failed to save benefit: ' + (error.response?.data?.message || error.message));
     }
-};
+  };
 
   /**
    * Handles the deletion of a benefit.
