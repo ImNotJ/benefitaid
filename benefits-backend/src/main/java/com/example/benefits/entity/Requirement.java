@@ -3,7 +3,6 @@ package com.example.benefits.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -19,7 +18,7 @@ public class Requirement {
     @NotBlank
     private String name;
 
-    @NotNull
+    @NotBlank
     @Enumerated(EnumType.STRING)
     private RequirementType type; // GENERAL, NECESSARY, INVALID, GENERAL_NECESSARY
 
