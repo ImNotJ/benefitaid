@@ -53,4 +53,21 @@ public class QuestionService {
     public void deleteQuestionById(Long id) {
         questionRepository.deleteById(id);
     }
+
+    /**
+     * Updates the options for a specific question.
+     *
+     * @param questionId the ID of the question to update
+     * @param options    the new list of options
+     * @return the updated question entity, or null if not found
+     */
+    public Question updateQuestionOptions(Long questionId, List<String> options) {
+        Question question = questionRepository.findById(questionId).orElse(null);
+        if (question != null) {
+            question.setOptions(options);
+            return questionRepository.save(question);
+        }
+        return null;
+    }
+
 }

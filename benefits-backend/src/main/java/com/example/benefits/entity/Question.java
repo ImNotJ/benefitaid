@@ -2,12 +2,9 @@ package com.example.benefits.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Question {
@@ -26,7 +23,7 @@ public class Question {
     private String questionText;
 
     @Column(name = "options")
-    private String options;
+    private String options; // Store options as a comma-separated string
 
     // Getters and Setters
 
@@ -62,21 +59,11 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public String getOptions() {
-        return options;
+    public List<String> getOptions() {
+        return options == null ? null : Arrays.asList(options.split(","));
     }
 
-    public void setOptions(String options) {
-        this.options = options;
-    }
-
-    // Helper methods for converting between String and List
-    @JsonIgnore
-    public List<String> getOptionsList() {
-        return options != null ? Arrays.asList(options.split(",")) : new ArrayList<>();
-    }
-
-    public void setOptionsList(List<String> optionsList) {
-        this.options = optionsList != null ? String.join(",", optionsList) : null;
+    public void setOptions(List<String> options) {
+        this.options = options == null ? null : String.join(",", options);
     }
 }

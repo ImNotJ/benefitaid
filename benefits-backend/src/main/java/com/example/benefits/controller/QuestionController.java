@@ -20,10 +20,6 @@ public class QuestionController {
 
     @PostMapping
     public Question createQuestion(@Valid @RequestBody Question question) {
-        // If options is passed as a list, join them
-        if (question.getOptionsList() != null && !question.getOptionsList().isEmpty()) {
-            question.setOptions(String.join(",", question.getOptionsList()));
-        }
         return questionService.saveQuestion(question);
     }
 
@@ -47,9 +43,8 @@ public class QuestionController {
         existingQuestion.setQuestionName(updatedQuestion.getQuestionName());
         existingQuestion.setQuestionType(updatedQuestion.getQuestionType());
         existingQuestion.setQuestionText(updatedQuestion.getQuestionText());
-        
-        // Handle options update
-        if (updatedQuestion.getOptions() != null) {
+
+        if (updatedQuestion.getOptions() != null && !updatedQuestion.getOptions().isEmpty()) {
             existingQuestion.setOptions(updatedQuestion.getOptions());
         }
 
