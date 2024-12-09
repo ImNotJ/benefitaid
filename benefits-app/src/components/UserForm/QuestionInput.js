@@ -1,3 +1,4 @@
+// QuestionInput.js
 import React from 'react';
 import { isValidEmail, formatDate } from '../../utils/validation';
 
@@ -6,8 +7,8 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     const newValue = e.target.value;
     let error = null;
 
-    // Only validate format if there's a value
-    if (newValue && newValue.trim() !== '') {
+    // Only validate if there's a value - all fields are optional
+    if (newValue) {
       switch (question.questionType) {
         case 'Email':
           if (!isValidEmail(newValue)) {
@@ -36,9 +37,7 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
   };
 
   const handleMultiChoiceChange = (selected) => {
-    // If no options are selected, pass empty string instead of empty array join
-    const value = selected.length > 0 ? selected.join(',') : '';
-    onChange(question.id, value);
+    onChange(question.id, selected.join(','));
   };
 
   switch (question.questionType) {
@@ -77,17 +76,16 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     case 'MultiChoiceSingle':
       return (
         <div className="form-control radio-group">
-          {/* Add skip option first */}
           <div className="radio-option">
             <input
               type="radio"
-              id={`${question.id}-skip`}
+              id={`${question.id}-none`}
               name={`question-${question.id}`}
               value=""
               checked={!value}
               onChange={(e) => onChange(question.id, '')}
             />
-            <label htmlFor={`${question.id}-skip`}>Skip this question</label>
+            <label htmlFor={`${question.id}-none`}>No Answer</label>
           </div>
           {question.options?.split(',').map((option) => (
             <div key={option} className="radio-option">
@@ -95,9 +93,9 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
                 type="radio"
                 id={`${question.id}-${option}`}
                 name={`question-${question.id}`}
-                value={option.trim()}
-                checked={value === option.trim()}
-                onChange={handleChange}
+                value={option}
+                checked={value === option}
+                onChange={(e) => onChange(question.id, e.target.value)}
               />
               <label htmlFor={`${question.id}-${option}`}>{option.trim()}</label>
             </div>
@@ -109,15 +107,12 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
       const selectedOptions = value ? value.split(',') : [];
       return (
         <div className="form-control checkbox-group">
-          <div className="checkbox-notice">
-            Select all that apply, or leave blank to skip
-          </div>
           {question.options?.split(',').map((option) => (
             <div key={option} className="checkbox-option">
               <input
                 type="checkbox"
                 id={`${question.id}-${option}`}
-                value={option.trim()}
+                value={option}
                 checked={selectedOptions.includes(option.trim())}
                 onChange={(e) => {
                   const option = e.target.value;
