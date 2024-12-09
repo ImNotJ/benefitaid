@@ -1,6 +1,6 @@
 package com.example.benefits.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -26,8 +26,8 @@ public class Benefit {
     @NotBlank
     private String benefitUrl;
 
-    @OneToMany(mappedBy = "benefit", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "benefit", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("benefit")
     private Set<Requirement> requirements;
 
     @Column(columnDefinition = "TEXT")

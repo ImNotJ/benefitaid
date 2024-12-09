@@ -1,6 +1,7 @@
 package com.example.benefits.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -27,9 +28,9 @@ public class Requirement {
     @CollectionTable(name = "requirement_conditions", joinColumns = @JoinColumn(name = "requirement_id"))
     private Set<Condition> conditions;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "benefit_id")
-    @JsonBackReference
+    @JsonIgnoreProperties("requirements")
     private Benefit benefit;
 
     public enum RequirementType {
