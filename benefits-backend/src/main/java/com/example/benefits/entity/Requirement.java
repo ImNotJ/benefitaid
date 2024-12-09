@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Set;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 
 /**
  * Entity class representing a Requirement.
@@ -22,8 +23,8 @@ public class Requirement {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private RequirementType type; // GENERAL, NECESSARY, INVALID, GENERAL_NECESSARY
+    @JsonDeserialize(using = RequirementTypeDeserializer.class)
+    private RequirementType type;
 
     @ElementCollection
     @CollectionTable(name = "requirement_conditions", joinColumns = @JoinColumn(name = "requirement_id"))
