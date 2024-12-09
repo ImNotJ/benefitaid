@@ -113,63 +113,20 @@ function UserForm() {
     setErrorMessage('');
     setSuccessMessage('');
 
-    const email = 'random@example.com'; // Dummy email
-    const password = 'randomPassword123'; // Dummy password
-
-    const payload = {
-      email,
-      password,
-      responses
-    };
-
-    console.log('Submitting payload:', payload); // Log the payload
-
     try {
-      const response = await axios.post('/api/eligibility/check', payload);
-
-      console.log('Response data:', response.data); // Log the response data
-
-      const eligibleBenefits = selectedQuiz.benefits.filter(benefit => {
-        if (!benefit.requirements || benefit.requirements.length === 0) {
-          return false;
-        }
-        return benefit.requirements.some(requirement => {
-          console.log('Checking requirement:', requirement); // Log the requirement
-          return requirement.conditions.every(condition => {
-            const userResponse = responses[condition.questionId];
-            console.log('Checking condition:', condition); // Log the condition
-            console.log('User response:', userResponse); // Log the user response
-            if (userResponse === undefined) {
-              return false;
-            }
-            switch (condition.operator) {
-              case '<=':
-                return parseFloat(userResponse) <= parseFloat(condition.value);
-              case '>=':
-                return parseFloat(userResponse) >= parseFloat(condition.value);
-              case '<':
-                return parseFloat(userResponse) < parseFloat(condition.value);
-              case '>':
-                return parseFloat(userResponse) > parseFloat(condition.value);
-              case '==':
-                return userResponse === condition.value;
-              default:
-                return false;
-            }
-          });
-        });
+      const response = await axios.post('/api/eligibility/check', {
+        responses,
+        quizId: selectedQuiz.id,
+        email: 'dummy@example.com', // Dummy login email
+        password: 'dummyPassword'   // Dummy login password
       });
 
-      console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
-
+      const eligibleBenefits = response.data;
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
-      setErrorMessage('');
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      console.error('Error response data:', error.response?.data); // Log the error response data
       setErrorMessage('Failed to check eligibility.');
-      setSuccessMessage('');
     } finally {
       setLoading(false);
     }
@@ -178,7 +135,7 @@ function UserForm() {
   const handleQuizSelect = async (quiz) => {
     setSelectedQuiz(quiz);
     try {
-      const response = await axios.get(`/api/quizzes/${quiz.id}`);
+      const response = await axios.get(`/api/quizzes/${quiz.id}/questions`);
       const orderedQuestions = response.data.questionIds
         .map(id => response.data.questions.find(q => q.id === id))
         .filter(Boolean);
@@ -222,7 +179,6 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
-                  {question.required && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
@@ -252,7 +208,7 @@ function UserForm() {
           {eligibilityResults && (
             <div id="eligibility-results" className="eligibility-results">
               <h3>Eligibility Results</h3>
-              <h4>You are eligibile for the following benefits:</h4>
+              <h4>You are eligible for the following benefits:</h4>
               <div className="benefits-grid">
                 {eligibilityResults.map((benefit) => (
                   <div key={benefit.id} className="benefit-card">
