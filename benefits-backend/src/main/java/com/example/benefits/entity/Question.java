@@ -1,12 +1,12 @@
 package com.example.benefits.entity;
 
-import com.example.benefits.util.StringListDeserializer;
-import com.example.benefits.util.StringListSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -26,9 +26,7 @@ public class Question {
     private String questionText;
 
     @Column(name = "options")
-    @JsonSerialize(using = StringListSerializer.class)
-    @JsonDeserialize(using = StringListDeserializer.class)
-    private List<String> options; // Store options as a list of strings
+    private String options;
 
     // Getters and Setters
 
@@ -64,11 +62,21 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public List<String> getOptions() {
+    public String getOptions() {
         return options;
     }
 
-    public void setOptions(List<String> options) {
+    public void setOptions(String options) {
         this.options = options;
+    }
+
+    // Helper methods for converting between String and List
+    @JsonIgnore
+    public List<String> getOptionsList() {
+        return options != null ? Arrays.asList(options.split(",")) : new ArrayList<>();
+    }
+
+    public void setOptionsList(List<String> optionsList) {
+        this.options = optionsList != null ? String.join(",", optionsList) : null;
     }
 }
