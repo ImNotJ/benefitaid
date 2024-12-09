@@ -3,52 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageQuestions.css';
 
-/**
- * ManageQuestions component for handling the management of questions.
- *
- * @returns {React.ReactNode} The rendered component.
- */
 function ManageQuestions() {
   const [questions, setQuestions] = useState([]);
   const [questionName, setQuestionName] = useState('');
   const [questionType, setQuestionType] = useState('');
   const [questionText, setQuestionText] = useState('');
-  const [options, setOptions] = useState(['']); // Array for multi-choice options
+  const [options, setOptions] = useState(['']);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await axios.get('/api/questions');
-        setQuestions(response.data);
-      } catch (error) {
-        console.error('Fetch questions error:', error);
-      }
-    };
     fetchQuestions();
   }, []);
 
-  /**
-   * Fetches the questions from the API.
-   */
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Fetch questions response:', response); // Debug log
       setQuestions(response.data);
     } catch (error) {
-      console.error('Fetch questions error:', error); // Debug log
+      console.error('Fetch questions error:', error);
+      setErrorMessage('Failed to fetch questions.');
     }
   };
 
-  /**
-   * Handles the addition or update of a question.
-   *
-   * @param {Event} e - The form submit event.
-   */
   const handleAddOption = () => {
     setOptions([...options, '']);
   };
@@ -63,7 +42,7 @@ function ManageQuestions() {
     newOptions[index] = value;
     setOptions(newOptions);
   };
-  
+
   const validateQuestion = () => {
     if (!questionName || !questionType || !questionText) {
       setErrorMessage('Name, type, and text are required.');
@@ -81,11 +60,11 @@ function ManageQuestions() {
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
-  
+
     if (!validateQuestion()) {
       return;
     }
-  
+
     const questionData = {
       questionName,
       questionType,
@@ -94,7 +73,7 @@ function ManageQuestions() {
         ? options.filter(opt => opt.trim() !== '').join(',')
         : null
     };
-  
+
     try {
       if (editingQuestionId) {
         await axios.put(`/api/questions/${editingQuestionId}`, questionData);
@@ -103,14 +82,8 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-      setQuestionName('');
-      setQuestionType('');
-      setQuestionText('');
-      setOptions(['']);
-      setEditingQuestionId(null);
-      setErrorMessage('');
-      const response = await axios.get('/api/questions');
-      setQuestions(response.data);
+      handleClearFields();
+      fetchQuestions();
     } catch (error) {
       console.error('Save question error:', error);
       setErrorMessage('Failed to save question.');
@@ -121,50 +94,40 @@ function ManageQuestions() {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(question.options ? question.options.split(',') : ['']);
+    // Safely handle options that might be null
+    setOptions(
+      ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) && question.options
+        ? question.options.split(',')
+        : ['']
+    );
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
   };
 
-  /**
-   * Handles the deletion of a question.
-   *
-   * @param {string} id - The ID of the question to delete.
-   */
   const handleDeleteQuestion = async (id) => {
     try {
-      const response = await axios.delete(`/api/questions/${id}`);
-      console.log('Delete question response:', response); // Debug log
+      await axios.delete(`/api/questions/${id}`);
       fetchQuestions();
       setSuccessMessage('Question deleted successfully!');
       setErrorMessage('');
     } catch (error) {
-      console.error('Delete question error:', error); // Debug log
+      console.error('Delete question error:', error);
       setErrorMessage('Failed to delete question.');
       setSuccessMessage('');
     }
   };
 
-  /**
-   * Handles navigation back to the admin dashboard.
-   */
   const handleBackToDashboard = () => {
     navigate('/admin-dashboard');
   };
 
-  /**
-   * Handles the logout process.
-   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/admin-login');
   };
 
-  /**
-   * Clears all input fields.
-   */
   const handleClearFields = () => {
     setQuestionName('');
     setQuestionType('');
@@ -173,6 +136,14 @@ function ManageQuestions() {
     setEditingQuestionId(null);
     setSuccessMessage('');
     setErrorMessage('');
+  };
+
+  // Helper function to safely display options
+  const displayOptions = (question) => {
+    if (!['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
+      return null;
+    }
+    return question.options ? question.options.split(',').join(', ') : '';
   };
 
   return (
@@ -251,7 +222,11 @@ function ManageQuestions() {
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                   />
-                  <button type="button" onClick={() => handleRemoveOption(index)}>Remove</button>
+                  {options.length > 1 && (
+                    <button type="button" onClick={() => handleRemoveOption(index)}>
+                      Remove
+                    </button>
+                  )}
                 </div>
               ))}
               <button
@@ -294,11 +269,7 @@ function ManageQuestions() {
                   <td>{question.questionName}</td>
                   <td>{question.questionType}</td>
                   <td>{question.questionText}</td>
-                  <td>
-                    {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      typeof question.options === 'string' &&
-                      question.options.split(',').join(', ')}
-                  </td>
+                  <td>{displayOptions(question)}</td>
                   <td>
                     <button
                       onClick={() => handleEditQuestion(question)}
