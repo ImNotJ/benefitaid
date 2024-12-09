@@ -95,8 +95,6 @@ function ManageQuestions() {
   };
 
   const handleEditQuestion = (question) => {
-    console.log('Editing question payload:', question); // Print the payload
-  
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);

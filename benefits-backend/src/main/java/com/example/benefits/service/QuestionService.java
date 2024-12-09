@@ -33,7 +33,7 @@ public class QuestionService {
      * @return the question entity, or null if not found
      */
     public Question getQuestionById(Long id) {
-        return questionRepository.findByIdWithOptions(id).orElse(null);
+        return questionRepository.findById(id).orElse(null);
     }
 
     /**
