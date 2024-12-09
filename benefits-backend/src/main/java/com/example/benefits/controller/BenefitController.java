@@ -65,6 +65,7 @@ public class BenefitController {
     @PutMapping("/{id}")
     public Benefit updateBenefit(@PathVariable Long id, @Valid @RequestBody Benefit benefit) {
         benefit.setId(id);
+        System.out.println("Received Benefit: " + benefit);
         return benefitService.saveBenefit(benefit);
     }
 
