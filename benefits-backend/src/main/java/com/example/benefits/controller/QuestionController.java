@@ -58,25 +58,9 @@ public class QuestionController {
      * @return the updated question entity
      */
     @PutMapping("/{id}")
-    public Question updateQuestion(@PathVariable Long id, @Valid @RequestBody Question updatedQuestion) {
-        // Fetch the existing question
-        Question existingQuestion = questionService.getQuestionById(id);
-        if (existingQuestion == null) {
-            throw new IllegalArgumentException("Question with ID " + id + " not found");
-        }
-
-        // Update fields
-        existingQuestion.setQuestionName(updatedQuestion.getQuestionName());
-        existingQuestion.setQuestionType(updatedQuestion.getQuestionType());
-        existingQuestion.setQuestionText(updatedQuestion.getQuestionText());
-
-        // Retain existing options if not provided
-        if (updatedQuestion.getOptions() != null && !updatedQuestion.getOptions().isEmpty()) {
-            existingQuestion.setOptions(updatedQuestion.getOptions());
-        }
-
-        // Save and return the updated question
-        return questionService.saveQuestion(existingQuestion);
+    public Question updateQuestion(@PathVariable Long id, @Valid @RequestBody Question question) {
+        question.setId(id);
+        return questionService.saveQuestion(question);
     }
 
     /**

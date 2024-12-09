@@ -118,15 +118,14 @@ function ManageQuestions() {
   };
 
   const handleEditQuestion = (question) => {
-    console.log('Editing question:', question); // Debug log
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(typeof question.options === 'string' ? question.options.split(',') : ['']);
+    setOptions(question.options ? question.options.split(',') : ['']);
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
-  };  
+  };
 
   /**
    * Handles the deletion of a question.
