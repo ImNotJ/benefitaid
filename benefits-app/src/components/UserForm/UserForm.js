@@ -18,8 +18,6 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
-
-
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
@@ -182,7 +180,6 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
-                  {question.required && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
