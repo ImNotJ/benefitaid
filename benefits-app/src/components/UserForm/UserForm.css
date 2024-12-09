@@ -153,10 +153,6 @@ html {
   text-decoration: none;
 }
 
-.user-form label::after {
-  content: none;
-}
-
 .img-preview {
   max-width: 300px;
   height: auto;
