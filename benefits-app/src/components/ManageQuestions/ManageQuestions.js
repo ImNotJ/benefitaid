@@ -117,6 +117,7 @@ function ManageQuestions() {
     }
   };
 
+
   const handleEditQuestion = (question) => {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
@@ -126,6 +127,7 @@ function ManageQuestions() {
     setSuccessMessage('');
     setErrorMessage('');
   };
+
 
   /**
    * Handles the deletion of a question.
@@ -221,8 +223,6 @@ function ManageQuestions() {
             <option value="Numerical">Numerical</option>
             <option value="Date">Date</option>
             <option value="Email">Email</option>
-            <option value="Yes/No">Yes/No</option>
-            <option value="State">State</option>
             <option value="MultiChoiceSingle">Multiple Choice (Single Select)</option>
             <option value="MultiChoiceMulti">Multiple Choice (Multi Select)</option>
           </select>
@@ -296,8 +296,7 @@ function ManageQuestions() {
                   <td>{question.questionText}</td>
                   <td>
                     {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      typeof question.options === 'string' &&
-                      question.options.split(',').join(', ')}
+                      question.options?.split(',').join(', ')}
                   </td>
                   <td>
                     <button
