@@ -2,8 +2,6 @@ package com.example.benefits.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,11 +20,10 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @ElementCollection(fetch = FetchType.EAGER)  // Change to EAGER loading
-    @CollectionTable(name = "question_options", 
-                    joinColumns = @JoinColumn(name = "question_id"))
+    @ElementCollection
+    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
     @Column(name = "option_value")
-    private List<String> options = new ArrayList<>();
+    private List<String> options; // Store options as a list of strings
 
     // Getters and Setters
 
