@@ -1,8 +1,13 @@
 package com.example.benefits.entity;
 
+import com.example.benefits.util.StringListDeserializer;
+import com.example.benefits.util.StringListSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-
+import java.util.List;
 
 @Entity
 public class Question {
@@ -21,7 +26,9 @@ public class Question {
     private String questionText;
 
     @Column(name = "options")
-    private String options;
+    @JsonSerialize(using = StringListSerializer.class)
+    @JsonDeserialize(using = StringListDeserializer.class)
+    private List<String> options; // Store options as a list of strings
 
     // Getters and Setters
 
@@ -57,12 +64,11 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public String getOptions() {
+    public List<String> getOptions() {
         return options;
     }
 
-    public void setOptions(String options) {
+    public void setOptions(List<String> options) {
         this.options = options;
     }
-
 }
