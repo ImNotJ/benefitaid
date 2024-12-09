@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Set;
 
 /**
@@ -22,7 +21,6 @@ public class Requirement {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private RequirementType type; // GENERAL, NECESSARY, INVALID, GENERAL_NECESSARY
 
     @ElementCollection
