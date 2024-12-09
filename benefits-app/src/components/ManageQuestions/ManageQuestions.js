@@ -94,19 +94,28 @@ function ManageQuestions() {
     }
   };
 
-  const handleEditQuestion = (question) => {
-    setQuestionName(question.questionName);
-    setQuestionType(question.questionType);
-    setQuestionText(question.questionText);
-    if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
-      setOptions(question.options || []);
-    } else {
-      setOptions(['']);
+  const handleEditQuestion = async (question) => {
+    try {
+        // Fetch the complete question with options
+        const response = await axios.get(`/api/questions/${question.id}`);
+        const questionWithOptions = response.data;
+        
+        setQuestionName(questionWithOptions.questionName);
+        setQuestionType(questionWithOptions.questionType);
+        setQuestionText(questionWithOptions.questionText);
+        if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionWithOptions.questionType)) {
+            setOptions(questionWithOptions.options || []);
+        } else {
+            setOptions(['']);
+        }
+        setEditingQuestionId(questionWithOptions.id);
+        setSuccessMessage('');
+        setErrorMessage('');
+    } catch (error) {
+        console.error('Error fetching question details:', error);
+        setErrorMessage('Failed to load question details.');
     }
-    setEditingQuestionId(question.id);
-    setSuccessMessage('');
-    setErrorMessage('');
-  };
+};
 
   const handleDeleteQuestion = async (id) => {
     try {
