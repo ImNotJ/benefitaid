@@ -1,11 +1,13 @@
 package com.example.benefits.controller;
 
 import com.example.benefits.entity.Question;
+import com.example.benefits.entity.QuestionOption;
 import com.example.benefits.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -18,58 +20,31 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
-    /**
-     * Endpoint to create a new question.
-     *
-     * @param question the question entity to create
-     * @return the created question entity
-     */
+    @GetMapping("/{id}/options")
+    public ResponseEntity<List<QuestionOption>> getQuestionOptions(@PathVariable Long id) {
+        Question question = questionService.getQuestionById(id);
+        if (question == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(question.getOptions());
+    }
+
     @PostMapping
-    public Question createQuestion(@Valid @RequestBody Question question) {
-        return questionService.saveQuestion(question);
+    public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
+        Question savedQuestion = questionService.saveQuestion(question);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedQuestion);
     }
 
-    /**
-     * Endpoint to get a question by ID.
-     *
-     * @param id the ID of the question
-     * @return the question entity
-     */
-    @GetMapping("/{id}")
-    public Question getQuestionById(@PathVariable Long id) {
-        return questionService.getQuestionById(id);
-    }
-
-    /**
-     * Endpoint to get all questions.
-     *
-     * @return a list of all question entities
-     */
-    @GetMapping
-    public List<Question> getAllQuestions() {
-        return questionService.getAllQuestions();
-    }
-
-    /**
-     * Endpoint to update a question.
-     *
-     * @param id       the ID of the question to update
-     * @param question the updated question entity
-     * @return the updated question entity
-     */
     @PutMapping("/{id}")
-    public Question updateQuestion(@PathVariable Long id, @Valid @RequestBody Question question) {
+    public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
         question.setId(id);
-        return questionService.saveQuestion(question);
+        Question updatedQuestion = questionService.saveQuestion(question);
+        return ResponseEntity.ok(updatedQuestion);
     }
 
-    /**
-     * Endpoint to delete a question by ID.
-     *
-     * @param id the ID of the question to delete
-     */
     @DeleteMapping("/{id}")
-    public void deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestionById(id);
+        return ResponseEntity.noContent().build();
     }
 }
