@@ -48,26 +48,10 @@ function ManageBenefits() {
   const navigate = useNavigate();
 
   const requirementTypes = [
-    {
-      value: 'GENERAL',
-      label: 'General (Must Meet At Least One General Requirement)',
-      description: 'If user meets any one General requirement, they may be eligible based on other requirement types.'
-    },
-    {
-      value: 'NECESSARY',
-      label: 'Necessary (Must Meet All)',
-      description: 'User must meet all Necessary requirements to be eligible.'
-    },
-    {
-      value: 'INVALID',
-      label: 'Invalid (Disqualifying)',
-      description: 'If user meets any Invalid requirement, they are not eligible.'
-    },
-    {
-      value: 'GENERAL_NECESSARY',
-      label: 'General + Necessary (Must Meet All)',
-      description: 'User must meet all General + Necessary requirements. If met, user is eligible regardless of General requirements.'
-    }
+    { value: 'GENERAL', label: 'General (Must Meet At Least One General Requirement)' },
+    { value: 'NECESSARY', label: 'Necessary (Must Meet All)' },
+    { value: 'INVALID', label: 'Invalid (Disqualifying)' },
+    { value: 'GENERAL_NECESSARY', label: 'General + Necessary (Must Meet All These AND At Least One General)' }
   ];
 
   useEffect(() => {
@@ -382,7 +366,7 @@ function ManageBenefits() {
     setSuccessMessage('');
     setErrorMessage('');
   };
-
+  
   const handleClearRequirementFields = () => {
     setRequirementName('');
     setRequirementType('GENERAL');
@@ -390,7 +374,7 @@ function ManageBenefits() {
     setEditingRequirementIndex(null);
     setErrorMessage('');
   };
-
+  
   const handleClearConditionFields = () => {
     setCurrentQuestionId('');
     setCurrentOperator('');
@@ -531,18 +515,11 @@ function ManageBenefits() {
               onChange={(e) => setRequirementType(e.target.value)}
             >
               {requirementTypes.map(type => (
-                <option
-                  key={type.value}
-                  value={type.value}
-                  title={type.description}
-                >
+                <option key={type.value} value={type.value}>
                   {type.label}
                 </option>
               ))}
             </select>
-            <small className="form-text text-muted">
-              {requirementTypes.find(t => t.value === requirementType)?.description}
-            </small>
           </div>
 
           {/* Conditions */}
