@@ -42,7 +42,7 @@ public class EligibilityService {
             return false;
         }
 
-        // First check INVALID requirements - if any are met, user is not eligible
+        // First check INVALID requirements
         boolean hasInvalidMatch = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.INVALID)
             .anyMatch(req -> meetsRequirement(req, responses, questionMap));
@@ -51,7 +51,7 @@ public class EligibilityService {
             return false;
         }
 
-        // Check NECESSARY requirements - must meet all of these
+        // Check NECESSARY requirements
         boolean meetsAllNecessary = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.NECESSARY)
             .allMatch(req -> meetsRequirement(req, responses, questionMap));
@@ -60,21 +60,21 @@ public class EligibilityService {
             return false;
         }
 
-        // Check GENERAL_NECESSARY requirements - must meet all of these as well
+        // Check GENERAL_NECESSARY requirements
         boolean hasGeneralNecessary = benefit.getRequirements().stream()
             .anyMatch(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY);
 
         if (hasGeneralNecessary) {
-            boolean meetsAllGeneralNecessary = benefit.getRequirements().stream()
+            boolean meetsAnyGeneralNecessary = benefit.getRequirements().stream()
                 .filter(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY)
-                .allMatch(req -> meetsRequirement(req, responses, questionMap));
+                .anyMatch(req -> meetsRequirement(req, responses, questionMap));
 
-            if (!meetsAllGeneralNecessary) {
+            if (!meetsAnyGeneralNecessary) {
                 return false;
             }
         }
 
-        // Check GENERAL requirements - must meet at least one if they exist
+        // Check GENERAL requirements
         boolean hasGeneral = benefit.getRequirements().stream()
             .anyMatch(req -> req.getType() == Requirement.RequirementType.GENERAL);
 
