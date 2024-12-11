@@ -7,50 +7,52 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Service class for managing Question entities.
- */
 @Service
 public class QuestionService {
 
     @Autowired
     private QuestionRepository questionRepository;
 
-    /**
-     * Saves a question entity.
-     *
-     * @param question the question entity to save
-     * @return the saved question entity
-     */
     public Question saveQuestion(Question question) {
-        return questionRepository.save(question);
+        // Save the question entity
+        Question savedQuestion = questionRepository.save(question);
+
+        // Delete existing options
+        questionRepository.deleteOptionsByQuestionId(savedQuestion.getId());
+
+        // Insert new options
+        List<String> options = question.getOptionsList();
+        if (options != null && !options.isEmpty()) {
+            for (String option : options) {
+                questionRepository.insertOption(savedQuestion.getId(), option);
+            }
+        }
+
+        return savedQuestion;
     }
 
-    /**
-     * Gets a question by ID.
-     *
-     * @param id the ID of the question
-     * @return the question entity, or null if not found
-     */
     public Question getQuestionById(Long id) {
-        return questionRepository.findById(id).orElse(null);
+        Question question = questionRepository.findById(id).orElse(null);
+        if (question != null) {
+            List<String> options = questionRepository.findOptionsByQuestionId(id);
+            question.setOptionsList(options);
+        }
+        return question;
     }
 
-    /**
-     * Gets all questions.
-     *
-     * @return a list of all question entities
-     */
     public List<Question> getAllQuestions() {
-        return questionRepository.findAll();
+        List<Question> questions = questionRepository.findAll();
+        for (Question question : questions) {
+            List<String> options = questionRepository.findOptionsByQuestionId(question.getId());
+            question.setOptionsList(options);
+        }
+        return questions;
     }
 
-    /**
-     * Deletes a question by ID.
-     *
-     * @param id the ID of the question to delete
-     */
     public void deleteQuestionById(Long id) {
+        // Delete options first
+        questionRepository.deleteOptionsByQuestionId(id);
+        // Then delete the question
         questionRepository.deleteById(id);
     }
 }
