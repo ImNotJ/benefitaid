@@ -18,26 +18,6 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
-  const handleBackToDashboard = () => {
-    if (selectedQuiz) {
-      setSelectedQuiz(null);
-      setQuestions([]);
-      setResponses({});
-      setErrors({});
-      setEligibilityResults(null);
-      setSuccessMessage('');
-      setErrorMessage('');
-    } else {
-      navigate('/user-dashboard');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/user-login');
-  };
-
   const fetchQuizzes = async () => {
     try {
       const response = await axios.get('/api/quizzes');
@@ -72,12 +52,12 @@ function UserForm() {
 
     questions.forEach(question => {
       const response = responses[question.id];
-
+      
       if (question.required && (!response || response.trim() === '')) {
         newErrors[question.id] = 'This field is required';
         isValid = false;
       }
-
+      
       switch (question.questionType) {
         case 'Email':
           if (response && !isValidEmail(response)) {
@@ -108,7 +88,7 @@ function UserForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!validateResponses()) {
       setErrorMessage('Please correct the errors before submitting');
       return;
@@ -127,7 +107,7 @@ function UserForm() {
       const eligibleBenefits = response.data;
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
-
+      
       // Scroll to results
       document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -155,6 +135,28 @@ function UserForm() {
       console.error('Error fetching quiz questions:', error);
       setErrorMessage('Failed to load quiz questions. Please try again.');
     }
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  const handleBackToDashboard = () => {
+    if (selectedQuiz) {
+      setSelectedQuiz(null);
+      setQuestions([]);
+      setResponses({});
+      setErrors({});
+      setEligibilityResults(null);
+      setSuccessMessage('');
+      setErrorMessage('');
+    } else {
+      navigate('/user-dashboard');
+    }
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/user-login');
   };
 
   return (
