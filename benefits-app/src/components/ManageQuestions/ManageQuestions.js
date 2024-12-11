@@ -167,10 +167,14 @@ function ManageQuestions() {
   return (
     <div className="manage-questions">
       <div className="top-buttons">
-        <button onClick={handleBackToDashboard} className="btn btn-secondary">
+        <button onClick={() => navigate('/admin-dashboard')} className="btn btn-secondary">
           Back to Dashboard
         </button>
-        <button onClick={handleLogout} className="btn btn-secondary">
+        <button onClick={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          navigate('/admin-login');
+        }} className="btn btn-secondary">
           Logout
         </button>
       </div>
