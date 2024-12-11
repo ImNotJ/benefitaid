@@ -75,7 +75,7 @@ function UserForm() {
     questions.forEach(question => {
       const response = responses[question.id];
 
-      // Only validate format if user provided an answer
+      // Only proceed with validation if there's a response
       if (response && response.trim() !== '') {
         switch (question.questionType) {
           case 'Email':
@@ -96,7 +96,10 @@ function UserForm() {
               isValid = false;
             }
             break;
-          // No validation needed for other types
+          // For multiple choice questions, no additional validation needed
+          // as the input is controlled by radio buttons or checkboxes
+          case 'MultiChoiceSingle':
+          case 'MultiChoiceMulti':
           default:
             break;
         }
@@ -172,7 +175,7 @@ function UserForm() {
         <>
           <h2 className="main-title">{selectedQuiz.quizName}</h2>
           <div className="completion-notice">
-            <p>The more questions you answer, the more accurate your results will be.</p>
+            <p>Please answer all questions accurately to get the most relevant results.</p>
           </div>
 
           {(successMessage || errorMessage) && (
@@ -186,10 +189,12 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
+                  {/* Only show required indicator if the question is explicitly marked as required */}
+                  {question.required === true && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
-                  question={{ ...question, required: false }} // Ensure required is always false
+                  question={question}
                   value={responses[question.id]}
                   onChange={handleInputChange}
                   onError={handleError}
