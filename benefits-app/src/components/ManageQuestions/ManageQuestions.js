@@ -29,14 +29,10 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Raw questions data:', response.data);
-      console.log('Questions with options:', response.data.map(q => ({
-        ...q,
-        optionsData: q.options
-      })));
+      console.log('Fetch questions response:', response); // Debug log
       setQuestions(response.data);
     } catch (error) {
-      console.error('Fetch questions error:', error);
+      console.error('Fetch questions error:', error); // Debug log
     }
   };
 
