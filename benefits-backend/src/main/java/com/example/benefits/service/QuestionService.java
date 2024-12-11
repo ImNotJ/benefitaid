@@ -1,6 +1,7 @@
 package com.example.benefits.service;
 
 import com.example.benefits.entity.Question;
+import com.example.benefits.entity.QuestionOption;
 import com.example.benefits.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,17 @@ public class QuestionService {
      * @return the saved question entity
      */
     public Question saveQuestion(Question question) {
+        if (question.getQuestionType().equals("MultiChoiceSingle") || 
+            question.getQuestionType().equals("MultiChoiceMulti")) {
+            
+            question.clearOptions();
+            // Handle the incoming options from the frontend
+            if (question.getOptions() != null) {
+                for (QuestionOption option : question.getOptions()) {
+                    question.addOption(option.getOptionValue());
+                }
+            }
+        }
         return questionRepository.save(question);
     }
 
