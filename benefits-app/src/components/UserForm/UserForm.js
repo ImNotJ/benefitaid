@@ -72,14 +72,6 @@ function UserForm() {
     });
   };
 
-  const email = localStorage.getItem('email');
-  const password = localStorage.getItem('password');
-
-  const payload = {
-    email,
-    password,
-    responses
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,14 +85,14 @@ function UserForm() {
     const email = localStorage.getItem('email');
     const password = localStorage.getItem('password');
 
-    const payload = {
-      email,
-      password,
-      responses
-    };
+    
 
     try {
-      const response = await axios.post('/api/eligibility/check', payload);
+      const response = await axios.post('/api/eligibility/check', {
+        email,
+        password,
+        responses
+      });
       setEligibilityResults(response.data);
       setSuccessMessage('Eligibility check completed successfully!');
       setErrorMessage('');
