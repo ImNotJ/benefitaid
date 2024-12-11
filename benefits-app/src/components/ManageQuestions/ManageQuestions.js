@@ -29,10 +29,11 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Raw questions data:', response.data);
-      console.log('Questions with options:', response.data.map(q => ({
-        ...q,
-        optionsData: q.options
+      console.log('Questions with detailed options:', response.data.map(q => ({
+        name: q.questionName,
+        type: q.questionType,
+        optionsCount: q.options?.length || 0,
+        options: q.options
       })));
       setQuestions(response.data);
     } catch (error) {
@@ -297,7 +298,8 @@ function ManageQuestions() {
                   <td>{question.questionText}</td>
                   <td>
                     {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      question.options?.map(opt => opt.optionValue).join(', ')}
+                      question.options &&
+                      question.options.map(opt => opt.optionValue).join(', ')}
                   </td>
                   <td>
                     <button
