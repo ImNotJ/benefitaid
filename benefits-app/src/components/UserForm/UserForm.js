@@ -1,44 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
-import QuestionInput from './QuestionInput';
-import { isValidEmail, formatDate } from '../../utils/validation';
-import { useNavigate } from 'react-router-dom';
 import './UserForm.css';
 
 function UserForm() {
-  const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
-  const [errors, setErrors] = useState({});
   const [eligibilityResults, setEligibilityResults] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
-
-  
-  const handleBackToDashboard = () => {
-    if (selectedQuiz) {
-      setSelectedQuiz(null);
-      setQuestions([]);
-      setResponses({});
-      setErrors({});
-      setEligibilityResults(null);
-      setSuccessMessage('');
-      setErrorMessage('');
-    } else {
-      navigate('/user-dashboard');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/user-login');
-  };
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
 
   const fetchQuizzes = async () => {
     try {
@@ -46,117 +22,292 @@ function UserForm() {
       setQuizzes(response.data);
     } catch (error) {
       console.error('Error fetching quizzes:', error);
-      setErrorMessage('Failed to load quizzes. Please try again.');
     }
   };
 
-  useEffect(() => {
-    fetchQuizzes();
-  }, []);
+  const fetchQuestions = async (quizId) => {
+    try {
+      const response = await axios.get(`/api/quizzes/${quizId}`);
+      const orderedQuestions = response.data.questionIds.map(id =>
+        response.data.questions.find(q => q.id === id)
+      );
+      setQuestions(orderedQuestions);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  };
 
-  const handleInputChange = (questionId, value) => {
+  const handleQuizSelect = (quiz) => {
+    setSelectedQuiz(quiz);
+    fetchQuestions(quiz.id);
+    setResponses({});
+    setEligibilityResults(null);
+    setSuccessMessage('');
+    setErrorMessage('');
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setResponses(prev => ({
       ...prev,
-      [questionId]: value
+      [name]: value,
     }));
   };
 
-  const handleError = (questionId, error) => {
-    setErrors(prev => ({
-      ...prev,
-      [questionId]: error
-    }));
-  };
+  const handleCheckboxChange = (questionId, option, checked) => {
+    setResponses(prev => {
+      const currentValues = prev[questionId] ? prev[questionId].split(',') : [];
+      let newValues;
 
-  const validateResponses = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    questions.forEach(question => {
-      const response = responses[question.id];
-
-      if (question.required && (!response || response.trim() === '')) {
-        newErrors[question.id] = 'This field is required';
-        isValid = false;
+      if (checked) {
+        newValues = [...currentValues, option];
+      } else {
+        newValues = currentValues.filter(val => val !== option);
       }
 
-      switch (question.questionType) {
-        case 'Email':
-          if (response && !isValidEmail(response)) {
-            newErrors[question.id] = 'Please enter a valid email address';
-            isValid = false;
-          }
-          break;
-        case 'Date':
-          if (response && !formatDate(response)) {
-            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
-            isValid = false;
-          }
-          break;
-        case 'Numerical':
-          if (response && isNaN(Number(response))) {
-            newErrors[question.id] = 'Please enter a valid number';
-            isValid = false;
-          }
-          break;
-        default:
-          break;
-      }
+      return {
+        ...prev,
+        [questionId]: newValues.join(',')
+      };
     });
-
-    setErrors(newErrors);
-    return isValid;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateResponses()) {
-      setErrorMessage('Please correct the errors before submitting');
+    if (Object.keys(responses).length === 0) {
+      setErrorMessage('Please answer at least one question to check eligibility.');
+      setSuccessMessage('');
       return;
     }
 
-    setLoading(true);
-    setErrorMessage('');
-    setSuccessMessage('');
+    const email = localStorage.getItem('email');
+    const password = localStorage.getItem('password');
+
+    
 
     try {
       const response = await axios.post('/api/eligibility/check', {
-        responses,
-        quizId: selectedQuiz.id
+        email,
+        password,
+        responses
       });
-
-      const eligibleBenefits = response.data;
-      setEligibilityResults(eligibleBenefits);
+      setEligibilityResults(response.data);
       setSuccessMessage('Eligibility check completed successfully!');
-
-      // Scroll to results
-      document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
+      setErrorMessage('');
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      setErrorMessage('Failed to check eligibility. Please try again.');
-    } finally {
-      setLoading(false);
+      setErrorMessage('Failed to check eligibility.');
+      setSuccessMessage('');
+    }
+  };
+  const renderInputField = (question) => {
+    switch (question.questionType) {
+      case 'MULTI_CHOICE':
+        const options = question.options.split(',');
+        const selectedOptions = responses[question.id] ? responses[question.id].split(',') : [];
+
+        return (
+          <div className="checkbox-group">
+            {options.map((option, index) => (
+              <div key={index} className="checkbox-option">
+                <input
+                  type="checkbox"
+                  id={`${question.id}-${index}`}
+                  checked={selectedOptions.includes(option.trim())}
+                  onChange={(e) => handleCheckboxChange(question.id, option.trim(), e.target.checked)}
+                />
+                <label htmlFor={`${question.id}-${index}`}>{option.trim()}</label>
+              </div>
+            ))}
+          </div>
+        );
+
+      case 'NUMERICAL':
+        return (
+          <input
+            type="number"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+          />
+        );
+
+      case 'DATE':
+        return (
+          <input
+            type="date"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+          />
+        );
+
+      case 'EMAIL':
+        return (
+          <input
+            type="email"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+          />
+        );
+
+      default:
+        return (
+          <input
+            type="text"
+            id={question.id}
+            name={question.id}
+            className="form-control"
+            value={responses[question.id] || ''}
+            onChange={handleInputChange}
+          />
+        );
     }
   };
 
-  const handleQuizSelect = async (quiz) => {
-    setSelectedQuiz(quiz);
-    try {
-      const response = await axios.get(`/api/quizzes/${quiz.id}`);
-      const orderedQuestions = response.data.questionIds
-        .map(id => response.data.questions.find(q => q.id === id))
-        .filter(Boolean);
-      setQuestions(orderedQuestions);
+  const handleBackToDashboard = () => {
+    if (selectedQuiz) {
+      setSelectedQuiz(null);
+      setQuestions([]);
       setResponses({});
-      setErrors({});
       setEligibilityResults(null);
       setSuccessMessage('');
       setErrorMessage('');
-    } catch (error) {
-      console.error('Error fetching quiz questions:', error);
-      setErrorMessage('Failed to load quiz questions. Please try again.');
+    } else {
+      window.location.href = '/user-dashboard';
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    window.location.href = '/user-login';
+  };
+
+  const renderEligibilityResults = () => {
+    if (!eligibilityResults) return null;
+
+    return (
+      <div className="eligibility-results">
+        <h3>Eligibility Results</h3>
+        {eligibilityResults.length > 0 ? (
+          <>
+            <h4>You may be eligible for the following benefits:</h4>
+            <div className="benefits-grid">
+              {eligibilityResults.map((benefit) => (
+                <div key={benefit.id} className="benefit-card">
+                  <div className="benefit-image">
+                    {benefit.imageUrl ? (
+                      <img
+                        src={benefit.imageUrl}
+                        alt={benefit.benefitName}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/api/placeholder/300/200';
+                        }}
+                      />
+                    ) : (
+                      <div className="image-placeholder" />
+                    )}
+                  </div>
+                  <div className="benefit-content">
+                    <h4>{benefit.benefitName}</h4>
+                    <p className="benefit-type">{benefit.federal ? 'Federal Benefit' : `State Benefit - ${benefit.state}`}</p>
+                    <div className="benefit-description">
+                      {benefit.description}
+                    </div>
+                    <div className="benefit-actions">
+                      <a
+                        href={benefit.benefitUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="benefit-link"
+                      >
+                        Learn More
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="no-benefits-message">
+            <p>Based on your responses, we couldn't identify any benefits you're eligible for at this time.</p>
+            <p>Consider answering more questions or try another quiz to discover additional benefits.</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAllBenefits = () => {
+    if (!selectedQuiz || !selectedQuiz.benefits) return null;
+
+    return (
+      <>
+        <hr className="divider" />
+        <h4>All Available Benefits in this Quiz:</h4>
+        <div className="button-group">
+          <button
+            onClick={() => setShowBenefits(!showBenefits)}
+            className="btn btn-info"
+          >
+            {showBenefits ? 'Hide Benefits' : 'Show Benefits'}
+          </button>
+        </div>
+        {showBenefits && (
+          <div className="benefits-dropdown">
+            <div className="benefits-grid">
+              {selectedQuiz.benefits.map((benefit) => (
+                <div key={benefit.id} className="benefit-card">
+                  <div className="benefit-image">
+                    {benefit.imageUrl ? (
+                      <img
+                        src={benefit.imageUrl}
+                        alt={benefit.benefitName}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/api/placeholder/300/200';
+                        }}
+                      />
+                    ) : (
+                      <div className="image-placeholder" />
+                    )}
+                  </div>
+                  <div className="benefit-content">
+                    <h4>{benefit.benefitName}</h4>
+                    <p className="benefit-type">{benefit.federal ? 'Federal Benefit' : `State Benefit - ${benefit.state}`}</p>
+                    <div className="benefit-description">
+                      {benefit.description}
+                    </div>
+                    <div className="benefit-actions">
+                      <a
+                        href={benefit.benefitUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="benefit-link"
+                      >
+                        Learn More
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </>
+    );
   };
 
   return (
@@ -169,108 +320,32 @@ function UserForm() {
           Logout
         </button>
       </div>
+
       {selectedQuiz ? (
         <>
           <h2 className="main-title">{selectedQuiz.quizName}</h2>
+          <p className="subtitle">Complete this simple quiz below to discover what resources may be available for you.</p>
           <div className="completion-notice">
-            <p>Please answer all questions accurately to get the most relevant results.</p>
+            <p>The more questions you answer, the more accurate your results will be.</p>
           </div>
 
-          {(successMessage || errorMessage) && (
-            <div className={`alert ${successMessage ? 'alert-success' : 'alert-danger'}`}>
-              {successMessage || errorMessage}
-            </div>
-          )}
+          {successMessage && <div className="alert alert-success">{successMessage}</div>}
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <form onSubmit={handleSubmit}>
             {questions.map((question) => (
               <div className="form-group" key={question.id}>
-                <label htmlFor={`question-${question.id}`}>
-                  {question.questionText}
-                  {question.required && <span className="required">*</span>}
-                </label>
-
-                <QuestionInput
-                  question={question}
-                  value={responses[question.id]}
-                  onChange={handleInputChange}
-                  onError={handleError}
-                />
-
-                {errors[question.id] && (
-                  <div className="error-message">{errors[question.id]}</div>
-                )}
+                <label htmlFor={question.id}>{question.questionText}</label>
+                {renderInputField(question)}
               </div>
             ))}
-
-            <div className="form-group button-group">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? 'Checking Eligibility...' : 'Check Eligibility'}
-              </button>
+            <div className="button-group">
+              <button type="submit" className="btn btn-primary">Check Eligibility</button>
             </div>
           </form>
 
-          {eligibilityResults && (
-            <div id="eligibility-results" className="eligibility-results">
-              <h3>Eligibility Results</h3>
-              <h4>You are eligibile for the following benefits:</h4>
-              <div className="benefits-grid">
-                {eligibilityResults.map((benefit) => (
-                  <div key={benefit.id} className="benefit-card">
-                    <div className="benefit-image">
-                      {benefit.imageUrl ? (
-                        <img
-                          src={benefit.imageUrl}
-                          alt={benefit.benefitName}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/placeholder-image.png';
-                          }}
-                        />
-                      ) : (
-                        <div className="image-placeholder" />
-                      )}
-                    </div>
-                    <div className="benefit-content">
-                      <h4>{benefit.benefitName}</h4>
-                      <p>{benefit.federal ? 'Federal' : benefit.state}</p>
-                      <div className="benefit-description">
-                        {benefit.description}
-                      </div>
-                      <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer" className="benefit-link">
-                        Learn More
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          <hr className="divider" />
-          <h4>Benefits you could be eligible for based on this quiz:</h4>
-          <h5>Select the button below to toggle.</h5>
-          <div className="button-group">
-            <button onClick={() => setShowBenefits(!showBenefits)} className="btn btn-info">
-              {showBenefits ? 'Hide Benefits' : 'Show Benefits'}
-            </button>
-          </div>
-          {showBenefits && (
-            <div className="benefits-dropdown">
-              <ul className="benefits-list">
-                {selectedQuiz.benefits.map((benefit) => (
-                  <li key={benefit.id}>
-                    <a href={benefit.benefitUrl} target="_blank" rel="noopener noreferrer">
-                      {benefit.benefitName}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {renderEligibilityResults()}
+          {renderAllBenefits()}
         </>
       ) : (
         <>
