@@ -3,21 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageBenefits.css';
 
-const states = [
-  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
-  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
-  "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
-  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
-  "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
-  "Wisconsin", "Wyoming"
-];
-
-/**
- * ManageBenefits component for handling the management of benefits.
- *
- * @returns {React.ReactNode} The rendered component.
- */
 function ManageBenefits() {
+
+  const states = [
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+    "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
+    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
+    "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
+    "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+    "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+    "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", 
+    "Wisconsin", "Wyoming"
+  ];
+  
+  // State declarations
   const [benefits, setBenefits] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [benefitName, setBenefitName] = useState('');
@@ -26,149 +25,32 @@ function ManageBenefits() {
   const [benefitUrl, setBenefitUrl] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  
+  // Requirement states
   const [requirements, setRequirements] = useState([]);
-
-  // Requirement form state
   const [requirementName, setRequirementName] = useState('');
-  const [requirementType, setRequirementType] = useState('GENERAL');
+  const [requirementType, setRequirementType] = useState('');
   const [currentConditions, setCurrentConditions] = useState([]);
   const [currentQuestionId, setCurrentQuestionId] = useState('');
   const [currentOperator, setCurrentOperator] = useState('');
   const [currentValue, setCurrentValue] = useState('');
-
+  
   // Editing states
   const [editingBenefitIndex, setEditingBenefitIndex] = useState(null);
   const [editingRequirementIndex, setEditingRequirementIndex] = useState(null);
   const [editingConditionIndex, setEditingConditionIndex] = useState(null);
-
-  // Messages
+  
+  // Message states
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+  
   const navigate = useNavigate();
 
-  const requirementTypes = [
-    {
-      value: 'GENERAL',
-      label: 'General (Must Meet At Least One General Requirement)',
-      description: 'If user meets any one General requirement, they may be eligible based on other requirement types.'
-    },
-    {
-      value: 'NECESSARY',
-      label: 'Necessary (Must Meet All)',
-      description: 'User must meet all Necessary requirements to be eligible.'
-    },
-    {
-      value: 'INVALID',
-      label: 'Invalid (Disqualifying)',
-      description: 'If user meets any Invalid requirement, they are not eligible.'
-    },
-    {
-      value: 'GENERAL_NECESSARY',
-      label: 'General + Necessary (Must Meet All)',
-      description: 'User must meet all General + Necessary requirements. If met, user is eligible regardless of General requirements.'
-    }
-  ];
-
   useEffect(() => {
     fetchBenefits();
     fetchQuestions();
   }, []);
 
-  const handleOperatorOptions = (questionType) => {
-    const question = questions.find(q => q.id === parseInt(currentQuestionId));
-    if (!question) return [];
-
-    switch (question.questionType) {
-      case 'Numerical':
-      case 'Date':
-        return ['=', '!=', '>', '<', '>=', '<='];
-      case 'MultiChoiceSingle':
-      case 'MultiChoiceMulti':
-      case 'Text':
-      case 'Email':
-        return ['=', '!='];
-      default:
-        return ['=', '!='];
-    }
-  };
-
-  const getValueInput = (questionType) => {
-    const question = questions.find(q => q.id === parseInt(currentQuestionId));
-    if (!question) return null;
-
-    switch (question.questionType) {
-      case 'MultiChoiceSingle':
-      case 'MultiChoiceMulti':
-        return (
-          <select
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          >
-            <option value="">Select Value</option>
-            {question.options.split(',').map(option => (
-              <option key={option} value={option.trim()}>
-                {option.trim()}
-              </option>
-            ))}
-          </select>
-        );
-      case 'Date':
-        return (
-          <input
-            type="date"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        );
-      case 'Numerical':
-        return (
-          <input
-            type="number"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-            step="any"
-          />
-        );
-      default:
-        return (
-          <input
-            type="text"
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          />
-        );
-    }
-  };
-
-  const validateBenefit = () => {
-    if (!benefitName || (!federal && !state) || !benefitUrl || !description) {
-      setErrorMessage('Please fill in all required benefit fields');
-      return false;
-    }
-    return true;
-  };
-
-  const validateRequirement = () => {
-    if (!requirementName || currentConditions.length === 0) {
-      setErrorMessage('Please provide a requirement name and at least one condition');
-      return false;
-    }
-    return true;
-  };
-
-  useEffect(() => {
-    fetchBenefits();
-    fetchQuestions();
-  }, []);
-
-  /**
-   * Fetches the benefits from the API.
-   */
   const fetchBenefits = async () => {
     try {
       const response = await axios.get('/api/benefits');
@@ -178,9 +60,6 @@ function ManageBenefits() {
     }
   };
 
-  /**
-   * Fetches the questions from the API.
-   */
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
@@ -190,16 +69,16 @@ function ManageBenefits() {
     }
   };
 
-  /**
-   * Handles the addition of a new benefit.
-   *
-   * @param {Event} e - The form submit event.
-   */
   const handleAddBenefit = async (e) => {
     e.preventDefault();
-    if (!validateBenefit()) return;
 
-    const benefitData = {
+    if (!benefitName || (!federal && !state) || !benefitUrl || !description) {
+      setErrorMessage('All fields are required except image URL.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const newBenefit = {
       benefitName,
       federal,
       state: federal ? null : state,
@@ -212,24 +91,21 @@ function ManageBenefits() {
     try {
       if (editingBenefitIndex !== null) {
         const benefitId = benefits[editingBenefitIndex].id;
-        await axios.put(`/api/benefits/${benefitId}`, benefitData);
+        await axios.put(`/api/benefits/${benefitId}`, newBenefit);
+        setEditingBenefitIndex(null);
       } else {
-        await axios.post('/api/benefits', benefitData);
+        await axios.post('/api/benefits', newBenefit);
       }
-
       fetchBenefits();
-      handleClearBenefitFields();
+      handleClearFields();
       setSuccessMessage('Benefit saved successfully!');
+      setErrorMessage('');
     } catch (error) {
-      setErrorMessage('Failed to save benefit: ' + (error.response?.data?.message || error.message));
+      setErrorMessage('Failed to save benefit.');
+      setSuccessMessage('');
     }
   };
 
-  /**
-   * Handles the deletion of a benefit.
-   *
-   * @param {string} id - The ID of the benefit to delete.
-   */
   const handleDeleteBenefit = async (id) => {
     try {
       await axios.delete(`/api/benefits/${id}`);
@@ -237,17 +113,11 @@ function ManageBenefits() {
       setSuccessMessage('Benefit deleted successfully!');
       setErrorMessage('');
     } catch (error) {
-      console.error('Error deleting benefit:', error);
       setErrorMessage('Failed to delete benefit.');
       setSuccessMessage('');
     }
   };
 
-  /**
-   * Handles the editing of a benefit.
-   *
-   * @param {number} index - The index of the benefit to edit.
-   */
   const handleEditBenefit = (index) => {
     const benefit = benefits[index];
     setBenefitName(benefit.benefitName);
@@ -256,41 +126,89 @@ function ManageBenefits() {
     setBenefitUrl(benefit.benefitUrl);
     setDescription(benefit.description || '');
     setImageUrl(benefit.imageUrl || '');
-    setRequirements(benefit.requirements);
+    setRequirements(benefit.requirements || []);
     setEditingBenefitIndex(index);
+    setSuccessMessage('');
+    setErrorMessage('');
   };
 
-  /**
-   * Handles the addition of a new condition.
-   */
   const handleAddCondition = () => {
     if (!currentQuestionId || !currentOperator || !currentValue) {
-      setErrorMessage('Please fill in all condition fields');
+      setErrorMessage('All fields are required for the condition.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const question = questions.find(q => q.id === currentQuestionId);
+    if (!question) {
+      setErrorMessage('Invalid question selected.');
       return;
     }
 
     const newCondition = {
-      questionId: parseInt(currentQuestionId),
+      questionId: currentQuestionId,
       operator: currentOperator,
-      value: currentValue
+      value: currentValue,
     };
 
     if (editingConditionIndex !== null) {
       const updatedConditions = [...currentConditions];
       updatedConditions[editingConditionIndex] = newCondition;
       setCurrentConditions(updatedConditions);
+      setEditingConditionIndex(null);
     } else {
       setCurrentConditions([...currentConditions, newCondition]);
     }
 
     handleClearConditionFields();
+    setSuccessMessage('Condition added successfully!');
+    setErrorMessage('');
   };
 
-  /**
-   * Handles the editing of a condition.
-   *
-   * @param {number} index - The index of the condition to edit.
-   */
+  const handleAddRequirement = () => {
+    if (!requirementName || !requirementType || currentConditions.length === 0) {
+      setErrorMessage('Requirement name, type, and at least one condition are required.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const newRequirement = {
+      name: requirementName,
+      type: requirementType,
+      conditions: currentConditions,
+    };
+
+    if (editingRequirementIndex !== null) {
+      const updatedRequirements = [...requirements];
+      updatedRequirements[editingRequirementIndex] = newRequirement;
+      setRequirements(updatedRequirements);
+      setEditingRequirementIndex(null);
+    } else {
+      setRequirements([...requirements, newRequirement]);
+    }
+
+    handleClearRequirementFields();
+    setSuccessMessage('Requirement added successfully!');
+    setErrorMessage('');
+  };
+
+  const handleEditRequirement = (index) => {
+    const requirement = requirements[index];
+    setRequirementName(requirement.name);
+    setRequirementType(requirement.type);
+    setCurrentConditions(requirement.conditions);
+    setEditingRequirementIndex(index);
+    setSuccessMessage('');
+    setErrorMessage('');
+  };
+
+  const handleDeleteRequirement = (index) => {
+    const updatedRequirements = requirements.filter((_, i) => i !== index);
+    setRequirements(updatedRequirements);
+    setSuccessMessage('Requirement deleted successfully!');
+    setErrorMessage('');
+  };
+
   const handleEditCondition = (index) => {
     const condition = currentConditions[index];
     setCurrentQuestionId(condition.questionId);
@@ -299,78 +217,22 @@ function ManageBenefits() {
     setEditingConditionIndex(index);
   };
 
-  /**
-   * Handles the deletion of a condition.
-   *
-   * @param {number} index - The index of the condition to delete.
-   */
   const handleDeleteCondition = (index) => {
     const updatedConditions = currentConditions.filter((_, i) => i !== index);
     setCurrentConditions(updatedConditions);
   };
 
-  /**
-   * Handles the addition of a new requirement.
-   */
-  const handleAddRequirement = () => {
-    if (!validateRequirement()) return;
-
-    const newRequirement = {
-      name: requirementName,
-      type: requirementType,
-      conditions: currentConditions
-    };
-
-    if (editingRequirementIndex !== null) {
-      const updatedRequirements = [...requirements];
-      updatedRequirements[editingRequirementIndex] = newRequirement;
-      setRequirements(updatedRequirements);
-    } else {
-      setRequirements([...requirements, newRequirement]);
-    }
-
-    handleClearRequirementFields();
-  };
-
-  /**
-   * Handles the editing of a requirement.
-   *
-   * @param {number} index - The index of the requirement to edit.
-   */
-  const handleEditRequirement = (index) => {
-    const requirement = requirements[index];
-    setRequirementName(requirement.name);
-    setCurrentConditions(requirement.conditions);
-    setEditingRequirementIndex(index);
-  };
-
-  /**
-   * Handles the deletion of a requirement.
-   *
-   * @param {number} index - The index of the requirement to delete.
-   */
-  const handleDeleteRequirement = (index) => {
-    const updatedRequirements = requirements.filter((_, i) => i !== index);
-    setRequirements(updatedRequirements);
-  };
-
-  /**
-   * Handles navigation back to the admin dashboard.
-   */
   const handleBackToDashboard = () => {
     navigate('/admin-dashboard');
   };
 
-  /**
-   * Handles the logout process.
-   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/admin-login');
   };
 
-  const handleClearBenefitFields = () => {
+  const handleClearFields = () => {
     setBenefitName('');
     setFederal(false);
     setState('');
@@ -378,6 +240,7 @@ function ManageBenefits() {
     setDescription('');
     setImageUrl('');
     setRequirements([]);
+    handleClearRequirementFields();
     setEditingBenefitIndex(null);
     setSuccessMessage('');
     setErrorMessage('');
@@ -385,10 +248,10 @@ function ManageBenefits() {
 
   const handleClearRequirementFields = () => {
     setRequirementName('');
-    setRequirementType('GENERAL');
+    setRequirementType('');
     setCurrentConditions([]);
+    handleClearConditionFields();
     setEditingRequirementIndex(null);
-    setErrorMessage('');
   };
 
   const handleClearConditionFields = () => {
@@ -396,12 +259,14 @@ function ManageBenefits() {
     setCurrentOperator('');
     setCurrentValue('');
     setEditingConditionIndex(null);
-    setErrorMessage('');
+  };
+
+  const getQuestionById = (questionId) => {
+    return questions.find(q => q.id === parseInt(questionId)) || null;
   };
 
   return (
     <div className="manage-benefits">
-      {/* Navigation buttons */}
       <div className="top-buttons">
         <button onClick={handleBackToDashboard} className="btn btn-secondary">
           Back to Dashboard
@@ -410,351 +275,248 @@ function ManageBenefits() {
           Logout
         </button>
       </div>
-
       <h2>Manage Benefits</h2>
-
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-
+      
       {/* Benefit Form */}
-      <div className="section benefit-form">
-        <h3>{editingBenefitIndex !== null ? 'Edit Benefit' : 'Add New Benefit'}</h3>
-        <form onSubmit={handleAddBenefit}>
-          {/* Existing benefit fields */}
+      <form onSubmit={handleAddBenefit}>
+        <div className="form-group">
+          <label htmlFor="benefitName">Benefit Name</label>
+          <input
+            type="text"
+            id="benefitName"
+            className="form-control"
+            value={benefitName}
+            onChange={(e) => setBenefitName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="federal">Federal</label>
+          <input
+            type="checkbox"
+            id="federal"
+            checked={federal}
+            onChange={(e) => setFederal(e.target.checked)}
+          />
+        </div>
+        {!federal && (
           <div className="form-group">
-            <label>Benefit Name *</label>
-            <input
-              type="text"
-              className="form-control"
-              value={benefitName}
-              onChange={(e) => setBenefitName(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Federal Benefit</label>
-            <input
-              type="checkbox"
-              checked={federal}
-              onChange={(e) => {
-                setFederal(e.target.checked);
-                if (e.target.checked) setState('');
-              }}
-            />
-          </div>
-
-          {!federal && (
-            <div className="form-group">
-              <label>State *</label>
-              <select
-                className="form-control"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-              >
-                <option value="">Select State</option>
-                {states.map(state => (
-                  <option key={state} value={state}>{state}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="form-group">
-            <label>Benefit URL *</label>
-            <input
-              type="url"
-              className="form-control"
-              value={benefitUrl}
-              onChange={(e) => setBenefitUrl(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Description *</label>
-            <textarea
-              className="form-control"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows="4"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Image URL</label>
-            <input
-              type="url"
-              className="form-control"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-            {imageUrl && (
-              <div className="image-preview">
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  onError={(e) => e.target.src = '/placeholder-image.png'}
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="form-buttons">
-            <button type="submit" className="btn btn-primary">
-              {editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}
-            </button>
-            <button type="button" onClick={handleClearBenefitFields} className="btn btn-secondary">
-              Clear
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Requirements Section */}
-      <div className="section requirements-section">
-        <h3>Requirements</h3>
-        <div className="requirement-form">
-          <div className="form-group">
-            <label>Requirement Name *</label>
-            <input
-              type="text"
-              className="form-control"
-              value={requirementName}
-              onChange={(e) => setRequirementName(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Requirement Type *</label>
+            <label htmlFor="state">State</label>
             <select
+              id="state"
               className="form-control"
-              value={requirementType}
-              onChange={(e) => setRequirementType(e.target.value)}
+              value={state}
+              onChange={(e) => setState(e.target.value)}
             >
-              {requirementTypes.map(type => (
-                <option
-                  key={type.value}
-                  value={type.value}
-                  title={type.description}
-                >
-                  {type.label}
-                </option>
+              <option value="">Select a state</option>
+              {states.map((stateName) => (
+                <option key={stateName} value={stateName}>{stateName}</option>
               ))}
             </select>
-            <small className="form-text text-muted">
-              {requirementTypes.find(t => t.value === requirementType)?.description}
-            </small>
           </div>
-
-          {/* Conditions */}
-          <div className="conditions-section">
-            <h4>Conditions</h4>
-            <div className="condition-form">
-              <div className="form-group">
-                <label>Question *</label>
-                <select
-                  className="form-control"
-                  value={currentQuestionId}
-                  onChange={(e) => {
-                    setCurrentQuestionId(e.target.value);
-                    setCurrentOperator('');
-                    setCurrentValue('');
-                  }}
-                >
-                  <option value="">Select Question</option>
-                  {questions.map(question => (
-                    <option key={question.id} value={question.id}>
-                      {question.questionName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {currentQuestionId && (
-                <>
-                  <div className="form-group">
-                    <label>Operator *</label>
-                    <select
-                      className="form-control"
-                      value={currentOperator}
-                      onChange={(e) => setCurrentOperator(e.target.value)}
-                    >
-                      <option value="">Select Operator</option>
-                      {handleOperatorOptions().map(op => (
-                        <option key={op} value={op}>{op}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Value *</label>
-                    {getValueInput()}
-                  </div>
-                </>
-              )}
-
-              <div className="form-buttons">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleAddCondition}
-                >
-                  {editingConditionIndex !== null ? 'Update Condition' : 'Add Condition'}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleClearConditionFields}
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-
-            {/* Current Conditions List */}
-            <div className="conditions-list">
-              {currentConditions.map((condition, index) => (
-                <div key={index} className="condition-item">
-                  <span>
-                    {questions.find(q => q.id === condition.questionId)?.questionName}
-                    {' '}{condition.operator}{' '}
-                    {condition.value}
-                  </span>
-                  <div className="condition-actions">
-                    <button
-                      onClick={() => handleEditCondition(index)}
-                      className="btn btn-sm btn-secondary"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCondition(index)}
-                      className="btn btn-sm btn-danger"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-buttons">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleAddRequirement}
-            >
-              {editingRequirementIndex !== null ? 'Update Requirement' : 'Add Requirement'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleClearRequirementFields}
-            >
-              Clear
-            </button>
-          </div>
+        )}
+        <div className="form-group">
+          <label htmlFor="benefitUrl">Benefit URL</label>
+          <input
+            type="text"
+            id="benefitUrl"
+            className="form-control"
+            value={benefitUrl}
+            onChange={(e) => setBenefitUrl(e.target.value)}
+          />
         </div>
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            className="form-control"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows="4"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="imageUrl">Image URL</label>
+          <input
+            type="text"
+            id="imageUrl"
+            className="form-control"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />
+          {imageUrl && (
+            <div className="img-preview">
+              <img
+                src={imageUrl}
+                alt="Benefit preview"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/api/placeholder/100/100';
+                }}
+              />
+            </div>
+          )}
+        </div>
+        <div className="form-buttons">
+          <button type="submit" className="btn btn-primary">
+            {editingBenefitIndex !== null ? 'Update Benefit' : 'Add Benefit'}
+          </button>
+          <button type="button" onClick={handleClearFields} className="btn btn-secondary">
+            Clear
+          </button>
+        </div>
+      </form>
 
-        {/* Requirements List */}
-        <div className="requirements-list">
+      {/* Requirements Section */}
+      <div className="requirement-section">
+        <h3>Requirements</h3>
+        <div className="form-group">
+          <label htmlFor="requirementName">Requirement Name</label>
+          <input
+            type="text"
+            id="requirementName"
+            className="form-control"
+            value={requirementName}
+            onChange={(e) => setRequirementName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="requirementType">Requirement Type</label>
+          <select
+            id="requirementType"
+            className="form-control"
+            value={requirementType}
+            onChange={(e) => setRequirementType(e.target.value)}
+          >
+            <option value="">Select Type</option>
+            <option value="GENERAL">General</option>
+            <option value="NECESSARY">Necessary</option>
+            <option value="INVALID">Invalid</option>
+            <option value="GENERAL_NECESSARY">General + Necessary</option>
+          </select>
+        </div>
+        <div className="form-buttons">
+          <button type="button" onClick={handleAddRequirement} className="btn btn-secondary">
+            {editingRequirementIndex !== null ? 'Update Requirement' : 'Add Requirement'}
+          </button>
+          <button type="button" onClick={handleClearRequirementFields} className="btn btn-secondary">
+            Clear
+          </button>
+        </div>
+        <ul className="requirement-list">
           {requirements.map((requirement, index) => (
-            <div key={index} className="requirement-item">
+            <li key={index}>
               <div className="requirement-header">
-                <h4>{requirement.name}</h4>
-                <span className="requirement-type">{requirement.type}</span>
+                <span>{requirement.name} - {requirement.type}</span>
+                <div className="requirement-buttons">
+                  <button onClick={() => handleEditRequirement(index)} className="btn btn-secondary">Edit</button>
+                  <button onClick={() => handleDeleteRequirement(index)} className="btn btn-danger">Delete</button>
+                </div>
               </div>
-              <div className="requirement-conditions">
-                {requirement.conditions.map((condition, condIndex) => (
-                  <div key={condIndex} className="condition-display">
-                    {questions.find(q => q.id === condition.questionId)?.questionName}
-                    {' '}{condition.operator}{' '}
-                    {condition.value}
-                  </div>
-                ))}
-              </div>
-
-              <div className="requirement-actions">
-                <button
-                  onClick={() => handleEditRequirement(index)}
-                  className="btn btn-sm btn-secondary"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteRequirement(index)}
-                  className="btn btn-sm btn-danger"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+              <ul className="condition-sublist">
+                {requirement.conditions.map((condition, i) => {
+                  const question = getQuestionById(condition.questionId);
+                  return (
+                    <li key={i}>
+                      {question ? `${question.questionName} ${condition.operator} ${condition.value}` : 'Invalid Question'}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
           ))}
+        </ul>
+      </div>
+
+      {/* Conditions Section */}
+      <div className="condition-section">
+        <h3>Conditions</h3>
+        <div className="form-group">
+          <label htmlFor="currentQuestionId">Question</label>
+          <select
+            id="currentQuestionId"
+            className="form-control"
+            value={currentQuestionId}
+            onChange={(e) => setCurrentQuestionId(e.target.value)}
+          >
+            <option value="">Select a question</option>
+            {questions.map((question) => (
+              <option key={question.id} value={question.id}>
+                {question.questionName}
+              </option>
+            ))}
+          </select>
         </div>
+        <div className="form-group">
+          <label htmlFor="currentOperator">Operator</label>
+          <select
+            id="currentOperator"
+            className="form-control"
+            value={currentOperator}
+            onChange={(e) => setCurrentOperator(e.target.value)}
+          >
+            <option value="">Select operator</option>
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+            <option value=">">&gt;</option>
+            <option value=">=">&gt;=</option>
+            <option value="<">&lt;</option>
+            <option value="<=">&lt;=</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="currentValue">Value</label>
+          <input
+            type="text"
+            id="currentValue"
+            className="form-control"
+            value={currentValue}
+            onChange={(e) => setCurrentValue(e.target.value)}
+          />
+          {getQuestionById(currentQuestionId)?.questionType === 'MULTI_CHOICE' && (
+            <small className="form-text text-muted">
+              For multiple choice questions, enter options separated by commas
+            </small>
+          )}
+        </div>
+        <div className="form-buttons">
+          <button type="button" onClick={handleAddCondition} className="btn btn-secondary">
+            {editingConditionIndex !== null ? 'Update Condition' : 'Add Condition'}
+          </button>
+          <button type="button" onClick={handleClearConditionFields} className="btn btn-secondary">
+            Clear
+          </button>
+        </div>
+        <ul className="condition-list">
+          {currentConditions.map((condition, index) => {
+            const question = getQuestionById(condition.questionId);
+            return (
+              <li key={index}>
+                <span>{question ? `${question.questionName} ${condition.operator} ${condition.value}` : 'Invalid Question'}</span>
+                <div className="condition-buttons">
+                  <button onClick={() => handleEditCondition(index)} className="btn btn-secondary">Edit</button>
+                  <button onClick={() => handleDeleteCondition(index)} className="btn btn-danger">Delete</button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       {/* Existing Benefits List */}
-      <div className="section existing-benefits">
-        <h3>Existing Benefits</h3>
-        <div className="benefits-grid">
-          {benefits.map((benefit, index) => (
-            <div key={benefit.id} className="benefit-card">
-              {benefit.imageUrl && (
-                <div className="benefit-image">
-                  <img
-                    src={benefit.imageUrl}
-                    alt={benefit.benefitName}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/placeholder-image.png';
-                    }}
-                  />
-                </div>
-              )}
-              <div className="benefit-content">
-                <h4>{benefit.benefitName}</h4>
-                <p className="benefit-scope">{benefit.federal ? 'Federal' : benefit.state}</p>
-                <div className="benefit-description">
-                  {benefit.description}
-                </div>
-                <div className="requirements-summary">
-                  <h5>Requirements:</h5>
-                  {benefit.requirements.map((req, reqIndex) => (
-                    <div key={reqIndex} className="requirement-summary">
-                      <span className={`requirement-type ${req.type.toLowerCase()}`}>
-                        {req.type}
-                      </span>
-                      {req.name}
-                    </div>
-                  ))}
-                </div>
-                <div className="benefit-actions">
-                  <a
-                    href={benefit.benefitUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-sm btn-link"
-                  >
-                    View Benefit
-                  </a>
-                  <button
-                    onClick={() => handleEditBenefit(index)}
-                    className="btn btn-sm btn-secondary"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteBenefit(benefit.id)}
-                    className="btn btn-sm btn-danger"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+      <h3>Existing Benefits</h3>
+      <ul className="benefit-list">
+        {benefits.map((benefit, index) => (
+          <li key={benefit.id}>
+            <span>{benefit.benefitName} - {benefit.federal ? 'Federal' : benefit.state}</span>
+            <div className="form-buttons">
+              <button onClick={() => handleEditBenefit(index)} className="btn btn-secondary">Edit</button>
+              <button onClick={() => handleDeleteBenefit(benefit.id)} className="btn btn-danger">Delete</button>
             </div>
-          ))}
-        </div>
-      </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
