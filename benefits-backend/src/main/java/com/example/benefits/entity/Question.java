@@ -23,16 +23,12 @@ public class Question {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
     @Column(name = "option_value")
-    private List<String> options; // Store options as a list of strings
+    private List<String> options;
 
     // Getters and Setters
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getQuestionName() {
@@ -66,5 +62,4 @@ public class Question {
     public void setOptions(List<String> options) {
         this.options = options;
     }
-
 }

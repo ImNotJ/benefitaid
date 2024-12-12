@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * REST controller for managing Question entities.
- */
 @RestController
 @RequestMapping("/api/questions")
 public class QuestionController {
@@ -37,7 +34,7 @@ public class QuestionController {
     public Question updateQuestion(@PathVariable Long id, @Valid @RequestBody Question updatedQuestion) {
         Question existingQuestion = questionService.getQuestionById(id);
         if (existingQuestion == null) {
-            throw new IllegalArgumentException("Question with ID " + id + " not found");
+            throw new RuntimeException("Question not found");
         }
 
         existingQuestion.setQuestionName(updatedQuestion.getQuestionName());
