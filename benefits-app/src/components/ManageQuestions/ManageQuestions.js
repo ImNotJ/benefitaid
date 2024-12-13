@@ -70,10 +70,6 @@ function ManageQuestions() {
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
 
-    if (!validateQuestion()) {
-      return;
-    }
-
     const questionData = {
       questionName,
       questionType,
