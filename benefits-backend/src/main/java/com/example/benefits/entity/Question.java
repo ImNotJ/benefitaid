@@ -1,21 +1,11 @@
 package com.example.benefits.entity;
 
-import java.util.ArrayList;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
-
-import org.springframework.data.annotation.Transient;
-
-/**
- * Entity class representing a Question.
- */
 @Entity
 public class Question {
 
@@ -27,13 +17,13 @@ public class Question {
     private String questionName;
 
     @NotBlank
-    private String questionType; // Text, Numerical, Date, Email, MultiChoiceSingle, MultiChoiceMulti
+    private String questionType;
 
     @NotBlank
     private String questionText;
-    
-    @Column(columnDefinition = "TEXT")
-    private String options;
+
+    @Column(name = "options")
+    private String options; // Store options as a comma-separated string
 
     // Getters and Setters
 
@@ -69,20 +59,11 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public String getOptions() {
-        return options;
+    public List<String> getOptions() {
+        return options == null ? null : Arrays.asList(options.split(","));
     }
 
-    public void setOptions(String options) {
-        this.options = options;
-    }
-
-    // Helper method to get options as list
-    @Transient
-    public List<String> getOptionsList() {
-        if (options == null || options.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(options.split(","));
+    public void setOptions(List<String> options) {
+        this.options = options == null ? null : String.join(",", options);
     }
 }
