@@ -27,8 +27,8 @@ public class Requirement {
     @CollectionTable(name = "requirement_conditions", joinColumns = @JoinColumn(name = "requirement_id"))
     private Set<Condition> conditions;
 
-    @ManyToOne
-    @JoinColumn(name = "benefit_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "benefit_id")
     @JsonBackReference
     private Benefit benefit;
 
