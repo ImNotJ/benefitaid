@@ -19,7 +19,7 @@ function UserForm() {
   const [showBenefits, setShowBenefits] = useState(false);
 
 
-  
+
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
@@ -75,32 +75,34 @@ function UserForm() {
     questions.forEach(question => {
       const response = responses[question.id];
 
-      if (question.required && (!response || response.trim() === '')) {
-        newErrors[question.id] = 'This field is required';
-        isValid = false;
-      }
-
-      switch (question.questionType) {
-        case 'Email':
-          if (response && !isValidEmail(response)) {
-            newErrors[question.id] = 'Please enter a valid email address';
-            isValid = false;
-          }
-          break;
-        case 'Date':
-          if (response && !formatDate(response)) {
-            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
-            isValid = false;
-          }
-          break;
-        case 'Numerical':
-          if (response && isNaN(Number(response))) {
-            newErrors[question.id] = 'Please enter a valid number';
-            isValid = false;
-          }
-          break;
-        default:
-          break;
+      // Only proceed with validation if there's a response
+      if (response && response.trim() !== '') {
+        switch (question.questionType) {
+          case 'Email':
+            if (!isValidEmail(response)) {
+              newErrors[question.id] = 'Please enter a valid email address';
+              isValid = false;
+            }
+            break;
+          case 'Date':
+            if (!formatDate(response)) {
+              newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
+              isValid = false;
+            }
+            break;
+          case 'Numerical':
+            if (isNaN(Number(response))) {
+              newErrors[question.id] = 'Please enter a valid number';
+              isValid = false;
+            }
+            break;
+          // For multiple choice questions, no additional validation needed
+          // as the input is controlled by radio buttons or checkboxes
+          case 'MultiChoiceSingle':
+          case 'MultiChoiceMulti':
+          default:
+            break;
+        }
       }
     });
 
@@ -187,7 +189,8 @@ function UserForm() {
               <div className="form-group" key={question.id}>
                 <label htmlFor={`question-${question.id}`}>
                   {question.questionText}
-                  {question.required && <span className="required">*</span>}
+                  {/* Only show required indicator if the question is explicitly marked as required */}
+                  {question.required === true && <span className="required">*</span>}
                 </label>
 
                 <QuestionInput
