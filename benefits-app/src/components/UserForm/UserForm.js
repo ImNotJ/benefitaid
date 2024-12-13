@@ -23,10 +23,10 @@ function UserForm() {
         email: 'random@example.com',
         password: 'randomPassword123'
       };
-
+  
       // Perform login
       await axios.post('/api/users/login', loginPayload);
-
+      
       // After successful login, fetch quizzes
       const response = await axios.get('/api/quizzes');
       setQuizzes(response.data);
@@ -44,11 +44,11 @@ function UserForm() {
       }
     }
   };
-
+  
   // Also update useEffect to handle any cleanup
   useEffect(() => {
     fetchQuizzes();
-
+    
     // Cleanup function
     return () => {
       // Clear any states if needed when component unmounts
