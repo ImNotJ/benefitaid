@@ -159,7 +159,7 @@ function ManageQuestions() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="questionType">Question Type blarh</label>
+          <label htmlFor="questionType">Question Type</label>
           <select
             id="questionType"
             className="form-control"
