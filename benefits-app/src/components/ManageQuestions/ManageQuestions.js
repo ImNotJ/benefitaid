@@ -41,20 +41,20 @@ function ManageQuestions() {
     setOptions(newOptions);
   };
 
-  // const validateQuestion = () => {
-  //   if (!questionName || !questionType || !questionText) {
-  //     setErrorMessage('Name, type, and text are required.');
-  //     return false;
-  //   }
-  //   if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
-  //     const validOptions = options.filter(opt => opt.trim() !== '');
-  //     if (validOptions.length < 2) {
-  //       setErrorMessage('Multi-choice questions require at least 2 options.');
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // };
+  const validateQuestion = () => {
+    if (!questionName || !questionType || !questionText) {
+      setErrorMessage('Name, type, and text are required.');
+      return false;
+    }
+    if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
+      const validOptions = options.filter(opt => opt.trim() !== '');
+      if (validOptions.length < 2) {
+        setErrorMessage('Multi-choice questions require at least 2 options.');
+        return false;
+      }
+    }
+    return true;
+  };
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
