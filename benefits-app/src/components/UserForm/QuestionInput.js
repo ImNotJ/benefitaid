@@ -71,49 +71,49 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
         />
       );
 
-    case 'MultiChoiceSingle':
-      return (
-        <div className="form-control radio-group">
-          {question.options?.split(',').map((option) => (
-            <div key={option} className="radio-option">
-              <input
-                type="radio"
-                id={`${question.id}-${option}`}
-                name={`question-${question.id}`}
-                value={option}
-                checked={value === option}
-                onChange={(e) => onChange(question.id, e.target.value)}
-              />
-              <label htmlFor={`${question.id}-${option}`}>{option.trim()}</label>
-            </div>
-          ))}
-        </div>
-      );
-
-    case 'MultiChoiceMulti':
-      const selectedOptions = value ? value.split(',') : [];
-      return (
-        <div className="form-control checkbox-group">
-          {question.options?.split(',').map((option) => (
-            <div key={option} className="checkbox-option">
-              <input
-                type="checkbox"
-                id={`${question.id}-${option}`}
-                value={option}
-                checked={selectedOptions.includes(option.trim())}
-                onChange={(e) => {
-                  const option = e.target.value;
-                  const newSelected = e.target.checked
-                    ? [...selectedOptions, option]
-                    : selectedOptions.filter(item => item !== option);
-                  handleMultiChoiceChange(newSelected);
-                }}
-              />
-              <label htmlFor={`${question.id}-${option}`}>{option.trim()}</label>
-            </div>
-          ))}
-        </div>
-      );
+      case 'MultiChoiceSingle':
+        return (
+          <div className="form-control radio-group">
+            {typeof question.options === 'string' && question.options.split(',').map((option) => (
+              <div key={option} className="radio-option">
+                <input
+                  type="radio"
+                  id={`${question.id}-${option}`}
+                  name={`question-${question.id}`}
+                  value={option}
+                  checked={value === option}
+                  onChange={(e) => onChange(question.id, e.target.value)}
+                />
+                <label htmlFor={`${question.id}-${option}`}>{option.trim()}</label>
+              </div>
+            ))}
+          </div>
+        );
+      
+      case 'MultiChoiceMulti':
+        const selectedOptions = value ? value.split(',') : [];
+        return (
+          <div className="form-control checkbox-group">
+            {typeof question.options === 'string' && question.options.split(',').map((option) => (
+              <div key={option} className="checkbox-option">
+                <input
+                  type="checkbox"
+                  id={`${question.id}-${option}`}
+                  value={option}
+                  checked={selectedOptions.includes(option.trim())}
+                  onChange={(e) => {
+                    const option = e.target.value;
+                    const newSelected = e.target.checked
+                      ? [...selectedOptions, option]
+                      : selectedOptions.filter(item => item !== option);
+                    handleMultiChoiceChange(newSelected);
+                  }}
+                />
+                <label htmlFor={`${question.id}-${option}`}>{option.trim()}</label>
+              </div>
+            ))}
+          </div>
+        );
 
     default:
       return (
