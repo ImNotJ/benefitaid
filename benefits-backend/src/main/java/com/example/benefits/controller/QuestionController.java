@@ -47,7 +47,13 @@ public class QuestionController {
      */
     @GetMapping
     public List<Question> getAllQuestions() {
-        return questionService.getAllQuestions();
+        List<Question> questions = questionService.getAllQuestions();
+        System.out.println("Returning questions: " + questions.size());
+        questions.forEach(q -> {
+            System.out.println("Question: " + q.getQuestionName());
+            System.out.println("Options: " + q.getOptions().size());
+        });
+        return questions;
     }
 
     /**
