@@ -3,17 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import './ManageQuestions.css';
 
-/**
- * ManageQuestions component for handling the management of questions.
- *
- * @returns {React.ReactNode} The rendered component.
- */
 function ManageQuestions() {
   const [questions, setQuestions] = useState([]);
   const [questionName, setQuestionName] = useState('');
   const [questionType, setQuestionType] = useState('');
   const [questionText, setQuestionText] = useState('');
-  const [options, setOptions] = useState(['']); // Array for multi-choice options
+  const [options, setOptions] = useState(''); // New state for multi-choice options
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,85 +18,52 @@ function ManageQuestions() {
     fetchQuestions();
   }, []);
 
-  /**
-   * Fetches the questions from the API.
-   */
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Fetch questions response:', response); // Debug log
       setQuestions(response.data);
     } catch (error) {
-      console.error('Fetch questions error:', error); // Debug log
+      console.error('Error fetching questions:', error);
     }
-  };
-
-  /**
-   * Handles the addition or update of a question.
-   *
-   * @param {Event} e - The form submit event.
-   */
-  const handleAddOption = () => {
-    setOptions([...options, '']);
-  };
-
-  const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index);
-    setOptions(newOptions);
-  };
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const validateQuestion = () => {
-    if (!questionName || !questionType || !questionText) {
-      setErrorMessage('Name, type, and text are required.');
-      return false;
-    }
-
-    if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
-      const validOptions = options.filter(opt => opt.trim() !== '');
-      if (validOptions.length < 2) {
-        setErrorMessage('Multi-choice questions require at least 2 options.');
-        return false;
-      }
-    }
-
-    return true;
   };
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
 
-    if (!validateQuestion()) {
+    if (!questionName || !questionType || !questionText) {
+      setErrorMessage('All fields are required.');
+      setSuccessMessage('');
       return;
     }
 
-    const questionData = {
+    // Validate that options are provided for multi-choice questions
+    if (questionType === 'MULTI_CHOICE' && !options) {
+      setErrorMessage('Options are required for multi-choice questions.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const newQuestion = {
       questionName,
       questionType,
       questionText,
-      options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '').join(',')
-        : null
+      options: questionType === 'MULTI_CHOICE' ? options : null
     };
 
     try {
       if (editingQuestionId) {
-        await axios.put(`/api/questions/${editingQuestionId}`, questionData);
+        await axios.put(`/api/questions/${editingQuestionId}`, newQuestion);
         setSuccessMessage('Question updated successfully!');
       } else {
-        await axios.post('/api/questions', questionData);
+        await axios.post('/api/questions', newQuestion);
         setSuccessMessage('Question added successfully!');
       }
-
       fetchQuestions();
       handleClearFields();
+      setErrorMessage('');
     } catch (error) {
-      setErrorMessage('Failed to save question: ' + (error.response?.data?.message || error.message));
+      setErrorMessage('Failed to add or update question.');
+      setSuccessMessage('');
     }
   };
 
@@ -109,56 +71,39 @@ function ManageQuestions() {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(question.options ? question.options.split(',') : ['']);
+    setOptions(question.options || '');
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
   };
 
-
-  /**
-   * Handles the deletion of a question.
-   *
-   * @param {string} id - The ID of the question to delete.
-   */
   const handleDeleteQuestion = async (id) => {
     try {
-      const response = await axios.delete(`/api/questions/${id}`);
-      console.log('Delete question response:', response); // Debug log
+      await axios.delete(`/api/questions/${id}`);
       fetchQuestions();
       setSuccessMessage('Question deleted successfully!');
       setErrorMessage('');
     } catch (error) {
-      console.error('Delete question error:', error); // Debug log
       setErrorMessage('Failed to delete question.');
       setSuccessMessage('');
     }
   };
 
-  /**
-   * Handles navigation back to the admin dashboard.
-   */
   const handleBackToDashboard = () => {
     navigate('/admin-dashboard');
   };
 
-  /**
-   * Handles the logout process.
-   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/admin-login');
   };
 
-  /**
-   * Clears all input fields.
-   */
   const handleClearFields = () => {
     setQuestionName('');
     setQuestionType('');
     setQuestionText('');
-    setOptions(['']);
+    setOptions('');
     setEditingQuestionId(null);
     setSuccessMessage('');
     setErrorMessage('');
@@ -174,13 +119,10 @@ function ManageQuestions() {
           Logout
         </button>
       </div>
-
       <h2>Manage Questions</h2>
-
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-
-      <form onSubmit={handleAddOrUpdateQuestion} className="question-form">
+      <form onSubmit={handleAddOrUpdateQuestion}>
         <div className="form-group">
           <label htmlFor="questionName">Question Name</label>
           <input
@@ -191,30 +133,22 @@ function ManageQuestions() {
             onChange={(e) => setQuestionName(e.target.value)}
           />
         </div>
-
         <div className="form-group">
           <label htmlFor="questionType">Question Type</label>
           <select
             id="questionType"
             className="form-control"
             value={questionType}
-            onChange={(e) => {
-              setQuestionType(e.target.value);
-              if (!['MultiChoiceSingle', 'MultiChoiceMulti'].includes(e.target.value)) {
-                setOptions(['']);
-              }
-            }}
+            onChange={(e) => setQuestionType(e.target.value)}
           >
-            <option value="">Select Type</option>
-            <option value="Text">Text</option>
-            <option value="Numerical">Numerical</option>
-            <option value="Date">Date</option>
-            <option value="Email">Email</option>
-            <option value="MultiChoiceSingle">Multiple Choice (Single Select)</option>
-            <option value="MultiChoiceMulti">Multiple Choice (Multi Select)</option>
+            <option value="">Select</option>
+            <option value="TEXT">Text</option>
+            <option value="NUMERICAL">Numerical</option>
+            <option value="DATE">Date (MM/DD/YYYY)</option>
+            <option value="EMAIL">Email</option>
+            <option value="MULTI_CHOICE">Multiple Choice</option>
           </select>
         </div>
-
         <div className="form-group">
           <label htmlFor="questionText">Question Text</label>
           <input
@@ -225,41 +159,22 @@ function ManageQuestions() {
             onChange={(e) => setQuestionText(e.target.value)}
           />
         </div>
-
-        {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType) && (
+        {questionType === 'MULTI_CHOICE' && (
           <div className="form-group">
-            <label>Options</label>
-            <div className="options-container">
-              {options.map((option, index) => (
-                <div key={index} className="option-row">
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={option}
-                    onChange={(e) => handleOptionChange(index, e.target.value)}
-                    placeholder={`Option ${index + 1}`}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleRemoveOption(index)}
-                    disabled={options.length <= 1}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={handleAddOption}
-              >
-                Add Option
-              </button>
-            </div>
+            <label htmlFor="options">Options (comma-separated)</label>
+            <input
+              type="text"
+              id="options"
+              className="form-control"
+              value={options}
+              onChange={(e) => setOptions(e.target.value)}
+              placeholder="Option1,Option2,Option3"
+            />
+            <small className="form-text text-muted">
+              Enter options separated by commas. Example: Yes,No,Maybe
+            </small>
           </div>
         )}
-
         <div className="form-buttons">
           <button type="submit" className="btn btn-primary">
             {editingQuestionId ? 'Update Question' : 'Add Question'}
@@ -269,50 +184,24 @@ function ManageQuestions() {
           </button>
         </div>
       </form>
-
-      <div className="questions-list">
-        <h3>Existing Questions</h3>
-        <div className="table-responsive">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Question</th>
-                <th>Options</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {questions.map((question) => (
-                <tr key={question.id}>
-                  <td>{question.questionName}</td>
-                  <td>{question.questionType}</td>
-                  <td>{question.questionText}</td>
-                  <td>
-                    {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      question.options?.split(',').join(', ')}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleEditQuestion(question)}
-                      className="btn btn-secondary btn-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteQuestion(question.id)}
-                      className="btn btn-danger btn-sm"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ul className="question-list">
+        {questions.map((question) => (
+          <li key={question.id}>
+            <div className="question-info">
+              <span>{question.id}: {question.questionName}</span>
+              {question.questionType === 'MULTI_CHOICE' && (
+                <small className="options-display">
+                  Options: {question.options}
+                </small>
+              )}
+            </div>
+            <div className="question-buttons">
+              <button onClick={() => handleEditQuestion(question)} className="btn btn-secondary">Edit</button>
+              <button onClick={() => handleDeleteQuestion(question.id)} className="btn btn-danger">Delete</button>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
