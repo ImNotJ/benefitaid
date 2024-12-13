@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import QuestionInput from './QuestionInput';
 import { isValidEmail, formatDate } from '../../utils/validation';
