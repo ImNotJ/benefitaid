@@ -1,70 +1,128 @@
-    package com.example.benefits.entity;
+package com.example.benefits.entity;
 
-    import javax.persistence.*;
-    import javax.validation.constraints.NotBlank;
-    import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    @Entity
-    public class Question {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+import org.springframework.data.annotation.Transient;
 
-        @NotBlank
-        private String questionName;
+/**
+ * Entity class representing a Question.
+ */
+@Entity
+public class Question {
 
-        @NotBlank
-        private String questionType;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @NotBlank
-        private String questionText;
+    @NotBlank
+    private String questionName;
 
-        @ElementCollection
-        @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
-        @Column(name = "option_value")
-        private List<String> options; // Store options as a list of strings
+    @NotBlank
+    private String questionType; // Text, Numerical, Date, Email, MultiChoiceSingle, MultiChoiceMulti
 
-        // Getters and Setters
+    @NotBlank
+    private String questionText;
+    
+    @Column(columnDefinition = "TEXT")
+    private String options;
 
-        public Long getId() {
-            return id;
-        }
+    // Getters and Setters
 
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getQuestionName() {
-            return questionName;
-        }
-
-        public void setQuestionName(String questionName) {
-            this.questionName = questionName;
-        }
-
-        public String getQuestionType() {
-            return questionType;
-        }
-
-        public void setQuestionType(String questionType) {
-            this.questionType = questionType;
-        }
-
-        public String getQuestionText() {
-            return questionText;
-        }
-
-        public void setQuestionText(String questionText) {
-            this.questionText = questionText;
-        }
-
-        public List<String> getOptions() {
-            return options;
-        }
-
-        public void setOptions(List<String> options) {
-            this.options = options;
-        }
-
+    /**
+     * Gets the ID of the question.
+     *
+     * @return the ID of the question
+     */
+    public Long getId() {
+        return id;
     }
+
+    /**
+     * Sets the ID of the question.
+     *
+     * @param id the ID to set
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * Gets the name of the question.
+     *
+     * @return the name of the question
+     */
+    public String getQuestionName() {
+        return questionName;
+    }
+
+    /**
+     * Sets the name of the question.
+     *
+     * @param questionName the name to set
+     */
+    public void setQuestionName(String questionName) {
+        this.questionName = questionName;
+    }
+
+    /**
+     * Gets the type of the question.
+     *
+     * @return the type of the question
+     */
+    public String getQuestionType() {
+        return questionType;
+    }
+
+    /**
+     * Sets the type of the question.
+     *
+     * @param questionType the type to set
+     */
+    public void setQuestionType(String questionType) {
+        this.questionType = questionType;
+    }
+
+    /**
+     * Gets the text of the question.
+     *
+     * @return the text of the question
+     */
+    public String getQuestionText() {
+        return questionText;
+    }
+
+    /**
+     * Sets the text of the question.
+     *
+     * @param questionText the text to set
+     */
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
+    // Helper method to get options as list
+    @Transient
+    public List<String> getOptionsList() {
+        if (options == null || options.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(options.split(","));
+    }
+}
