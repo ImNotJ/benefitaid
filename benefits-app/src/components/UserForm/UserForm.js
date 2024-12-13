@@ -18,6 +18,10 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
   const fetchQuizzes = async () => {
     try {
       const response = await axios.get('/api/quizzes');
@@ -25,96 +29,6 @@ function UserForm() {
     } catch (error) {
       console.error('Error fetching quizzes:', error);
       setErrorMessage('Failed to load quizzes. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    fetchQuizzes();
-  }, []);
-
-  const handleInputChange = (questionId, value) => {
-    setResponses(prev => ({
-      ...prev,
-      [questionId]: value
-    }));
-  };
-
-  const handleError = (questionId, error) => {
-    setErrors(prev => ({
-      ...prev,
-      [questionId]: error
-    }));
-  };
-
-  const validateResponses = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    questions.forEach(question => {
-      const response = responses[question.id];
-      
-      if (question.required && (!response || response.trim() === '')) {
-        newErrors[question.id] = 'This field is required';
-        isValid = false;
-      }
-      
-      switch (question.questionType) {
-        case 'Email':
-          if (response && !isValidEmail(response)) {
-            newErrors[question.id] = 'Please enter a valid email address';
-            isValid = false;
-          }
-          break;
-        case 'Date':
-          if (response && !formatDate(response)) {
-            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
-            isValid = false;
-          }
-          break;
-        case 'Numerical':
-          if (response && isNaN(Number(response))) {
-            newErrors[question.id] = 'Please enter a valid number';
-            isValid = false;
-          }
-          break;
-        default:
-          break;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateResponses()) {
-      setErrorMessage('Please correct the errors before submitting');
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage('');
-    setSuccessMessage('');
-
-    try {
-      const response = await axios.post('/api/eligibility/check', {
-        responses,
-        quizId: selectedQuiz.id
-      });
-
-      const eligibleBenefits = response.data;
-      setEligibilityResults(eligibleBenefits);
-      setSuccessMessage('Eligibility check completed successfully!');
-      
-      // Scroll to results
-      document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-      console.error('Error checking eligibility:', error);
-      setErrorMessage('Failed to check eligibility. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -155,6 +69,96 @@ function UserForm() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/user-login');
+  };
+
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const handleInputChange = (questionId, value) => {
+    setResponses(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+
+  const handleError = (questionId, error) => {
+    setErrors(prev => ({
+      ...prev,
+      [questionId]: error
+    }));
+  };
+
+  const validateResponses = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    questions.forEach(question => {
+      const response = responses[question.id];
+
+      if (question.required && (!response || response.trim() === '')) {
+        newErrors[question.id] = 'This field is required';
+        isValid = false;
+      }
+
+      switch (question.questionType) {
+        case 'Email':
+          if (response && !isValidEmail(response)) {
+            newErrors[question.id] = 'Please enter a valid email address';
+            isValid = false;
+          }
+          break;
+        case 'Date':
+          if (response && !formatDate(response)) {
+            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
+            isValid = false;
+          }
+          break;
+        case 'Numerical':
+          if (response && isNaN(Number(response))) {
+            newErrors[question.id] = 'Please enter a valid number';
+            isValid = false;
+          }
+          break;
+        default:
+          break;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateResponses()) {
+      setErrorMessage('Please correct the errors before submitting');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const response = await axios.post('/api/eligibility/check', {
+        responses,
+        quizId: selectedQuiz.id
+      });
+
+      const eligibleBenefits = response.data;
+      setEligibilityResults(eligibleBenefits);
+      setSuccessMessage('Eligibility check completed successfully!');
+
+      // Scroll to results
+      document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+      console.error('Error checking eligibility:', error);
+      setErrorMessage('Failed to check eligibility. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
