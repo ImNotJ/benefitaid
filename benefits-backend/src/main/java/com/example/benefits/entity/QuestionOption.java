@@ -2,6 +2,8 @@ package com.example.benefits.entity;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "question_options")
 public class QuestionOption {
@@ -13,8 +15,9 @@ public class QuestionOption {
     @Column(name = "option_value")
     private String optionValue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "question_id")
+    @JsonBackReference
     private Question question;
 
     // Getters and Setters

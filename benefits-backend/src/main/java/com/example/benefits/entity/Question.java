@@ -2,6 +2,9 @@ package com.example.benefits.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.util.List;
 
 @Entity
@@ -21,6 +24,7 @@ public class Question {
     private String questionText;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<QuestionOption> options;
 
     // Getters and Setters
