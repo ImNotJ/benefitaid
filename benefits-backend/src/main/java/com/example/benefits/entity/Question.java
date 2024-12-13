@@ -110,6 +110,8 @@ public class Question {
     }
 
     public List<QuestionOption> getOptions() {
+        System.out.println("Getting options for question: " + this.questionName 
+            + ", count: " + (options != null ? options.size() : 0));
         return options;
     }
 

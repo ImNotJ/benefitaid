@@ -54,7 +54,7 @@ public class QuestionService {
      * @return a list of all question entities
      */
     public List<Question> getAllQuestions() {
-        return questionRepository.findAll();
+        return questionRepository.findAllWithOptions();
     }
 
     /**
