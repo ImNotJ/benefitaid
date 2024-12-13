@@ -20,6 +20,14 @@ function ManageQuestions() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await axios.get('/api/questions');
+        setQuestions(response.data);
+      } catch (error) {
+        console.error('Fetch questions error:', error);
+      }
+    };
     fetchQuestions();
   }, []);
 
@@ -61,7 +69,6 @@ function ManageQuestions() {
       setErrorMessage('Name, type, and text are required.');
       return false;
     }
-
     if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
       const validOptions = options.filter(opt => opt.trim() !== '');
       if (validOptions.length < 2) {
@@ -69,7 +76,6 @@ function ManageQuestions() {
         return false;
       }
     }
-
     return true;
   };
 
@@ -97,13 +103,20 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-
-      fetchQuestions();
-      handleClearFields();
+      setQuestionName('');
+      setQuestionType('');
+      setQuestionText('');
+      setOptions(['']);
+      setEditingQuestionId(null);
+      setErrorMessage('');
+      const response = await axios.get('/api/questions');
+      setQuestions(response.data);
     } catch (error) {
-      setErrorMessage('Failed to save question: ' + (error.response?.data?.message || error.message));
+      console.error('Save question error:', error);
+      setErrorMessage('Failed to save question.');
     }
   };
+
 
   const handleEditQuestion = (question) => {
     setQuestionName(question.questionName);
@@ -231,22 +244,14 @@ function ManageQuestions() {
             <label>Options</label>
             <div className="options-container">
               {options.map((option, index) => (
-                <div key={index} className="option-row">
+                <div key={index} className="option-item">
                   <input
                     type="text"
                     className="form-control"
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
-                    placeholder={`Option ${index + 1}`}
                   />
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleRemoveOption(index)}
-                    disabled={options.length <= 1}
-                  >
-                    Remove
-                  </button>
+                  <button type="button" onClick={() => handleRemoveOption(index)}>Remove</button>
                 </div>
               ))}
               <button
