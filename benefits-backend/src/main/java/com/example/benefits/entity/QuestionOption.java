@@ -1,7 +1,6 @@
 package com.example.benefits.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "question_options")
@@ -11,7 +10,6 @@ public class QuestionOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(name = "option_value")
     private String optionValue;
 
