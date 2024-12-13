@@ -1,7 +1,6 @@
 package com.example.benefits.service;
 
 import com.example.benefits.entity.Question;
-import com.example.benefits.entity.QuestionOption;
 import com.example.benefits.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,6 @@ public class QuestionService {
     private QuestionRepository questionRepository;
 
     public Question saveQuestion(Question question) {
-        for (QuestionOption option : question.getOptions()) {
-            option.setQuestion(question);
-        }
         return questionRepository.save(question);
     }
 

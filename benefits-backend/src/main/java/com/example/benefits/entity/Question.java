@@ -20,8 +20,10 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<QuestionOption> options;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "option_value")
+    private List<String> options;
 
     // Getters and Setters
 
@@ -53,11 +55,11 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public List<QuestionOption> getOptions() {
+    public List<String> getOptions() {
         return options;
     }
 
-    public void setOptions(List<QuestionOption> options) {
+    public void setOptions(List<String> options) {
         this.options = options;
     }
 }
