@@ -29,31 +29,25 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Fetch questions response:', response); // Debug log
       setQuestions(response.data);
     } catch (error) {
-      console.error('Fetch questions error:', error); // Debug log
+      console.error('Error fetching questions:', error);
     }
   };
 
-  /**
-   * Handles the addition or update of a question.
-   *
-   * @param {Event} e - The form submit event.
-   */
   const handleAddOption = () => {
     setOptions([...options, '']);
   };
 
   const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index);
-    setOptions(newOptions);
+    const updatedOptions = options.filter((_, i) => i !== index);
+    setOptions(updatedOptions);
   };
 
   const handleOptionChange = (index, value) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
+    const updatedOptions = [...options];
+    updatedOptions[index] = value;
+    setOptions(updatedOptions);
   };
 
   const validateQuestion = () => {
@@ -76,40 +70,34 @@ function ManageQuestions() {
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
 
-    if (!validateQuestion()) {
-      return;
-    }
-
     const questionData = {
       questionName,
       questionType,
       questionText,
-      options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '').join(',')
-        : null
+      optionsList: options.filter((opt) => opt.trim() !== ''),
     };
 
     try {
       if (editingQuestionId) {
+        // Update existing question
         await axios.put(`/api/questions/${editingQuestionId}`, questionData);
-        setSuccessMessage('Question updated successfully!');
       } else {
+        // Create new question
         await axios.post('/api/questions', questionData);
-        setSuccessMessage('Question added successfully!');
       }
-
       fetchQuestions();
       handleClearFields();
     } catch (error) {
-      setErrorMessage('Failed to save question: ' + (error.response?.data?.message || error.message));
+      console.error('Error saving question:', error);
     }
   };
 
   const handleEditQuestion = (question) => {
+    setEditingQuestionId(question.id);
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(question.options ? question.options.split(',') : ['']);
+    setOptions(question.optionsList || ['']);
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
