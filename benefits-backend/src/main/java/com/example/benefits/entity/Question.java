@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.data.annotation.Transient;
@@ -32,8 +34,8 @@ public class Question {
     @NotBlank
     private String questionText;
     
-    @Column(columnDefinition = "TEXT")
-    private String options;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuestionOption> options = new ArrayList<>();
 
     // Getters and Setters
 
@@ -109,20 +111,14 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public String getOptions() {
+    public List<QuestionOption> getOptions() {
         return options;
     }
 
-    public void setOptions(String options) {
-        this.options = options;
-    }
-
-    // Helper method to get options as list
-    @Transient
-    public List<String> getOptionsList() {
-        if (options == null || options.trim().isEmpty()) {
-            return new ArrayList<>();
+    public void setOptions(List<QuestionOption> options) {
+        this.options.clear();
+        if (options != null) {
+            this.options.addAll(options);
         }
-        return Arrays.asList(options.split(","));
     }
 }
