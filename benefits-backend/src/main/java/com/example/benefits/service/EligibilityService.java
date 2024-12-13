@@ -51,7 +51,7 @@ public class EligibilityService {
             return false;
         }
 
-        // Check NECESSARY requirements - must meet all of these
+        // Check NECESSARY requirements - all must be met
         boolean meetsAllNecessary = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.NECESSARY)
             .allMatch(req -> meetsRequirement(req, responses, questionMap));
@@ -60,31 +60,34 @@ public class EligibilityService {
             return false;
         }
 
-        // Check GENERAL_NECESSARY requirements - must meet all of these as well
-        boolean hasGeneralNecessary = benefit.getRequirements().stream()
-            .anyMatch(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY);
+        // Check GENERAL_NECESSARY requirements - all must be met
+        List<Requirement> generalNecessaryReqs = benefit.getRequirements().stream()
+            .filter(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY)
+            .collect(Collectors.toList());
 
-        if (hasGeneralNecessary) {
-            boolean meetsAllGeneralNecessary = benefit.getRequirements().stream()
-                .filter(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY)
+        if (!generalNecessaryReqs.isEmpty()) {
+            boolean meetsAllGeneralNecessary = generalNecessaryReqs.stream()
                 .allMatch(req -> meetsRequirement(req, responses, questionMap));
-
-            if (!meetsAllGeneralNecessary) {
-                return false;
+            
+            // If meets all GENERAL_NECESSARY, user is eligible regardless of GENERAL requirements
+            if (meetsAllGeneralNecessary) {
+                return true;
             }
         }
 
-        // Check GENERAL requirements - must meet at least one if they exist
-        boolean hasGeneral = benefit.getRequirements().stream()
-            .anyMatch(req -> req.getType() == Requirement.RequirementType.GENERAL);
+        // If no GENERAL_NECESSARY requirements exist or they weren't all met,
+        // check if at least one GENERAL requirement is met
+        List<Requirement> generalReqs = benefit.getRequirements().stream()
+            .filter(req -> req.getType() == Requirement.RequirementType.GENERAL)
+            .collect(Collectors.toList());
 
-        if (!hasGeneral) {
-            return true; // If no general requirements and passed all other checks
+        if (generalReqs.isEmpty()) {
+            // If no GENERAL requirements and we've passed all other checks, user is eligible
+            return true;
         }
 
-        // Must meet at least one GENERAL requirement if they exist
-        return benefit.getRequirements().stream()
-            .filter(req -> req.getType() == Requirement.RequirementType.GENERAL)
+        // Must meet at least one GENERAL requirement
+        return generalReqs.stream()
             .anyMatch(req -> meetsRequirement(req, responses, questionMap));
     }
 
