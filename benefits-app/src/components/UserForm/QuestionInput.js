@@ -7,25 +7,27 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     const newValue = e.target.value;
     let error = null;
 
-    // Frontend validation based on question type
-    switch (question.questionType) {
-      case 'Email':
-        if (newValue && !isValidEmail(newValue)) {
-          error = 'Please enter a valid email address';
-        }
-        break;
-      case 'Date':
-        if (newValue && !formatDate(newValue)) {
-          error = 'Please enter a date in MM/DD/YYYY format';
-        }
-        break;
-      case 'Numerical':
-        if (newValue && isNaN(Number(newValue))) {
-          error = 'Please enter a valid number';
-        }
-        break;
-      default:
-        break;
+    // Only validate if there's a value - all fields are optional
+    if (newValue) {
+      switch (question.questionType) {
+        case 'Email':
+          if (!isValidEmail(newValue)) {
+            error = 'Please enter a valid email address';
+          }
+          break;
+        case 'Date':
+          if (!formatDate(newValue)) {
+            error = 'Please enter a date in MM/DD/YYYY format';
+          }
+          break;
+        case 'Numerical':
+          if (isNaN(Number(newValue))) {
+            error = 'Please enter a valid number';
+          }
+          break;
+        default:
+          break;
+      }
     }
 
     onChange(question.id, newValue);
@@ -74,6 +76,17 @@ const QuestionInput = ({ question, value, onChange, onError }) => {
     case 'MultiChoiceSingle':
       return (
         <div className="form-control radio-group">
+          <div className="radio-option">
+            <input
+              type="radio"
+              id={`${question.id}-none`}
+              name={`question-${question.id}`}
+              value=""
+              checked={!value}
+              onChange={(e) => onChange(question.id, '')}
+            />
+            <label htmlFor={`${question.id}-none`}>No Answer</label>
+          </div>
           {question.options?.split(',').map((option) => (
             <div key={option} className="radio-option">
               <input
