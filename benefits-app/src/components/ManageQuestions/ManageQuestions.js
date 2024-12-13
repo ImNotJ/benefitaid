@@ -23,7 +23,7 @@ function ManageQuestions() {
       const response = await axios.get('/api/questions');
       setQuestions(response.data);
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error('Fetch questions error:', error);
     }
   };
 
@@ -32,7 +32,8 @@ function ManageQuestions() {
   };
 
   const handleRemoveOption = (index) => {
-    setOptions(options.filter((_, i) => i !== index));
+    const newOptions = options.filter((_, i) => i !== index);
+    setOptions(newOptions);
   };
 
   const handleOptionChange = (index, value) => {
@@ -58,28 +59,38 @@ function ManageQuestions() {
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
-  
-    // Collect question data
+
+    if (!validateQuestion()) {
+      return;
+    }
+
     const questionData = {
       questionName,
       questionType,
       questionText,
-      options,
+      options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
+        ? options.filter(opt => opt.trim() !== '')
+        : []
     };
-  
+
     try {
       if (editingQuestionId) {
-        // Update existing question
         await axios.put(`/api/questions/${editingQuestionId}`, questionData);
+        setSuccessMessage('Question updated successfully!');
       } else {
-        // Create new question
         await axios.post('/api/questions', questionData);
+        setSuccessMessage('Question added successfully!');
       }
-      // Reload questions and reset form
+      setQuestionName('');
+      setQuestionType('');
+      setQuestionText('');
+      setOptions(['']);
+      setEditingQuestionId(null);
+      setErrorMessage('');
       fetchQuestions();
-      handleClearFields();
     } catch (error) {
-      console.error('Error saving question:', error);
+      console.error('Save question error:', error);
+      setErrorMessage('Failed to save question.');
     }
   };
 
@@ -199,16 +210,23 @@ function ManageQuestions() {
             <label>Options</label>
             <div className="options-container">
               {options.map((option, index) => (
-                <div key={index}>
+                <div key={index} className="option-item">
                   <input
                     type="text"
+                    className="form-control"
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                   />
                   <button type="button" onClick={() => handleRemoveOption(index)}>Remove</button>
                 </div>
               ))}
-              <button type="button" onClick={handleAddOption}>Add Option</button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleAddOption}
+              >
+                Add Option
+              </button>
             </div>
           </div>
         )}
