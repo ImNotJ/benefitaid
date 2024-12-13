@@ -137,7 +137,7 @@ function UserForm() {
     }
   };
 
-  const handleBackToDashboard = useCallback(() => {
+  const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
       setQuestions([]);
@@ -149,29 +149,21 @@ function UserForm() {
     } else {
       navigate('/user-dashboard');
     }
-  }, [selectedQuiz, navigate]);
+  };
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/user-login');
-  }, [navigate]);
+  };
 
   return (
     <div className="user-form">
       <div className="top-buttons">
-        <button 
-          type="button"
-          onClick={() => handleBackToDashboard()}
-          className="btn btn-secondary"
-        >
+        <button onClick={handleBackToDashboard} className="btn btn-secondary">
           {selectedQuiz ? 'Back to Quizzes' : 'Back to Dashboard'}
         </button>
-        <button 
-          type="button"
-          onClick={() => handleLogout()}
-          className="btn btn-danger"
-        >
+        <button onClick={handleLogout} className="btn btn-danger">
           Logout
         </button>
       </div>
