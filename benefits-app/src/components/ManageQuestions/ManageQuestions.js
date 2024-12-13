@@ -85,10 +85,8 @@ function ManageQuestions() {
       questionType,
       questionText,
       options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '').map(optionValue => ({
-          optionValue: optionValue
-        }))
-        : []
+        ? options.filter(opt => opt.trim() !== '').join(',')
+        : null
     };
 
     try {
@@ -111,7 +109,7 @@ function ManageQuestions() {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(question.options ? question.options.map(opt => opt.optionValue) : ['']);
+    setOptions(question.options ? question.options.split(',') : ['']);
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
@@ -293,7 +291,7 @@ function ManageQuestions() {
                   <td>{question.questionText}</td>
                   <td>
                     {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      question.options?.map(opt => opt.optionValue).join(', ')}
+                      question.options?.split(',').join(', ')}
                   </td>
                   <td>
                     <button
