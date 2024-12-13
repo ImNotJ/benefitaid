@@ -18,8 +18,6 @@ function UserForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showBenefits, setShowBenefits] = useState(false);
 
-
-  
   const handleBackToDashboard = () => {
     if (selectedQuiz) {
       setSelectedQuiz(null);
@@ -75,32 +73,31 @@ function UserForm() {
     questions.forEach(question => {
       const response = responses[question.id];
 
-      if (question.required && (!response || response.trim() === '')) {
-        newErrors[question.id] = 'This field is required';
-        isValid = false;
-      }
-
-      switch (question.questionType) {
-        case 'Email':
-          if (response && !isValidEmail(response)) {
-            newErrors[question.id] = 'Please enter a valid email address';
-            isValid = false;
-          }
-          break;
-        case 'Date':
-          if (response && !formatDate(response)) {
-            newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
-            isValid = false;
-          }
-          break;
-        case 'Numerical':
-          if (response && isNaN(Number(response))) {
-            newErrors[question.id] = 'Please enter a valid number';
-            isValid = false;
-          }
-          break;
-        default:
-          break;
+      // Only validate if user has entered something
+      if (response && response.trim() !== '') {
+        switch (question.questionType) {
+          case 'Email':
+            if (!isValidEmail(response)) {
+              newErrors[question.id] = 'Please enter a valid email address';
+              isValid = false;
+            }
+            break;
+          case 'Date':
+            if (!formatDate(response)) {
+              newErrors[question.id] = 'Please enter a valid date in MM/DD/YYYY format';
+              isValid = false;
+            }
+            break;
+          case 'Numerical':
+            if (isNaN(Number(response))) {
+              newErrors[question.id] = 'Please enter a valid number';
+              isValid = false;
+            }
+            break;
+          // No validation needed for other types if they have a value
+          default:
+            break;
+        }
       }
     });
 
@@ -108,11 +105,12 @@ function UserForm() {
     return isValid;
   };
 
+  // Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateResponses()) {
-      setErrorMessage('Please correct the errors before submitting');
+      setErrorMessage('Please correct any errors in your responses');
       return;
     }
 
@@ -121,8 +119,16 @@ function UserForm() {
     setSuccessMessage('');
 
     try {
+      // Only send non-empty responses
+      const filteredResponses = Object.entries(responses).reduce((acc, [key, value]) => {
+        if (value && value.trim() !== '') {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+
       const response = await axios.post('/api/eligibility/check', {
-        responses,
+        responses: filteredResponses,
         quizId: selectedQuiz.id
       });
 
@@ -130,7 +136,6 @@ function UserForm() {
       setEligibilityResults(eligibleBenefits);
       setSuccessMessage('Eligibility check completed successfully!');
 
-      // Scroll to results
       document.getElementById('eligibility-results')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
       console.error('Error checking eligibility:', error);
@@ -139,6 +144,7 @@ function UserForm() {
       setLoading(false);
     }
   };
+
 
   const handleQuizSelect = async (quiz) => {
     setSelectedQuiz(quiz);
