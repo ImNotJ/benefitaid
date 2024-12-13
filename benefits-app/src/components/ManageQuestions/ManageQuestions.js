@@ -29,13 +29,10 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      const questionsWithOptions = await Promise.all(response.data.map(async (question) => {
-        const optionsResponse = await axios.get(`/api/questions/${question.id}/options`);
-        return { ...question, options: optionsResponse.data };
-      }));
-      setQuestions(questionsWithOptions);
+      console.log('Fetch questions response:', response); // Debug log
+      setQuestions(response.data);
     } catch (error) {
-      console.error('Fetch questions error:', error);
+      console.error('Fetch questions error:', error); // Debug log
     }
   };
 
@@ -64,7 +61,7 @@ function ManageQuestions() {
       setErrorMessage('Name, type, and text are required.');
       return false;
     }
-
+  
     if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
       // Filter out empty options
       const validOptions = options.filter(opt => opt.trim() !== '');
@@ -75,26 +72,26 @@ function ManageQuestions() {
       // Only save the non-empty options
       setOptions(validOptions);
     }
-
+  
     return true;
   };
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
-
+  
     if (!validateQuestion()) {
       return;
     }
-
+  
     const questionData = {
       questionName,
       questionType,
       questionText,
       options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '').map(opt => ({ optionValue: opt }))
-        : []
+        ? options.filter(opt => opt.trim() !== '').join(',')
+        : null
     };
-
+  
     try {
       if (editingQuestionId) {
         await axios.put(`/api/questions/${editingQuestionId}`, questionData);
@@ -103,7 +100,7 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-
+  
       fetchQuestions();
       handleClearFields();
     } catch (error) {
@@ -115,7 +112,7 @@ function ManageQuestions() {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(question.options ? question.options.map(opt => opt.optionValue) : ['']);
+    setOptions(question.options ? question.options.split(',') : ['']);
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
@@ -297,7 +294,7 @@ function ManageQuestions() {
                   <td>{question.questionText}</td>
                   <td>
                     {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      question.options.map(opt => opt.optionValue).join(', ')}
+                      question.options?.split(',').join(', ')}
                   </td>
                   <td>
                     <button
