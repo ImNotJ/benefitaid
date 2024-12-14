@@ -5,7 +5,6 @@ import com.example.benefits.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,10 +22,7 @@ public class QuestionService {
      * @param question the question entity to save
      * @return the saved question entity
      */
-    public Question save(Question question) {
-        if (question.getOptions() == null) {
-            question.setOptions(new ArrayList<>());
-        }
+    public Question saveQuestion(Question question) {
         return questionRepository.save(question);
     }
 
