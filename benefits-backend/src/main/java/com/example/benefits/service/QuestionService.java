@@ -23,7 +23,7 @@ public class QuestionService {
      * @param question the question entity to save
      * @return the saved question entity
      */
-    public Question saveQuestion(Question question) {
+    public Question save(Question question) {
         if (question.getOptions() == null) {
             question.setOptions(new ArrayList<>());
         }
