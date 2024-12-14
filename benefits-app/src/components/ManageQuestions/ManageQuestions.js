@@ -21,7 +21,6 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Fetched questions:', response.data);
       setQuestions(response.data);
     } catch (error) {
       console.error('Fetch questions error:', error);
@@ -74,49 +73,36 @@ function ManageQuestions() {
         : []
     };
 
-    console.log('Saving question data:', questionData);
-
     try {
       if (editingQuestionId) {
-        const response = await axios.put(`/api/questions/${editingQuestionId}`, questionData);
-        console.log('Update response:', response.data);
+        await axios.put(`/api/questions/${editingQuestionId}`, questionData);
         setSuccessMessage('Question updated successfully!');
       } else {
-        const response = await axios.post('/api/questions', questionData);
-        console.log('Create response:', response.data);
+        await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-
-      // Reset form
       setQuestionName('');
       setQuestionType('');
       setQuestionText('');
       setOptions(['']);
       setEditingQuestionId(null);
       setErrorMessage('');
-      await fetchQuestions(); // Refresh list
+      fetchQuestions();
     } catch (error) {
       console.error('Save question error:', error);
-      console.error('Error response:', error.response?.data);
       setErrorMessage('Failed to save question.');
     }
   };
 
   const handleEditQuestion = (question) => {
-    console.log('Editing question:', question);
-    console.log('Question options:', question.options);
-
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-
     if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
-      console.log('Setting options:', question.options || []);
       setOptions(question.options || []);
     } else {
       setOptions(['']);
     }
-
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
@@ -274,12 +260,7 @@ function ManageQuestions() {
                   <td>{question.questionName}</td>
                   <td>{question.questionType}</td>
                   <td>{question.questionText}</td>
-                  <td>
-                    {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType) &&
-                      Array.isArray(question.options) ?
-                      question.options.join(', ') :
-                      ''}
-                  </td>
+                  <td>{question.options ? question.options.join(', ') : ''}</td>
                   <td>
                     <button
                       onClick={() => handleEditQuestion(question)}
