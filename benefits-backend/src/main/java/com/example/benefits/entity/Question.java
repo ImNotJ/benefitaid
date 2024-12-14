@@ -2,6 +2,7 @@ package com.example.benefits.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import com.example.benefits.converter.StringListConverter;
 import java.util.List;
 
 @Entity
@@ -20,9 +21,8 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @ElementCollection
-    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
-    @Column(name = "option_value")
+    @Column(columnDefinition = "json")
+    @Convert(converter = StringListConverter.class)
     private List<String> options; // Store options as a list of strings
 
     // Getters and Setters
