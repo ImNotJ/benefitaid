@@ -59,19 +59,17 @@ function ManageQuestions() {
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
+        
+        if (!validateQuestion()) return;
 
-    if (!validateQuestion()) {
-      return;
-    }
-
-    const questionData = {
-      questionName,
-      questionType,
-      questionText,
-      options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '')
-        : []
-    };
+        const questionData = {
+            questionName,
+            questionType,
+            questionText,
+            options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
+                ? options.filter(opt => opt.trim() !== '').map(value => ({ value }))
+                : []
+        };
 
     try {
       if (editingQuestionId) {
@@ -98,15 +96,11 @@ function ManageQuestions() {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
-      setOptions(question.options || []);
-    } else {
-      setOptions(['']);
-    }
+    setOptions(question.options.map(opt => opt.value || ''));
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
-  };
+};
 
   const handleDeleteQuestion = async (id) => {
     try {
