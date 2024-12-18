@@ -20,7 +20,7 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
     @Column(name = "option_value")
     private List<String> options; // Store options as a list of strings
