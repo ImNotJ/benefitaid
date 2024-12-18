@@ -79,15 +79,9 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-      setQuestionName('');
-      setQuestionType('');
-      setQuestionText('');
-      setOptions(['']);
-      setEditingQuestionId(null);
-      setErrorMessage('');
+      clearForm();
       fetchQuestions();
     } catch (error) {
-      console.error('Save question error:', error);
       setErrorMessage('Failed to save question.');
     }
   };
@@ -204,19 +198,57 @@ function ManageQuestions() {
             <label>Options</label>
             <div className="options-container">
               {options.map((option, index) => (
-                <div key={index} className="option-item">
+                <div key={index} className="option-row">
                   <input
                     type="text"
                     className="form-control"
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
+                    placeholder="Enter option"
                   />
-                  <button type="button" onClick={() => handleRemoveOption(index)}>Remove</button>
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleRemoveOption(index)}
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
               <button
                 type="button"
-                className="btn btn-secondary btn-sm"
+                className="btn btn-secondary"
+                onClick={handleAddOption}
+              >
+                Add Option
+              </button>
+            </div>
+          </div>
+        )}{['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType) && (
+          <div className="form-group">
+            <label>Options</label>
+            <div className="options-container">
+              {options.map((option, index) => (
+                <div key={index} className="option-row">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={option}
+                    onChange={(e) => handleOptionChange(index, e.target.value)}
+                    placeholder="Enter option"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleRemoveOption(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="btn btn-secondary"
                 onClick={handleAddOption}
               >
                 Add Option
