@@ -79,7 +79,7 @@ function ManageQuestions() {
         await axios.post('/api/questions', questionData);
         setSuccessMessage('Question added successfully!');
       }
-      clearForm();
+      handleClearFields();
       fetchQuestions();
     } catch (error) {
       setErrorMessage('Failed to save question.');
