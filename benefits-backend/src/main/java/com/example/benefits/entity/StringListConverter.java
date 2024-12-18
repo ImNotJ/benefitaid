@@ -1,12 +1,14 @@
-package com.example.benefits.converter;
+package com.example.benefits.entity;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.ArrayList;
 
 @Converter
 public class StringListConverter implements AttributeConverter<List<String>, String> {
@@ -15,7 +17,7 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {
         try {
-            return attribute == null ? "[]" : mapper.writeValueAsString(attribute);
+            return mapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
             return "[]";
         }
