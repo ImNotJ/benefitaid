@@ -34,7 +34,6 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker builder prune -f
           docker build \
             --build-arg ROOT_ADMIN_USERNAME=${{ secrets.ROOT_ADMIN_USERNAME }} \
             --build-arg ROOT_ADMIN_PASSWORD=${{ secrets.ROOT_ADMIN_PASSWORD }} \
