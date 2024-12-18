@@ -24,6 +24,7 @@ function ManageQuestions() {
       setQuestions(response.data);
     } catch (error) {
       console.error('Fetch questions error:', error);
+      setErrorMessage('Failed to fetch questions.');
     }
   };
 
@@ -64,13 +65,18 @@ function ManageQuestions() {
       return;
     }
 
+    let questionOptions = [];
+    if (questionType === 'Yes/No') {
+      questionOptions = ['Yes', 'No'];
+    } else if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)) {
+      questionOptions = options.filter(opt => opt.trim() !== '');
+    }
+
     const questionData = {
       questionName,
       questionType,
       questionText,
-      options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-        ? options.filter(opt => opt.trim() !== '')
-        : []
+      options: questionOptions
     };
 
     try {
@@ -91,6 +97,7 @@ function ManageQuestions() {
     } catch (error) {
       console.error('Save question error:', error);
       setErrorMessage('Failed to save question.');
+      setSuccessMessage('');
     }
   };
 
@@ -98,11 +105,15 @@ function ManageQuestions() {
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
-      setOptions(question.options || []);
+
+    if (question.questionType === 'Yes/No') {
+      setOptions(['Yes', 'No']);
+    } else if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)) {
+      setOptions(question.options.length > 0 ? question.options : ['']);
     } else {
       setOptions(['']);
     }
+
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
@@ -176,8 +187,23 @@ function ManageQuestions() {
             className="form-control"
             value={questionType}
             onChange={(e) => {
-              setQuestionType(e.target.value);
-              if (!['MultiChoiceSingle', 'MultiChoiceMulti'].includes(e.target.value)) {
+              const selectedType = e.target.value;
+              setQuestionType(selectedType);
+
+              if (selectedType === 'Yes/No') {
+                setOptions(['Yes', 'No']);
+              } else if (['MultiChoiceSingle', 'MultiChoiceMulti'].includes(selectedType)) {
+                if (editingQuestionId) {
+                  // When editing, retain existing options or initialize with two empty options
+                  setOptions(options.length > 0 ? options : ['', '']);
+                } else {
+                  setOptions(['', '']);
+                }
+              } else {
+                setOptions(['']);
+              }
+
+              if (!['MultiChoiceSingle', 'MultiChoiceMulti', 'Yes/No'].includes(selectedType)) {
                 setOptions(['']);
               }
             }}
@@ -216,8 +242,17 @@ function ManageQuestions() {
                     className="form-control"
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
+                    placeholder={`Option ${index + 1}`}
                   />
-                  <button type="button" onClick={() => handleRemoveOption(index)}>Remove</button>
+                  {options.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOption(index)}
+                      className="btn btn-danger btn-sm"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               ))}
               <button
@@ -227,6 +262,24 @@ function ManageQuestions() {
               >
                 Add Option
               </button>
+            </div>
+          </div>
+        )}
+
+        {questionType === 'Yes/No' && (
+          <div className="form-group">
+            <label>Options</label>
+            <div className="options-container">
+              {options.map((option, index) => (
+                <div key={index} className="option-item">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={option}
+                    readOnly
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -260,7 +313,13 @@ function ManageQuestions() {
                   <td>{question.questionName}</td>
                   <td>{question.questionType}</td>
                   <td>{question.questionText}</td>
-                  <td>{question.options ? question.options.join(', ') : ''}</td>
+                  <td>
+                    {question.questionType === 'Yes/No'
+                      ? 'Yes, No'
+                      : question.options && question.options.length > 0
+                      ? question.options.join(', ')
+                      : 'N/A'}
+                  </td>
                   <td>
                     <button
                       onClick={() => handleEditQuestion(question)}
@@ -277,6 +336,13 @@ function ManageQuestions() {
                   </td>
                 </tr>
               ))}
+              {questions.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No questions available.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
