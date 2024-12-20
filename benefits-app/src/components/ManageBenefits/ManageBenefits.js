@@ -249,14 +249,26 @@ function ManageBenefits() {
    */
   const handleEditBenefit = (index) => {
     const benefit = benefits[index];
+    console.log('Editing benefit:', benefit);
+    
     setBenefitName(benefit.benefitName);
     setFederal(benefit.federal);
     setState(benefit.state || '');
     setBenefitUrl(benefit.benefitUrl);
-    setDescription(benefit.description || '');  // Convert null to empty string
-    setImageUrl(benefit.imageUrl || '');       // Convert null to empty string
+    setDescription(benefit.description || '');
+    setImageUrl(benefit.imageUrl || '');
     setRequirements(benefit.requirements);
     setEditingBenefitIndex(index);
+    
+    console.log('Set form values:', {
+      benefitName: benefit.benefitName,
+      federal: benefit.federal,
+      state: benefit.state || '',
+      benefitUrl: benefit.benefitUrl,
+      description: benefit.description || '',
+      imageUrl: benefit.imageUrl || '',
+      requirements: benefit.requirements
+    });
   };
 
   /**
