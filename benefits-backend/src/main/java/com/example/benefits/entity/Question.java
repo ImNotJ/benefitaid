@@ -2,8 +2,6 @@ package com.example.benefits.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,9 +20,10 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "question_id")
-    private List<QuestionOption> options = new ArrayList<>(); // Store options as a list of strings
+    @ElementCollection
+    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "option_value")
+    private List<String> options; // Store options as a list of strings
 
     // Getters and Setters
 
@@ -60,11 +59,11 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public List<QuestionOption> getOptions() {
+    public List<String> getOptions() {
         return options;
     }
 
-    public void setOptions(List<QuestionOption> options) {
+    public void setOptions(List<String> options) {
         this.options = options;
     }
 }
