@@ -23,6 +23,12 @@ public class QuestionService {
      * @return the saved question entity
      */
     public Question saveQuestion(Question question) {
+        if (question.getId() != null) {
+            Question existingQuestion = getQuestionById(question.getId());
+            existingQuestion.getOptions().clear();
+            existingQuestion.getOptions().addAll(question.getOptions());
+            return questionRepository.save(existingQuestion);
+        }
         return questionRepository.save(question);
     }
 

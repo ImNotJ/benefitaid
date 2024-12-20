@@ -22,10 +22,9 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @ElementCollection
-    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
-    @Column(name = "option_value")
-    private List<String> options = new ArrayList<>(); // Store options as a list of strings
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "question_id")
+    private List<QuestionOption> options = new ArrayList<>(); // Store options as a list of strings
 
     // Getters and Setters
 
@@ -61,11 +60,11 @@ public class Question {
         this.questionText = questionText;
     }
 
-    public List<String> getOptions() {
+    public List<QuestionOption> getOptions() {
         return options;
     }
 
-    public void setOptions(List<String> options) {
+    public void setOptions(List<QuestionOption> options) {
         this.options = options;
     }
 }
