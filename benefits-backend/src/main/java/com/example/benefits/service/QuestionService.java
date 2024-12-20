@@ -25,22 +25,11 @@ public class QuestionService {
     public Question saveQuestion(Question question) {
         if (question.getId() != null) {
             Question existingQuestion = getQuestionById(question.getId());
-            existingQuestion.setQuestionName(question.getQuestionName());
-            existingQuestion.setQuestionType(question.getQuestionType());
-            existingQuestion.setQuestionText(question.getQuestionText());
-            
-            if (isMultiChoiceType(question.getQuestionType())) {
-                existingQuestion.getOptions().clear();
-                existingQuestion.getOptions().addAll(question.getOptions());
-            }
+            existingQuestion.getOptions().clear();
+            existingQuestion.getOptions().addAll(question.getOptions());
             return questionRepository.save(existingQuestion);
         }
         return questionRepository.save(question);
-    }
-
-    private boolean isMultiChoiceType(String questionType) {
-        return "MultiChoiceSingle".equals(questionType) || 
-               "MultiChoiceMulti".equals(questionType);
     }
 
     /**
