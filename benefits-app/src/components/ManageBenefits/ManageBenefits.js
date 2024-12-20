@@ -721,8 +721,8 @@ function ManageBenefits() {
                   <h5>Requirements:</h5>
                   {benefit.requirements.map((req, reqIndex) => (
                     <div key={reqIndex} className="requirement-summary">
-                      <span className={`requirement-type ${req.type.toLowerCase()}`}>
-                        {req.type}
+                      <span className={`requirement-type ${(req.type || 'general').toLowerCase()}`}>
+                        {req.type || 'GENERAL'}
                       </span>
                       {req.name}
                     </div>
