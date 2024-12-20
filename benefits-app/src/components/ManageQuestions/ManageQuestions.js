@@ -21,20 +21,7 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Fetched questions data:', response.data);
-
-      // Parse options if they're stored as pipe-delimited strings
-      const parsedQuestions = response.data.map(question => ({
-        ...question,
-        options: question.options && question.options.length > 0
-          ? Array.isArray(question.options)
-            ? question.options
-            : question.options[0].split('|')
-          : []
-      }));
-
-      console.log('Parsed questions data:', parsedQuestions);
-      setQuestions(parsedQuestions);
+      setQuestions(response.data);
     } catch (error) {
       console.error('Fetch questions error:', error);
     }
@@ -100,20 +87,10 @@ function ManageQuestions() {
   };
 
   const handleEditQuestion = (question) => {
-    console.log('Editing question:', question);
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-
-    // Handle options parsing
-    const questionOptions = question.options && question.options.length > 0
-      ? Array.isArray(question.options)
-        ? question.options
-        : question.options[0].split('|')
-      : [''];
-
-    console.log('Parsed options for editing:', questionOptions);
-    setOptions(questionOptions);
+    setOptions(question.options || ['']);
     setEditingQuestionId(question.id);
     setSuccessMessage('');
     setErrorMessage('');
@@ -309,13 +286,7 @@ function ManageQuestions() {
                   <td>{question.questionName}</td>
                   <td>{question.questionType}</td>
                   <td>{question.questionText}</td>
-                  <td>
-                    {['MultiChoiceSingle', 'MultiChoiceMulti'].includes(question.questionType)
-                      ? (Array.isArray(question.options)
-                        ? question.options.join(', ')
-                        : question.options)
-                      : ''}
-                  </td>
+                  <td>{question.options ? question.options.join(', ') : ''}</td>
                   <td>
                     <button
                       onClick={() => handleEditQuestion(question)}
