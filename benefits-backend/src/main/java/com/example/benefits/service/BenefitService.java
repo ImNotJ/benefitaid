@@ -29,8 +29,26 @@ public class BenefitService {
      * @return the saved benefit entity
      */
     public Benefit saveBenefit(Benefit benefit) {
-        for (Requirement requirement : benefit.getRequirements()) {
-            requirement.setBenefit(benefit);
+        // Ensure null values are preserved rather than omitted
+        if (benefit != null) {
+            // If updating an existing benefit, preserve existing values if not provided
+            if (benefit.getId() != null) {
+                Benefit existingBenefit = benefitRepository.findById(benefit.getId()).orElse(null);
+                if (existingBenefit != null) {
+                    // Only update description and imageUrl if they are explicitly set
+                    if (benefit.getDescription() == null) {
+                        benefit.setDescription(existingBenefit.getDescription());
+                    }
+                    if (benefit.getImageUrl() == null) {
+                        benefit.setImageUrl(existingBenefit.getImageUrl());
+                    }
+                }
+            }
+            
+            // Set requirements benefit reference
+            if (benefit.getRequirements() != null) {
+                benefit.getRequirements().forEach(requirement -> requirement.setBenefit(benefit));
+            }
         }
         return benefitRepository.save(benefit);
     }
@@ -42,7 +60,13 @@ public class BenefitService {
      * @return the benefit entity, or null if not found
      */
     public Benefit getBenefitById(Long id) {
-        return benefitRepository.findById(id).orElse(null);
+        Benefit benefit = benefitRepository.findById(id).orElse(null);
+        if (benefit != null) {
+            // Ensure these fields are included in the response even if null
+            benefit.setDescription(benefit.getDescription());
+            benefit.setImageUrl(benefit.getImageUrl());
+        }
+        return benefit;
     }
 
     /**
@@ -51,7 +75,13 @@ public class BenefitService {
      * @return a list of all benefit entities
      */
     public List<Benefit> getAllBenefits() {
-        return benefitRepository.findAll();
+        List<Benefit> benefits = benefitRepository.findAll();
+        // Ensure these fields are included in the response even if null
+        benefits.forEach(benefit -> {
+            benefit.setDescription(benefit.getDescription());
+            benefit.setImageUrl(benefit.getImageUrl());
+        });
+        return benefits;
     }
 
     /**
