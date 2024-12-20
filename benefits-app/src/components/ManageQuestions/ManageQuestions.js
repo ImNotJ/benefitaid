@@ -21,18 +21,22 @@ function ManageQuestions() {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get('/api/questions');
-      console.log('Raw response:', response.data);
+      console.log('Fetched questions data:', response.data);
 
+      // Parse options if they're stored as pipe-delimited strings
       const parsedQuestions = response.data.map(question => ({
         ...question,
-        options: question.options || []
+        options: question.options && question.options.length > 0
+          ? Array.isArray(question.options)
+            ? question.options
+            : question.options[0].split('|')
+          : []
       }));
 
-      console.log('Parsed questions:', parsedQuestions);
+      console.log('Parsed questions data:', parsedQuestions);
       setQuestions(parsedQuestions);
     } catch (error) {
-      console.error('Error fetching questions:', error);
-      setErrorMessage('Failed to fetch questions');
+      console.error('Fetch questions error:', error);
     }
   };
 
@@ -68,39 +72,52 @@ function ManageQuestions() {
 
   const handleAddOrUpdateQuestion = async (e) => {
     e.preventDefault();
+
+    if (!validateQuestion()) return;
+
     const questionData = {
-        questionName,
-        questionType,
-        questionText,
-        options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
-            ? options.filter(opt => opt.trim() !== '')
-            : []
+      questionName,
+      questionType,
+      questionText,
+      options: ['MultiChoiceSingle', 'MultiChoiceMulti'].includes(questionType)
+        ? options.filter(opt => opt.trim() !== '')
+        : []
     };
-    
-    console.log('Saving question data:', questionData);
-    
+
     try {
-        if (editingQuestionId) {
-            await axios.put(`/api/questions/${editingQuestionId}`, questionData);
-        } else {
-            await axios.post('/api/questions', questionData);
-        }
-        await fetchQuestions();
-        handleClearFields();
+      if (editingQuestionId) {
+        await axios.put(`/api/questions/${editingQuestionId}`, questionData);
+        setSuccessMessage('Question updated successfully!');
+      } else {
+        await axios.post('/api/questions', questionData);
+        setSuccessMessage('Question added successfully!');
+      }
+      handleClearFields();
+      fetchQuestions();
     } catch (error) {
-        console.error('Error saving question:', error);
-        setErrorMessage('Failed to save question');
+      setErrorMessage('Failed to save question.');
     }
-};
+  };
 
   const handleEditQuestion = (question) => {
     console.log('Editing question:', question);
     setQuestionName(question.questionName);
     setQuestionType(question.questionType);
     setQuestionText(question.questionText);
-    setOptions(question.options || ['']);
+
+    // Handle options parsing
+    const questionOptions = question.options && question.options.length > 0
+      ? Array.isArray(question.options)
+        ? question.options
+        : question.options[0].split('|')
+      : [''];
+
+    console.log('Parsed options for editing:', questionOptions);
+    setOptions(questionOptions);
     setEditingQuestionId(question.id);
-};
+    setSuccessMessage('');
+    setErrorMessage('');
+  };
 
   const handleDeleteQuestion = async (id) => {
     try {

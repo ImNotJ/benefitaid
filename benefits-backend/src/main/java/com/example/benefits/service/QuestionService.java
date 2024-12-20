@@ -5,7 +5,6 @@ import com.example.benefits.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,9 +30,8 @@ public class QuestionService {
             existingQuestion.setQuestionText(question.getQuestionText());
             
             if (isMultiChoiceType(question.getQuestionType())) {
-                existingQuestion.setOptions(question.getOptions());
-            } else {
-                existingQuestion.setOptions(new ArrayList<>());
+                existingQuestion.getOptions().clear();
+                existingQuestion.getOptions().addAll(question.getOptions());
             }
             return questionRepository.save(existingQuestion);
         }

@@ -4,7 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -23,8 +22,10 @@ public class Question {
     @NotBlank
     private String questionText;
 
-    @Column(name = "options", columnDefinition = "TEXT")
-    private String optionsString;
+    @ElementCollection
+    @CollectionTable(name = "question_options", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "option_value")
+    private List<String> options = new ArrayList<>(); // Store options as a list of strings
 
     // Getters and Setters
 
@@ -61,17 +62,10 @@ public class Question {
     }
 
     public List<String> getOptions() {
-        if (optionsString == null || optionsString.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(optionsString.split("\\|"));
+        return options;
     }
 
     public void setOptions(List<String> options) {
-        if (options == null || options.isEmpty()) {
-            this.optionsString = null;
-        } else {
-            this.optionsString = String.join("|", options);
-        }
+        this.options = options;
     }
 }
