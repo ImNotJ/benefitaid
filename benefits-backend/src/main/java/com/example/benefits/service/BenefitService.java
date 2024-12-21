@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Service class for managing Benefit entities.
@@ -21,8 +20,6 @@ public class BenefitService {
 
     @Autowired
     private RequirementRepository requirementRepository;
-
-    private static final Logger logger = Logger.getLogger(BenefitService.class.getName());
 
     /**
      * Saves a benefit entity.
@@ -64,11 +61,13 @@ public class BenefitService {
      */
     public Benefit getBenefitById(Long id) {
         Benefit benefit = benefitRepository.findById(id).orElse(null);
-        logger.info(() -> "Fetched Benefit for ID " + id + ": " + (benefit == null ? "null" : benefit.toString()));
+        if (benefit != null) {
+            // Ensure these fields are included in the response even if null
+            benefit.setDescription(benefit.getDescription());
+            benefit.setImageUrl(benefit.getImageUrl());
+        }
         return benefit;
     }
-
-    
 
     /**
      * Gets all benefits.
@@ -77,7 +76,11 @@ public class BenefitService {
      */
     public List<Benefit> getAllBenefits() {
         List<Benefit> benefits = benefitRepository.findAll();
-        logger.info(() -> "Fetched all Benefits: " + benefits);
+        // Ensure these fields are included in the response even if null
+        benefits.forEach(benefit -> {
+            benefit.setDescription(benefit.getDescription());
+            benefit.setImageUrl(benefit.getImageUrl());
+        });
         return benefits;
     }
 
