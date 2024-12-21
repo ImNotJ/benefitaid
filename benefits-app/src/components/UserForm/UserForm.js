@@ -208,7 +208,7 @@ function UserForm() {
         <>
           <h2 className="main-title">{selectedQuiz.quizName}</h2>
           <div className="completion-notice">
-            <p>Please answer all questions accurately to get the most relevant results.</p>
+            <p>Please answer the following questions to see a list of benefits you may be eligible for:</p>
           </div>
 
           {(successMessage || errorMessage) && (
