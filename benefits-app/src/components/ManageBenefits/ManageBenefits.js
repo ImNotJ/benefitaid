@@ -146,7 +146,7 @@ function ManageBenefits() {
   };
 
   const validateBenefit = () => {
-    if (!benefitName || (!federal && !state) || !benefitUrl) {
+    if (!benefitName || (!federal && !state) || !benefitUrl || !description) {
       setErrorMessage('Please fill in all required benefit fields');
       return false;
     }
@@ -198,17 +198,17 @@ function ManageBenefits() {
   const handleAddBenefit = async (e) => {
     e.preventDefault();
     if (!validateBenefit()) return;
-  
+
     const benefitData = {
       benefitName,
       federal,
       state: federal ? null : state,
       benefitUrl,
-      description: description || null,  // Convert empty string to null
-      imageUrl: imageUrl || null,      // Convert empty string to null
+      description,
+      imageUrl,
       requirements
     };
-  
+
     try {
       if (editingBenefitIndex !== null) {
         const benefitId = benefits[editingBenefitIndex].id;
@@ -216,6 +216,7 @@ function ManageBenefits() {
       } else {
         await axios.post('/api/benefits', benefitData);
       }
+
       fetchBenefits();
       handleClearBenefitFields();
       setSuccessMessage('Benefit saved successfully!');
@@ -253,8 +254,8 @@ function ManageBenefits() {
     setFederal(benefit.federal);
     setState(benefit.state || '');
     setBenefitUrl(benefit.benefitUrl);
-    setDescription(benefit.description || '');  // Convert null to empty string
-    setImageUrl(benefit.imageUrl || '');       // Convert null to empty string
+    setDescription(benefit.description || '');
+    setImageUrl(benefit.imageUrl || '');
     setRequirements(benefit.requirements);
     setEditingBenefitIndex(index);
   };
