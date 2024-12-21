@@ -261,7 +261,7 @@ function ManageBenefits() {
   };
 
   /**
-   * Handles the addition of a new condition.
+   * Handles the addition of a new condition.a
    */
   const handleAddCondition = () => {
     if (!currentQuestionId || !currentOperator || !currentValue) {
