@@ -29,10 +29,10 @@ public class Benefit {
     @JsonManagedReference
     private Set<Requirement> requirements;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name="description", columnDefinition = "TEXT")
     private String description;
-    
-    @Column
+
+    @Column(name="image_url")
     private String imageUrl;
 
     // Getters and setters
