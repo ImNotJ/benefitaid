@@ -106,8 +106,8 @@ function ManageBenefits() {
             value={currentValue}
             onChange={(e) => setCurrentValue(e.target.value)}
           >
-            <option value="">Select Value</option>
-            {question.options.split(',').map(option => (
+            <option value="">Select Value2</option>
+            {typeof question.options === 'string' && question.options.split(',').map(option => (
               <option key={option} value={option.trim()}>
                 {option.trim()}
               </option>
