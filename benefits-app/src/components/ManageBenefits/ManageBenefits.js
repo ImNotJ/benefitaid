@@ -99,21 +99,21 @@ function ManageBenefits() {
 
     switch (question.questionType) {
       case 'MultiChoiceSingle':
-        case 'MultiChoiceMulti':
-          return (
-            <select
-              className="form-control"
-              value={currentValue}
-              onChange={(e) => setCurrentValue(e.target.value)}
-            >
-              <option value="">Select Value</option>
-              {options.map(option => (
-                <option key={option.option_value} value={option.option_value}>
-                  {option.option_value}
-                </option>
-              ))}
-            </select>
-          );
+      case 'MultiChoiceMulti':
+        return (
+          <select
+            className="form-control"
+            value={currentValue}
+            onChange={(e) => setCurrentValue(e.target.value)}
+          >
+            <option value="">Select Value</option>
+            {question.options?.map((option, index) => (
+              <option key={index} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        );
       case 'Date':
         return (
           <input
@@ -258,6 +258,11 @@ function ManageBenefits() {
     setImageUrl(benefit.imageUrl || '');
     setRequirements(benefit.requirements);
     setEditingBenefitIndex(index);
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   /**
