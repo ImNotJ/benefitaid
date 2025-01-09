@@ -99,21 +99,21 @@ function ManageBenefits() {
 
     switch (question.questionType) {
       case 'MultiChoiceSingle':
-      case 'MultiChoiceMulti':
-        return (
-          <select
-            className="form-control"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-          >
-            <option value="">Select Value2</option>
-            {typeof question.options === 'string' && question.options.split(',').map(option => (
-              <option key={option} value={option.trim()}>
-                {option.trim()}
-              </option>
-            ))}
-          </select>
-        );
+        case 'MultiChoiceMulti':
+          return (
+            <select
+              className="form-control"
+              value={currentValue}
+              onChange={(e) => setCurrentValue(e.target.value)}
+            >
+              <option value="">Select Value</option>
+              {options.map(option => (
+                <option key={option.option_value} value={option.option_value}>
+                  {option.option_value}
+                </option>
+              ))}
+            </select>
+          );
       case 'Date':
         return (
           <input
