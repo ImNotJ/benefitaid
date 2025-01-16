@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service class for checking user eligibility for benefits.
@@ -37,6 +39,8 @@ public class EligibilityService {
             .collect(Collectors.toList());
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(EligibilityService.class); 
+
     private boolean isEligible(Benefit benefit, Map<Long, String> responses, Map<Long, Question> questionMap) {
         if (benefit.getRequirements() == null || benefit.getRequirements().isEmpty()) {
             return false;
@@ -57,6 +61,7 @@ public class EligibilityService {
             .allMatch(req -> meetsRequirement(req, responses, questionMap));
 
         if (!meetsAllNecessary) {
+            logger.debug("User does not meet all necessary requirements for benefit: {}", benefit.getBenefitName());
             return false;
         }
 
@@ -92,7 +97,7 @@ public class EligibilityService {
     }
 
     private boolean meetsRequirement(Requirement requirement, Map<Long, String> responses, Map<Long, Question> questionMap) {
-        return requirement.getConditions().stream()
+        boolean result = requirement.getConditions().stream()
             .allMatch(condition -> {
                 String response = responses.get(condition.getQuestionId());
                 Question question = questionMap.get(condition.getQuestionId());
@@ -103,5 +108,8 @@ public class EligibilityService {
 
                 return condition.evaluate(response, question);
             });
+
+        logger.debug("Requirement {} met: {}", requirement.getName(), result);
+        return result;
     }
 }
