@@ -43,33 +43,41 @@ public class EligibilityService {
 
     private boolean isEligible(Benefit benefit, Map<Long, String> responses, Map<Long, Question> questionMap) {
         if (benefit.getRequirements() == null || benefit.getRequirements().isEmpty()) {
+            logger.debug("Benefit {} has no requirements", benefit.getBenefitName());
             return false;
         }
-
+    
         // First check INVALID requirements - if any are met, user is not eligible
         boolean hasInvalidMatch = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.INVALID)
             .anyMatch(req -> meetsRequirement(req, responses, questionMap));
         
         if (hasInvalidMatch) {
+            logger.debug("User does not meet invalid requirements for benefit: {}", benefit.getBenefitName());
             return false;
         }
-
+    
         // Check NECESSARY requirements - all must be met
         boolean meetsAllNecessary = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.NECESSARY)
-            .allMatch(req -> meetsRequirement(req, responses, questionMap));
-
+            .allMatch(req -> {
+                boolean result = meetsRequirement(req, responses, questionMap);
+                if (!result) {
+                    logger.debug("User does not meet necessary requirement: {}", req.getName());
+                }
+                return result;
+            });
+    
         if (!meetsAllNecessary) {
             logger.debug("User does not meet all necessary requirements for benefit: {}", benefit.getBenefitName());
             return false;
         }
-
+    
         // Check GENERAL_NECESSARY requirements - all must be met
         List<Requirement> generalNecessaryReqs = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.GENERAL_NECESSARY)
             .collect(Collectors.toList());
-
+    
         if (!generalNecessaryReqs.isEmpty()) {
             boolean meetsAllGeneralNecessary = generalNecessaryReqs.stream()
                 .allMatch(req -> meetsRequirement(req, responses, questionMap));
@@ -79,21 +87,27 @@ public class EligibilityService {
                 return true;
             }
         }
-
+    
         // If no GENERAL_NECESSARY requirements exist or they weren't all met,
         // check if at least one GENERAL requirement is met
         List<Requirement> generalReqs = benefit.getRequirements().stream()
             .filter(req -> req.getType() == Requirement.RequirementType.GENERAL)
             .collect(Collectors.toList());
-
+    
         if (generalReqs.isEmpty()) {
             // If no GENERAL requirements and we've passed all other checks, user is eligible
             return true;
         }
-
+    
         // Must meet at least one GENERAL requirement
-        return generalReqs.stream()
+        boolean meetsAtLeastOneGeneral = generalReqs.stream()
             .anyMatch(req -> meetsRequirement(req, responses, questionMap));
+    
+        if (!meetsAtLeastOneGeneral) {
+            logger.debug("User does not meet any general requirements for benefit: {}", benefit.getBenefitName());
+        }
+    
+        return meetsAtLeastOneGeneral;
     }
 
     private boolean meetsRequirement(Requirement requirement, Map<Long, String> responses, Map<Long, Question> questionMap) {
