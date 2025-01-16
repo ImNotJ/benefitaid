@@ -133,33 +133,46 @@ function UserForm() {
         if (!benefit.requirements || benefit.requirements.length === 0) {
           return false;
         }
-        return benefit.requirements.some(requirement => {
-          console.log('Checking requirement:', requirement); // Log the requirement
+        
+        // First check if all NECESSARY requirements are met
+        const necessaryReqs = benefit.requirements.filter(req => req.type === 'NECESSARY');
+        const meetsAllNecessary = necessaryReqs.length === 0 || necessaryReqs.every(requirement => {
           return requirement.conditions.every(condition => {
             const userResponse = responses[condition.questionId];
-            console.log('Checking condition:', condition); // Log the condition
-            console.log('User response:', userResponse); // Log the user response
-            if (userResponse === undefined) {
-              return false;
-            }
+            if (userResponse === undefined) return false;
+            
             switch (condition.operator) {
-              case '<=':
-                return parseFloat(userResponse) <= parseFloat(condition.value);
-              case '>=':
-                return parseFloat(userResponse) >= parseFloat(condition.value);
-              case '<':
-                return parseFloat(userResponse) < parseFloat(condition.value);
-              case '>':
-                return parseFloat(userResponse) > parseFloat(condition.value);
-              case '=':
-                return userResponse === condition.value;
-              default:
-                return false;
+              case '<=': return parseFloat(userResponse) <= parseFloat(condition.value);
+              case '>=': return parseFloat(userResponse) >= parseFloat(condition.value);
+              case '<': return parseFloat(userResponse) < parseFloat(condition.value);
+              case '>': return parseFloat(userResponse) > parseFloat(condition.value);
+              case '=': return userResponse === condition.value;
+              default: return false;
+            }
+          });
+        });
+      
+        if (!meetsAllNecessary) return false;
+      
+        // Then check if at least one GENERAL requirement is met (if any exist)
+        const generalReqs = benefit.requirements.filter(req => req.type === 'GENERAL');
+        return generalReqs.length === 0 || generalReqs.some(requirement => {
+          return requirement.conditions.every(condition => {
+            const userResponse = responses[condition.questionId];
+            if (userResponse === undefined) return false;
+            
+            switch (condition.operator) {
+              case '<=': return parseFloat(userResponse) <= parseFloat(condition.value);
+              case '>=': return parseFloat(userResponse) >= parseFloat(condition.value);
+              case '<': return parseFloat(userResponse) < parseFloat(condition.value);
+              case '>': return parseFloat(userResponse) > parseFloat(condition.value);
+              case '=': return userResponse === condition.value;
+              default: return false;
             }
           });
         });
       });
-
+      
       console.log('Eligible benefits:', eligibleBenefits); // Log the eligible benefits
 
       setEligibilityResults(eligibleBenefits);
