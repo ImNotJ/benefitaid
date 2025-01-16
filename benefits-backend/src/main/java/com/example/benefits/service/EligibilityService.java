@@ -103,12 +103,13 @@ public class EligibilityService {
                 Question question = questionMap.get(condition.getQuestionId());
                 
                 if (response == null || question == null) {
+                    logger.debug("Condition not met: response or question is null for condition {}", condition);
                     return false;
                 }
-
+    
                 return condition.evaluate(response, question);
             });
-
+    
         logger.debug("Requirement {} met: {}", requirement.getName(), result);
         return result;
     }
